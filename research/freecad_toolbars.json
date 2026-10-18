@@ -1,0 +1,771 @@
+{
+ "Assembly": [
+  {
+   "toolbar": "Assembly",
+   "items": [
+    "Assembly_CreateAssembly",
+    "Assembly_Insert",
+    "Part_LinkArrays",
+    "Assembly_SolveAssembly",
+    "Assembly_CreateView",
+    "Assembly_CreateSnapshot",
+    "Assembly_CreateSimulation",
+    "Assembly_CreateBom"
+   ]
+  },
+  {
+   "toolbar": "Assembly Joints",
+   "items": [
+    "Assembly_ToggleGrounded",
+    "Assembly_CreateJointRigidGroup",
+    "Separator",
+    "Assembly_CreateJointFixed",
+    "Assembly_CreateJointRevolute",
+    "Assembly_CreateJointCylindrical",
+    "Assembly_CreateJointSlider",
+    "Assembly_CreateJointBall",
+    "Separator",
+    "Assembly_CreateJointDistance",
+    "Assembly_CreateJointParallel",
+    "Assembly_CreateJointPerpendicular",
+    "Assembly_CreateJointAngle",
+    "Separator",
+    "Assembly_CreateJointRackPinion",
+    "Assembly_CreateJointScrew",
+    "Assembly_CreateJointGearBelt"
+   ]
+  }
+ ],
+ "Draft": [
+  {
+   "toolbar": "Draft Creation",
+   "items": [
+    "Draft_Line",
+    "Draft_Wire",
+    "Draft_Fillet",
+    "Draft_ArcTools",
+    "Draft_Circle",
+    "Draft_Ellipse",
+    "Draft_Rectangle",
+    "Draft_Polygon",
+    "Draft_BSpline",
+    "Draft_BezierTools",
+    "Draft_Point",
+    "Draft_Facebinder",
+    "Draft_ShapeString",
+    "Draft_Hatch"
+   ]
+  },
+  {
+   "toolbar": "Draft Annotation",
+   "items": [
+    "Draft_Text",
+    "Draft_Dimension",
+    "Draft_Label",
+    "Draft_AnnotationStyleEditor"
+   ]
+  },
+  {
+   "toolbar": "Draft Modification",
+   "items": [
+    "Draft_Move",
+    "Draft_Rotate",
+    "Draft_Scale",
+    "Draft_Mirror",
+    "Draft_Offset",
+    "Draft_Trimex",
+    "Draft_Stretch",
+    "Separator",
+    "Draft_Clone",
+    "Draft_ArrayTools",
+    "Separator",
+    "Draft_Edit",
+    "Draft_SubelementHighlight",
+    "Separator",
+    "Draft_Join",
+    "Draft_Split",
+    "Draft_Upgrade",
+    "Draft_Downgrade",
+    "Separator",
+    "Draft_WireToBSpline",
+    "Draft_Draft2Sketch",
+    "Draft_Slope",
+    "Draft_FlipDimension",
+    "Separator",
+    "Draft_Shape2DViewTools"
+   ]
+  },
+  {
+   "toolbar": "Draft Utility",
+   "items": [
+    "Draft_LayerManager",
+    "Draft_AddNamedGroup",
+    "Draft_SelectGroup",
+    "Draft_AddToLayer",
+    "Draft_AddToGroup",
+    "Draft_AddConstruction",
+    "Draft_ToggleDisplayMode",
+    "Draft_WorkingPlaneProxy"
+   ]
+  },
+  {
+   "toolbar": "Draft Snap",
+   "items": [
+    "Draft_Snap_Lock",
+    "Draft_Snap_Endpoint",
+    "Draft_Snap_Midpoint",
+    "Draft_Snap_Center",
+    "Draft_Snap_Angle",
+    "Draft_Snap_Intersection",
+    "Draft_Snap_Perpendicular",
+    "Draft_Snap_Extension",
+    "Draft_Snap_Parallel",
+    "Draft_Snap_Special",
+    "Draft_Snap_Near",
+    "Draft_Snap_Ortho",
+    "Draft_Snap_Grid",
+    "Draft_Snap_WorkingPlane",
+    "Draft_Snap_Dimensions",
+    "Separator",
+    "Draft_ToggleGrid"
+   ]
+  }
+ ],
+ "Fem": [
+  {
+   "toolbar": "Model",
+   "items": [
+    "FEM_Analysis",
+    "Separator",
+    "FEM_MaterialSolid",
+    "FEM_MaterialFluid",
+    "FEM_MaterialMechanicalNonlinear",
+    "FEM_MaterialReinforced",
+    "FEM_MaterialEditor",
+    "Separator",
+    "FEM_ElementGeometry1D",
+    "FEM_ElementRotation1D",
+    "FEM_ElementGeometry2D",
+    "FEM_ElementFluid1D"
+   ]
+  },
+  {
+   "toolbar": "Electromagnetic Boundary Conditions",
+   "items": [
+    "FEM_CompEmConstraints"
+   ]
+  },
+  {
+   "toolbar": "Fluid Boundary Conditions",
+   "items": [
+    "FEM_ConstraintInitialFlowVelocity",
+    "FEM_ConstraintInitialPressure",
+    "Separator",
+    "FEM_ConstraintFlowVelocity"
+   ]
+  },
+  {
+   "toolbar": "Geometrical Analysis Features",
+   "items": [
+    "FEM_ConstraintPlaneRotation",
+    "FEM_ConstraintSectionPrint",
+    "FEM_ConstraintTransform"
+   ]
+  },
+  {
+   "toolbar": "Mechanical Boundary Conditions and Loads",
+   "items": [
+    "FEM_ConstraintFixed",
+    "FEM_ConstraintRigidBody",
+    "FEM_ConstraintDisplacement",
+    "FEM_ConstraintContact",
+    "FEM_ConstraintTie",
+    "FEM_ConstraintSpring",
+    "Separator",
+    "FEM_ConstraintForce",
+    "FEM_ConstraintPressure",
+    "FEM_ConstraintCentrif",
+    "FEM_ConstraintSelfWeight"
+   ]
+  },
+  {
+   "toolbar": "Thermal Boundary Conditions and Loads",
+   "items": [
+    "FEM_ConstraintInitialTemperature",
+    "Separator",
+    "FEM_ConstraintHeatflux",
+    "FEM_ConstraintTemperature",
+    "FEM_ConstraintBodyHeatSource"
+   ]
+  },
+  {
+   "toolbar": "Mesh",
+   "items": [
+    "FEM_MeshNetgenFromShape",
+    "FEM_MeshGmshFromShape",
+    "Separator",
+    "FEM_MeshRegion",
+    "FEM_MeshGroup",
+    "FEM_MeshGMSHRefinement",
+    "Separator",
+    "FEM_FEMMesh2Mesh"
+   ]
+  },
+  {
+   "toolbar": "Solve",
+   "items": [
+    "FEM_CompSolvers",
+    "Separator",
+    "FEM_CompMechEquations",
+    "FEM_CompEmEquations",
+    "FEM_EquationFlow",
+    "FEM_EquationFlux",
+    "FEM_EquationHeat",
+    "Separator",
+    "FEM_SolverControl",
+    "FEM_SolverRun"
+   ]
+  },
+  {
+   "toolbar": "Results",
+   "items": [
+    "FEM_ResultsPurge",
+    "FEM_ResultShow",
+    "Separator",
+    "FEM_PostApplyChanges",
+    "FEM_PostPipelineFromResult",
+    "FEM_PostBranchFilter",
+    "Separator",
+    "FEM_PostFilterWarp",
+    "FEM_PostFilterClipScalar",
+    "FEM_PostFilterCutFunction",
+    "FEM_PostFilterClipRegion",
+    "FEM_PostFilterContours",
+    "FEM_PostFilterGlyph",
+    "FEM_PostFilterDataAlongLine",
+    "FEM_PostFilterLinearizedStresses",
+    "FEM_PostFilterDataAtPoint",
+    "FEM_PostFilterCalculator",
+    "Separator",
+    "FEM_PostCreateFunctions",
+    "FEM_PostVisualization"
+   ]
+  },
+  {
+   "toolbar": "Utilities",
+   "items": [
+    "FEM_ClippingPlaneAdd",
+    "FEM_ClippingPlaneRemoveAll",
+    "FEM_Examples"
+   ]
+  }
+ ],
+ "Inspection": [
+  {
+   "toolbar": "Inspection",
+   "items": [
+    "Inspection_VisualInspection",
+    "Inspection_InspectElement"
+   ]
+  }
+ ],
+ "Material": [
+  {
+   "toolbar": "Material",
+   "items": [
+    "Material_Edit"
+   ]
+  }
+ ],
+ "Mesh": [
+  {
+   "toolbar": "Mesh Tools",
+   "items": [
+    "Mesh_Import",
+    "Mesh_Export",
+    "Mesh_FromPartShape",
+    "Mesh_BuildRegularSolid"
+   ]
+  },
+  {
+   "toolbar": "Mesh Modify",
+   "items": [
+    "Mesh_HarmonizeNormals",
+    "Mesh_FlipNormals",
+    "Mesh_FillupHoles",
+    "Mesh_FillInteractiveHole",
+    "Mesh_AddFacet",
+    "Mesh_RemoveComponents",
+    "Mesh_Smoothing",
+    "Mesh_RemeshGmsh",
+    "Mesh_Decimating",
+    "Mesh_Scale"
+   ]
+  },
+  {
+   "toolbar": "Mesh Boolean",
+   "items": [
+    "Mesh_Union",
+    "Mesh_Intersection",
+    "Mesh_Difference"
+   ]
+  },
+  {
+   "toolbar": "Mesh Cutting",
+   "items": [
+    "Mesh_PolyCut",
+    "Mesh_PolyTrim",
+    "Mesh_TrimByPlane",
+    "Mesh_SectionByPlane",
+    "Mesh_CrossSections"
+   ]
+  },
+  {
+   "toolbar": "Mesh Segmentation",
+   "items": [
+    "Mesh_Merge",
+    "Mesh_SplitComponents",
+    "Mesh_Segmentation",
+    "Mesh_SegmentationBestFit"
+   ]
+  },
+  {
+   "toolbar": "Mesh Analyze",
+   "items": [
+    "Mesh_Evaluation",
+    "Mesh_EvaluateFacet",
+    "Mesh_VertexCurvature",
+    "Mesh_CurvatureInfo",
+    "Mesh_EvaluateSolid",
+    "Mesh_BoundingBox"
+   ]
+  }
+ ],
+ "MeshPart": [
+  {
+   "toolbar": "MeshPart",
+   "items": [
+    "MeshPart_Mesher"
+   ]
+  }
+ ],
+ "Part": [
+  {
+   "toolbar": "Solids",
+   "items": [
+    "Part_Box",
+    "Part_Cylinder",
+    "Part_Sphere",
+    "Part_Cone",
+    "Part_Torus",
+    "Part_Tube",
+    "Part_Primitives",
+    "Part_Builder"
+   ]
+  },
+  {
+   "toolbar": "Part Tools",
+   "items": [
+    "Sketcher_NewSketch",
+    "Part_Extrude",
+    "Part_Revolve",
+    "Part_Mirror",
+    "Part_Scale",
+    "Part_Fillet",
+    "Part_Chamfer",
+    "Part_MakeFace",
+    "Part_RuledSurface",
+    "Part_Loft",
+    "Part_Sweep",
+    "Part_Section",
+    "Part_CrossSections",
+    "Part_CompOffset",
+    "Part_Thickness",
+    "Part_ProjectionOnSurface",
+    "Part_ColorPerFace"
+   ]
+  },
+  {
+   "toolbar": "Boolean Tools",
+   "items": [
+    "Part_CompCompoundTools",
+    "Part_LinkArrays",
+    "Part_Boolean",
+    "Part_Cut",
+    "Part_Fuse",
+    "Part_Common",
+    "Part_CompJoinFeatures",
+    "Part_CompSplitFeatures",
+    "Part_CheckGeometry",
+    "Part_Defeaturing"
+   ]
+  }
+ ],
+ "PartDesign": [
+  {
+   "toolbar": "Part Design Helper Features",
+   "items": [
+    "PartDesign_Body",
+    "PartDesign_CompSketches",
+    "Sketcher_ValidateSketch",
+    "Part_CheckGeometry",
+    "PartDesign_SubShapeBinder",
+    "PartDesign_Clone"
+   ]
+  },
+  {
+   "toolbar": "Part Design Modeling Features",
+   "items": [
+    "PartDesign_Pad",
+    "PartDesign_Revolution",
+    "PartDesign_AdditiveLoft",
+    "PartDesign_AdditivePipe",
+    "PartDesign_AdditiveHelix",
+    "PartDesign_CompPrimitiveAdditive",
+    "Separator",
+    "PartDesign_Pocket",
+    "PartDesign_Hole",
+    "PartDesign_Groove",
+    "PartDesign_SubtractiveLoft",
+    "PartDesign_SubtractivePipe",
+    "PartDesign_SubtractiveHelix",
+    "PartDesign_CompPrimitiveSubtractive",
+    "Separator",
+    "PartDesign_Boolean"
+   ]
+  },
+  {
+   "toolbar": "Part Design Dress-Up Features",
+   "items": [
+    "PartDesign_Fillet",
+    "PartDesign_Chamfer",
+    "PartDesign_Draft",
+    "PartDesign_Thickness",
+    "PartDesign_Defeaturing"
+   ]
+  },
+  {
+   "toolbar": "Part Design Transformation Features",
+   "items": [
+    "PartDesign_Mirrored",
+    "PartDesign_LinearPattern",
+    "PartDesign_PolarPattern",
+    "PartDesign_CircularPattern",
+    "PartDesign_PathPattern",
+    "PartDesign_PointPattern",
+    "PartDesign_MultiTransform"
+   ]
+  }
+ ],
+ "Points": [
+  {
+   "toolbar": "Points Tools",
+   "items": [
+    "Points_Import",
+    "Points_Export",
+    "Separator",
+    "Points_Convert",
+    "Points_Structure",
+    "Points_Merge",
+    "Points_PolyCut"
+   ]
+  }
+ ],
+ "ReverseEngineering": [
+  {
+   "toolbar": "Reverse Engineering",
+   "items": [
+    "Reen_ApproxSurface"
+   ]
+  }
+ ],
+ "Robot": [
+  {
+   "toolbar": "Robot",
+   "items": [
+    "Robot_Create",
+    "Separator",
+    "Robot_CreateTrajectory",
+    "Robot_InsertWaypoint",
+    "Robot_InsertWaypointPreselect",
+    "Separator",
+    "Robot_Edge2Trac",
+    "Robot_TrajectoryDressUp",
+    "Robot_TrajectoryCompound",
+    "Separator",
+    "Robot_SetHomePos",
+    "Robot_RestoreHomePos",
+    "Separator",
+    "Robot_Simulate"
+   ]
+  }
+ ],
+ "Sketcher": [
+  {
+   "toolbar": "Sketcher",
+   "items": [
+    "Sketcher_NewSketch",
+    "Sketcher_EditSketch",
+    "Sketcher_MapSketch",
+    "Sketcher_ReorientSketch",
+    "Sketcher_ValidateSketch",
+    "Sketcher_MergeSketches",
+    "Sketcher_MirrorSketch"
+   ]
+  },
+  {
+   "toolbar": "Geometries",
+   "items": [
+    "Sketcher_CreatePoint",
+    "Sketcher_CompLine",
+    "Sketcher_CreatePolyline",
+    "Sketcher_CreateLine",
+    "Sketcher_CompCreateArc",
+    "Sketcher_CompCreateConic",
+    "Sketcher_CompCreateRectangles",
+    "Sketcher_CompCreateRegularPolygon",
+    "Sketcher_CompSlot",
+    "Sketcher_CompCreateBSpline",
+    "Sketcher_CreateText",
+    "Separator",
+    "Sketcher_ToggleConstruction"
+   ]
+  },
+  {
+   "toolbar": "Constraints",
+   "items": [
+    "Sketcher_CompDimensionTools",
+    "Sketcher_Dimension",
+    "Sketcher_CompConstrainRadDia",
+    "Sketcher_ConstrainSnellsLaw",
+    "Separator",
+    "Sketcher_CompHorVer",
+    "Sketcher_ConstrainGroup",
+    "Separator",
+    "Sketcher_CompToggleConstraints"
+   ]
+  },
+  {
+   "toolbar": "Sketcher Tools",
+   "items": [
+    "Sketcher_CompCreateFillets",
+    "Sketcher_CompCurveEdition",
+    "Sketcher_CompExternal",
+    "Sketcher_CarbonCopy",
+    "Separator",
+    "Sketcher_Translate",
+    "Sketcher_Rotate",
+    "Sketcher_Scale",
+    "Sketcher_Offset",
+    "Sketcher_Symmetry",
+    "Sketcher_RemoveAxesAlignment"
+   ]
+  },
+  {
+   "toolbar": "B-Spline Tools",
+   "items": [
+    "Sketcher_BSplineConvertToNURBS",
+    "Sketcher_BSplineIncreaseDegree",
+    "Sketcher_BSplineDecreaseDegree",
+    "Sketcher_CompModifyKnotMultiplicity",
+    "Sketcher_BSplineInsertKnot",
+    "Sketcher_JoinCurves"
+   ]
+  },
+  {
+   "toolbar": "Visual Helpers",
+   "items": [
+    "Sketcher_SelectConstraints",
+    "Separator",
+    "Sketcher_ArcOverlay",
+    "Sketcher_CompBSplineShowHideGeometryInformation",
+    "Sketcher_RestoreInternalAlignmentGeometry",
+    "Sketcher_SwitchVirtualSpace"
+   ]
+  }
+ ],
+ "Spreadsheet": [
+  {
+   "toolbar": "Spreadsheet",
+   "items": [
+    "Spreadsheet_CreateSheet",
+    "Separator",
+    "Spreadsheet_Import",
+    "Spreadsheet_Export",
+    "Separator",
+    "Spreadsheet_MergeCells",
+    "Spreadsheet_SplitCell",
+    "Separator",
+    "Spreadsheet_AlignLeft",
+    "Spreadsheet_AlignCenter",
+    "Spreadsheet_AlignRight",
+    "Spreadsheet_AlignTop",
+    "Spreadsheet_AlignVCenter",
+    "Spreadsheet_AlignBottom",
+    "Separator",
+    "Spreadsheet_StyleBold",
+    "Spreadsheet_StyleItalic",
+    "Spreadsheet_StyleUnderline",
+    "Separator",
+    "Spreadsheet_SetAlias",
+    "Separator"
+   ]
+  }
+ ],
+ "Surface": [
+  {
+   "toolbar": "Surface",
+   "items": [
+    "Surface_Filling",
+    "Surface_GeomFillSurface",
+    "Surface_Sections",
+    "Surface_ExtendFace",
+    "Surface_CurveOnMesh",
+    "Surface_BlendCurve",
+    "Surface_Cut"
+   ]
+  }
+ ],
+ "TechDraw": [
+  {
+   "toolbar": "TechDraw Pages",
+   "items": [
+    "TechDraw_PageDefault",
+    "TechDraw_PageTemplate",
+    "TechDraw_FillTemplateFields",
+    "TechDraw_RedrawPage",
+    "TechDraw_PrintAll"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Views",
+   "items": [
+    "TechDraw_View",
+    "TechDraw_BrokenView",
+    "TechDraw_ActiveView",
+    "TechDraw_SectionGroup",
+    "TechDraw_DetailView",
+    "TechDraw_DraftView",
+    "TechDraw_SpreadsheetView",
+    "TechDraw_ClipGroup"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Stacking",
+   "items": [
+    "TechDraw_StackGroup"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Dimensions",
+   "items": [
+    "TechDraw_Dimension",
+    "TechDraw_CompDimensionTools",
+    "TechDraw_LengthDimension",
+    "TechDraw_HorizontalDimension",
+    "TechDraw_VerticalDimension",
+    "TechDraw_RadiusDimension",
+    "TechDraw_DiameterDimension",
+    "TechDraw_AngleDimension",
+    "TechDraw_3PtAngleDimension",
+    "TechDraw_AreaDimension",
+    "TechDraw_ExtentGroup",
+    "TechDraw_Balloon",
+    "TechDraw_AxoLengthDimension",
+    "TechDraw_DimensionRepair"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Attributes",
+   "items": [
+    "TechDraw_ExtensionSelectLineAttributes",
+    "TechDraw_ExtensionChangeLineAttributes",
+    "TechDraw_ExtensionExtendShortenLineGroup",
+    "TechDraw_ExtensionLockUnlockView",
+    "TechDraw_ExtensionPositionSectionView",
+    "TechDraw_ExtensionAreaAnnotation",
+    "TechDraw_ExtensionArcLengthAnnotation",
+    "TechDraw_ExtensionCustomizeFormat"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Centerlines",
+   "items": [
+    "TechDraw_ExtensionCircleCenterLinesGroup",
+    "TechDraw_ExtensionThreadsGroup",
+    "TechDraw_CommandVertexCreationGroup",
+    "TechDraw_ExtensionDrawCirclesGroup",
+    "TechDraw_ExtensionLinePPGroup"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Extend Dimensions",
+   "items": [
+    "TechDraw_ExtensionCreateChainDimensionGroup",
+    "TechDraw_ExtensionCreateCoordDimensionGroup",
+    "TechDraw_ExtensionChamferDimensionGroup",
+    "TechDraw_ExtensionCreateLengthArc",
+    "TechDraw_ExtensionInsertPrefixGroup",
+    "TechDraw_ExtensionIncreaseDecreaseGroup"
+   ]
+  },
+  {
+   "toolbar": "TechDraw File Access",
+   "items": [
+    "TechDraw_ExportPageSVG",
+    "TechDraw_ExportPageDXF"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Decoration",
+   "items": [
+    "TechDraw_ToggleFrame",
+    "TechDraw_Hatch",
+    "TechDraw_GeometricHatch"
+   ]
+  },
+  {
+   "toolbar": "TechDraw Annotation",
+   "items": [
+    "TechDraw_RichTextAnnotation",
+    "TechDraw_LeaderLine",
+    "TechDraw_CosmeticVertexGroup",
+    "TechDraw_CenterLineGroup",
+    "TechDraw_2PointCosmeticLine",
+    "TechDraw_DecorateLine",
+    "TechDraw_ShowAll",
+    "TechDraw_WeldSymbol",
+    "TechDraw_SurfaceFinishSymbols",
+    "TechDraw_HoleShaftFit"
+   ]
+  }
+ ],
+ "TemplatePyMod": [
+  {
+   "toolbar": "TemplateTools",
+   "items": [
+    "TemplatePyMod_Cmd1",
+    "TemplatePyMod_Cmd2",
+    "TemplatePyMod_Cmd3",
+    "TemplatePyMod_Cmd4",
+    "TemplatePyMod_Cmd5"
+   ]
+  }
+ ],
+ "Test": [
+  {
+   "toolbar": "TestTools",
+   "items": [
+    "Std_ViewExample1",
+    "Std_ViewExample2",
+    "Std_ViewExample3"
+   ]
+  },
+  {
+   "toolbar": "My Unittest",
+   "items": [
+    "Test_Test"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,176 @@
+{
+"Arch_AxisTools": [
+"Arch_Axis",
+"Arch_AxisSystem",
+"Arch_Grid"
+],
+"Arch_StructureTools": [
+"Arch_StructuralSystem",
+"Arch_StructuresFromSelection"
+],
+"Draft_ArrayTools": [
+"Draft_OrthoArray",
+"Draft_PolarArray",
+"Draft_CircularArray",
+"Draft_PathArray",
+"Draft_PathLinkArray",
+"Draft_PointArray",
+"Draft_PointLinkArray",
+"Draft_PathTwistedArray",
+"Draft_PathTwistedLinkArray"
+],
+"Draft_BezierTools": [
+"Draft_CubicBezCurve",
+"Draft_BezCurve"
+],
+"Draft_ArcTools": [
+"Draft_Arc",
+"Draft_Arc_3Points"
+],
+"Draft_Shape2DViewTools": [
+"Draft_Shape2DView",
+"Draft_UpdateShape2DView"
+],
+"Arch_MaterialTools": [
+"Arch_Material",
+"Arch_MultiMaterial"
+],
+"Arch_PanelTools": [
+"Arch_Panel",
+"Arch_Panel_Cut",
+"Arch_Panel_Sheet",
+"Arch_Nest"
+],
+"Arch_PipeTools": [
+"Arch_Pipe",
+"Arch_PipeConnector"
+],
+"CAM_PostTools": [
+"CAM_Post",
+"CAM_PostSelected"
+],
+"CAM_SimTools": [
+"CAM_SimulatorGL",
+"CAM_Simulator"
+],
+"CAM_EngraveTools": [
+"CAM_Engrave",
+"CAM_Deburr",
+"CAM_Vcarve"
+],
+"CAM_DrillingTools": [
+"CAM_Drilling",
+"CAM_ThreadMilling"
+],
+"CAM_DressupTools": [
+"CAM_DressupArray",
+"CAM_DressupAxisMap",
+"CAM_DressupPathBoundary",
+"CAM_DressupPathBoundary2",
+"CAM_DressupDogbone",
+"CAM_DressupDragKnife",
+"CAM_DressupLeadInOut",
+"CAM_DressupMirror",
+"CAM_DressupPlungeMilling",
+"CAM_DressupRampEntry",
+"CAM_DressupTag",
+"CAM_DressupZCorrect"
+],
+"FEM_MeshGMSHRefinement": [
+"FEM_MeshDistance",
+"FEM_MeshBoundaryLayer",
+"FEM_MeshShape",
+"FEM_MeshManipulate",
+"FEM_MeshAdvanced",
+"FEM_MeshTransfiniteCurve",
+"FEM_MeshTransfiniteSurface",
+"FEM_MeshTransfiniteVolume"
+],
+"FEM_CompSolvers": [
+"FEM_SolverCalculiX",
+"FEM_SolverElmer",
+"FEM_SolverMystran",
+"FEM_SolverZ88"
+],
+"BIM_ArcTools": [
+"Draft_Arc",
+"Draft_Arc_3Points"
+],
+"BIM_SplineTools": [
+"Draft_BSpline",
+"Draft_BezCurve",
+"Draft_CubicBezCurve"
+],
+"BIM_AxisTools": [
+"Arch_Axis",
+"Arch_AxisSystem"
+],
+"BIM_OffsetTools": [
+"BIM_Offset2D",
+"Draft_Offset"
+],
+"BIM_ArrayTools": [
+"Draft_OrthoArray",
+"Draft_PathLinkArray",
+"Draft_PolarArray",
+"Draft_PointLinkArray"
+],
+"BIM_BooleanTools": [
+"BIM_Fuse",
+"BIM_Cut",
+"BIM_Common"
+],
+"BIM_ExtrudeTools": [
+"BIM_ExtrudeFace",
+"BIM_Extrude"
+],
+"BIM_IfcManageTools": [
+"BIM_IfcElements",
+"BIM_IfcQuantities",
+"BIM_IfcProperties",
+"BIM_Classification"
+],
+"BIM_ReportTools": [
+"BIM_Report",
+"Arch_Schedule",
+"Arch_Survey"
+],
+"BIM_GenericTools": [
+"Arch_Profile",
+"BIM_Box",
+"BIM_Builder",
+"Draft_Facebinder",
+"BIM_Library",
+"Arch_Component",
+"Arch_Reference"
+],
+"BIM_Create2DViews": [
+"BIM_DrawingView",
+"BIM_Shape2DView",
+"BIM_Shape2DCut",
+"Draft_UpdateShape2DView"
+],
+"BIM_CloneTools": [
+"BIM_Clone",
+"BIM_LinkMake",
+"BIM_Unclone"
+],
+"Assembly_CreateJointGearBelt": [
+"Assembly_CreateJointGears",
+"Assembly_CreateJointBelt"
+],
+"Assembly_Insert": [
+"Assembly_InsertLink",
+"Assembly_InsertNewPart"
+],
+"TemplatePyGroup": [
+"TemplatePyGrp_1",
+"TemplatePyGrp_2",
+"TemplatePyGrp_3",
+"Std_New"
+],
+"TechDraw_CommandVertexCreationGroup": [
+"TechDraw_ExtensionVertexAtIntersection",
+"TechDraw_CommandAddOffsetVertex"
+]
+}

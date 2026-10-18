@@ -1,0 +1,22 @@
+--- a/b/src/H5detect.c	2026-10-17 18:29:12.119779511 -0300
++++ b/src/H5detect.c	2026-10-17 18:29:12.122844525 -0300
+@@ -1153,7 +1153,7 @@
+     {
+         size_t n;
+         char  *comma;
+-        if ((pwd = HDgetpwuid(HDgetuid()))) {
++        if ((pwd = HDgetpwuid(HDgetuid())) && pwd->pw_gecos) {
+             if ((comma = HDstrchr(pwd->pw_gecos, ','))) {
+                 n = MIN(sizeof(real_name) - 1, (unsigned)(comma - pwd->pw_gecos));
+                 HDstrncpy(real_name, pwd->pw_gecos, n);
+--- a/src/H5make_libsettings.c	2026-10-17 18:29:12.121314177 -0300
++++ src/H5make_libsettings.c	2026-10-17 18:29:12.123418630 -0300
+@@ -171,7 +171,7 @@
+         size_t n;
+         char  *comma;
+ 
+-        if ((pwd = HDgetpwuid(HDgetuid()))) {
++        if ((pwd = HDgetpwuid(HDgetuid())) && pwd->pw_gecos) {
+             if ((comma = HDstrchr(pwd->pw_gecos, ','))) {
+                 n = MIN(sizeof(real_name) - 1, (unsigned)(comma - pwd->pw_gecos));
+                 HDstrncpy(real_name, pwd->pw_gecos, n);

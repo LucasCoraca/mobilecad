@@ -1,0 +1,88 @@
+{
+ "TechDraw_SectionGroup": [
+  "TechDraw_SectionView",
+  "TechDraw_ComplexSection"
+ ],
+ "TechDraw_ExtentGroup": [
+  "TechDraw_HorizontalExtentDimension",
+  "TechDraw_VerticalExtentDimension"
+ ],
+ "TechDraw_CenterLineGroup": [
+  "TechDraw_FaceCenterLine",
+  "TechDraw_2LineCenterLine",
+  "TechDraw_2PointCenterLine"
+ ],
+ "TechDraw_CosmeticVertexGroup": [
+  "TechDraw_CosmeticVertex",
+  "TechDraw_Midpoints",
+  "TechDraw_Quadrants"
+ ],
+ "TechDraw_StackGroup": [
+  "TechDraw_StackTop",
+  "TechDraw_StackBottom",
+  "TechDraw_StackUp",
+  "TechDraw_StackDown"
+ ],
+ "TechDraw_CommandVertexCreationGroup": [
+  "TechDraw_ExtensionVertexAtIntersection",
+  "TechDraw_CommandAddOffsetVertex"
+ ],
+ "TechDraw_ExtensionCascadeDimensionGroup": [
+  "TechDraw_ExtensionCascadeHorizDimension",
+  "TechDraw_ExtensionCascadeVertDimension",
+  "TechDraw_ExtensionCascadeObliqueDimension"
+ ],
+ "TechDraw_ExtensionChamferDimensionGroup": [
+  "TechDraw_ExtensionCreateHorizChamferDimension",
+  "TechDraw_ExtensionCreateVertChamferDimension"
+ ],
+ "TechDraw_ExtensionCircleCenterLinesGroup": [
+  "TechDraw_ExtensionCircleCenterLines",
+  "TechDraw_ExtensionHoleCircle"
+ ],
+ "TechDraw_ExtensionCreateChainDimensionGroup": [
+  "TechDraw_ExtensionCreateHorizChainDimension",
+  "TechDraw_ExtensionCreateVertChainDimension",
+  "TechDraw_ExtensionCreateObliqueChainDimension"
+ ],
+ "TechDraw_ExtensionCreateCoordDimensionGroup": [
+  "TechDraw_ExtensionCreateHorizCoordDimension",
+  "TechDraw_ExtensionCreateVertCoordDimension",
+  "TechDraw_ExtensionCreateObliqueCoordDimension"
+ ],
+ "TechDraw_ExtensionDrawCirclesGroup": [
+  "TechDraw_CosmeticCircle",
+  "TechDraw_ExtensionDrawCosmCircle",
+  "TechDraw_ExtensionDrawCosmCircle3Points",
+  "TechDraw_ExtensionDrawCosmArc"
+ ],
+ "TechDraw_ExtensionExtendShortenLineGroup": [
+  "TechDraw_ExtensionExtendLine",
+  "TechDraw_ExtensionShortenLine"
+ ],
+ "TechDraw_ExtensionIncreaseDecreaseGroup": [
+  "TechDraw_ExtensionIncreaseDecimal",
+  "TechDraw_ExtensionDecreaseDecimal"
+ ],
+ "TechDraw_ExtensionInsertPrefixGroup": [
+  "TechDraw_ExtensionInsertDiameter",
+  "TechDraw_ExtensionInsertSquare",
+  "TechDraw_ExtensionInsertRepetition",
+  "TechDraw_ExtensionRemovePrefixChar"
+ ],
+ "TechDraw_ExtensionLinePPGroup": [
+  "TechDraw_ExtensionLineParallel",
+  "TechDraw_ExtensionLinePerpendicular"
+ ],
+ "TechDraw_ExtensionPosChainDimensionGroup": [
+  "TechDraw_ExtensionPosHorizChainDimension",
+  "TechDraw_ExtensionPosVertChainDimension",
+  "TechDraw_ExtensionPosObliqueChainDimension"
+ ],
+ "TechDraw_ExtensionThreadsGroup": [
+  "TechDraw_ExtensionThreadHoleSide",
+  "TechDraw_ExtensionThreadBoltSide",
+  "TechDraw_ExtensionThreadHoleBottom",
+  "TechDraw_ExtensionThreadBoltBottom"
+ ]
+}

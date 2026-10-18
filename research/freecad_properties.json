@@ -1,0 +1,4187 @@
+{
+ "PartDesign::Body": [
+  {
+   "name": "AllowCompound",
+   "default": "true",
+   "group": "Base",
+   "doc": "Allow multiple solids in Body"
+  }
+ ],
+ "PartDesign::Line": [
+  {
+   "name": "ResizeMode",
+   "default": "static_cast<long>(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Automatic",
+    "Manual"
+   ]
+  },
+  {
+   "name": "Length",
+   "default": "20",
+   "group": "Size",
+   "doc": "Length of the line"
+  }
+ ],
+ "PartDesign::Plane": [
+  {
+   "name": "ResizeMode",
+   "default": "static_cast<long>(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Automatic",
+    "Manual"
+   ]
+  },
+  {
+   "name": "Length",
+   "default": "20",
+   "group": "Size",
+   "doc": "Length of the plane"
+  },
+  {
+   "name": "Width",
+   "default": "20",
+   "group": "Size",
+   "doc": "Width of the plane"
+  }
+ ],
+ "PartDesign::Feature": [
+  {
+   "name": "BaseFeature",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "_Body",
+   "default": "nullptr),\n        \"Base\",\n        (App::PropertyType)(App::P",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::FeatureAddSub": [
+  {
+   "name": "AddSubShape",
+   "default": "TopoDS_Shape(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Operation",
+   "default": "false",
+   "group": "Part Design",
+   "doc": "Boolean operation to compute"
+  }
+ ],
+ "PartDesign::FeatureBase": [
+  {
+   "name": "UseLegacyBaseFeaturePlacement",
+   "default": "App::GetApplication().isRestoring(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::Boolean": [
+  {
+   "name": "Type",
+   "default": "(long)0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Fuse",
+    "Cut",
+    "Common"
+   ]
+  },
+  {
+   "name": "UseLegacyBodyPlacement",
+   "default": "App::GetApplication().isRestoring(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::Chamfer": [
+  {
+   "name": "ChamferType",
+   "default": "0L",
+   "group": "Chamfer",
+   "doc": "Type of chamfer",
+   "enum": [
+    "Equal distance",
+    "Two distances",
+    "Distance and Angle"
+   ]
+  },
+  {
+   "name": "Size",
+   "default": "1.0",
+   "group": "Chamfer",
+   "doc": "Size of chamfer"
+  },
+  {
+   "name": "Size2",
+   "default": "1.0",
+   "group": "Chamfer",
+   "doc": "Second size of chamfer"
+  },
+  {
+   "name": "Angle",
+   "default": "45.0",
+   "group": "Chamfer",
+   "doc": "Angle of chamfer"
+  },
+  {
+   "name": "FlipDirection",
+   "default": "false",
+   "group": "Chamfer",
+   "doc": "Flip direction"
+  }
+ ],
+ "PartDesign::Draft": [
+  {
+   "name": "Angle",
+   "default": "1.5",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "NeutralPlane",
+   "default": "nullptr",
+   "group": "Draft",
+   "doc": "NeutralPlane"
+  },
+  {
+   "name": "PullDirection",
+   "default": "nullptr",
+   "group": "Draft",
+   "doc": "PullDirection"
+  },
+  {
+   "name": "Reversed",
+   "default": "0",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::DressUp": [
+  {
+   "name": "Base",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::FeatureExtrude": [
+  {
+   "name": "UseLegacyTaperDirection",
+   "default": "false",
+   "group": "Compatibility",
+   "doc": "Use legacy profile copying for tapered extrusions"
+  }
+ ],
+ "PartDesign::Fillet": [
+  {
+   "name": "Radius",
+   "default": "1.0",
+   "group": "Fillet",
+   "doc": "Fillet radius."
+  }
+ ],
+ "PartDesign::Groove": [
+  {
+   "name": "SideType",
+   "default": "0L",
+   "group": "Groove",
+   "doc": "Type of side definition"
+  },
+  {
+   "name": "Type",
+   "default": "0L",
+   "group": "Side1",
+   "doc": "Groove type for side 1"
+  },
+  {
+   "name": "Type2",
+   "default": "0L",
+   "group": "Side2",
+   "doc": "Groove type for side 2",
+   "enum": [
+    "Angle",
+    "ThroughAll",
+    "UpToFirst",
+    "UpToFace",
+    "?TwoAngles"
+   ]
+  },
+  {
+   "name": "Base",
+   "default": "Base::Vector3d(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Axis",
+   "default": "Base::Vector3d::UnitY",
+   "group": "Groove",
+   "doc": "Axis"
+  },
+  {
+   "name": "ProjectAxis",
+   "default": "false",
+   "group": "Groove",
+   "doc": "Projects the reference axis onto the profile plane"
+  },
+  {
+   "name": "Angle",
+   "default": "fullAngle",
+   "group": "Side1",
+   "doc": "Angle"
+  },
+  {
+   "name": "Angle2",
+   "default": "emptyAngle",
+   "group": "Side2",
+   "doc": "Groove angle in 2nd direction"
+  },
+  {
+   "name": "UpToFace",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Face where groove will end"
+  },
+  {
+   "name": "UpToFace2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Face where groove will end on side 2"
+  },
+  {
+   "name": "ReferenceAxis",
+   "default": "nullptr",
+   "group": "Groove",
+   "doc": "Reference axis of groove"
+  }
+ ],
+ "PartDesign::Helix": [
+  {
+   "name": "Base",
+   "default": "Base::Vector3d(0.0, 0.0, 0.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Axis",
+   "default": "Base::Vector3d(0.0, 1.0, 0.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ReferenceAxis",
+   "default": "nullptr),\n        group,\n        App::Prop_None,\n        QT_",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Mode",
+   "default": "long(initialMode",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "pitch-height-angle",
+    "pitch-turns-angle",
+    "height-turns-angle",
+    "height-turns-growth"
+   ]
+  },
+  {
+   "name": "Pitch",
+   "default": "10.0),\n        group,\n        App::Prop_None,\n        QT_TRA",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Height",
+   "default": "30.0),\n        group,\n        App::Prop_None,\n        QT_TRA",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Turns",
+   "default": "3.0),\n        group,\n        App::Prop_None,\n        QT_TRAN",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Angle",
+   "default": "0.0),\n        group,\n        App::Prop_None,\n        QT_TRAN",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Growth",
+   "default": "0.0),\n        group,\n        App::Prop_None,\n        QT_TRAN",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "LeftHanded",
+   "default": "false),\n        group,\n        App::Prop_None,\n        QT_TR",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Reversed",
+   "default": "false),\n        group,\n        App::Prop_None,\n        QT_TR",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "HasBeenEdited",
+   "default": "false),\n        group,\n        App::Prop_Hidden,\n        QT_",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Tolerance",
+   "default": "0.1),\n        group,\n        App::Prop_None,\n        QT_TRAN",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Outside",
+   "default": "false),\n        group,\n        App::Prop_Hidden,\n        QT_",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::Hole": [
+  {
+   "name": "Threaded",
+   "default": "false",
+   "group": "Hole",
+   "doc": "Threaded"
+  },
+  {
+   "name": "ModelThread",
+   "default": "false",
+   "group": "Hole",
+   "doc": "Model actual thread"
+  },
+  {
+   "name": "CosmeticThread",
+   "default": "true",
+   "group": "Hole",
+   "doc": "Texture the thread"
+  },
+  {
+   "name": "ThreadType",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Thread type",
+   "enum": [
+    "None",
+    "ISOMetricProfile",
+    "ISOMetricFineProfile",
+    "UNC",
+    "UNF",
+    "UNEF",
+    "NPT",
+    "BSP",
+    "BSW",
+    "BSF",
+    "ISOTyre"
+   ]
+  },
+  {
+   "name": "ThreadSize",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Thread size"
+  },
+  {
+   "name": "ThreadClass",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Thread class",
+   "enum": [
+    "None"
+   ]
+  },
+  {
+   "name": "ThreadFit",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Clearance hole fit",
+   "enum": [
+    "Medium",
+    "Fine",
+    "Coarse"
+   ]
+  },
+  {
+   "name": "Diameter",
+   "default": "6.0",
+   "group": "Hole",
+   "doc": "Diameter"
+  },
+  {
+   "name": "ThreadDiameter",
+   "default": "0.0",
+   "group": "Hole",
+   "doc": "Thread major diameter"
+  },
+  {
+   "name": "ThreadDirection",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Thread direction",
+   "enum": [
+    "Right",
+    "Left"
+   ]
+  },
+  {
+   "name": "HoleCutType",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Head cut type",
+   "enum": [
+    "None",
+    "Counterbore",
+    "Countersink",
+    "Counterdrill"
+   ]
+  },
+  {
+   "name": "HoleCutCustomValues",
+   "default": "false",
+   "group": "Hole",
+   "doc": "Custom cut values"
+  },
+  {
+   "name": "HoleCutDiameter",
+   "default": "0.0",
+   "group": "Hole",
+   "doc": "Head cut diameter"
+  },
+  {
+   "name": "HoleCutDepth",
+   "default": "0.0",
+   "group": "Hole",
+   "doc": "Head cut depth"
+  },
+  {
+   "name": "HoleCutCountersinkAngle",
+   "default": "90.0",
+   "group": "Hole",
+   "doc": "Head cut countersink angle"
+  },
+  {
+   "name": "DepthType",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Type",
+   "enum": [
+    "Dimension",
+    "ThroughAll",
+    "UpToFirst"
+   ]
+  },
+  {
+   "name": "Depth",
+   "default": "25.0",
+   "group": "Hole",
+   "doc": "Length"
+  },
+  {
+   "name": "DrillPoint",
+   "default": "1L",
+   "group": "Hole",
+   "doc": "Drill point type",
+   "enum": [
+    "Flat",
+    "Angled"
+   ]
+  },
+  {
+   "name": "DrillPointAngle",
+   "default": "118.0",
+   "group": "Hole",
+   "doc": "Drill point angle"
+  },
+  {
+   "name": "DrillForDepth",
+   "default": "(long)0",
+   "group": "Hole",
+   "doc": "The size of the drill point will be taken into\\n account for the depth of blind holes"
+  },
+  {
+   "name": "Tapered",
+   "default": "false",
+   "group": "Hole",
+   "doc": "Tapered"
+  },
+  {
+   "name": "TaperedAngle",
+   "default": "90.0",
+   "group": "Hole",
+   "doc": "Tapered angle"
+  },
+  {
+   "name": "ThreadDepthType",
+   "default": "0L",
+   "group": "Hole",
+   "doc": "Thread depth type",
+   "enum": [
+    "Hole Depth",
+    "Dimension",
+    "Tapped (DIN76)"
+   ]
+  },
+  {
+   "name": "ThreadDepth",
+   "default": "23.5",
+   "group": "Hole",
+   "doc": "Thread Length"
+  },
+  {
+   "name": "UseCustomThreadClearance",
+   "default": "false",
+   "group": "Hole",
+   "doc": "Use custom thread clearance"
+  },
+  {
+   "name": "CustomThreadClearance",
+   "default": "0.0",
+   "group": "Hole",
+   "doc": "Custom thread clearance (overrides ThreadClass)"
+  },
+  {
+   "name": "BaseProfileType",
+   "default": "BaseProfileTypeOptions::OnCirclesArcs",
+   "group": "Hole",
+   "doc": "Which profile feature to base the holes on"
+  },
+  {
+   "name": "StartType",
+   "default": "0L",
+   "group": "Start",
+   "doc": "How to define the start plane"
+  },
+  {
+   "name": "StartOffset",
+   "default": "0.0",
+   "group": "Start",
+   "doc": "Offset from the start plane"
+  },
+  {
+   "name": "StartReference",
+   "default": "nullptr",
+   "group": "Start",
+   "doc": "Face, plane or sketch used as the start reference"
+  }
+ ],
+ "PartDesign::Loft": [
+  {
+   "name": "Sections",
+   "default": "nullptr",
+   "group": "Loft",
+   "doc": "List of sections"
+  },
+  {
+   "name": "Ruled",
+   "default": "false",
+   "group": "Loft",
+   "doc": "Create ruled surface"
+  },
+  {
+   "name": "Closed",
+   "default": "false",
+   "group": "Loft",
+   "doc": "Close Last to First Profile"
+  }
+ ],
+ "PartDesign::Mirrored": [
+  {
+   "name": "MirrorPlane",
+   "default": "nullptr",
+   "group": "Mirrored",
+   "doc": "Mirror plane"
+  }
+ ],
+ "PartDesign::MultiTransform": [
+  {
+   "name": "Transformations",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::Pad": [
+  {
+   "name": "SideType",
+   "default": "0L",
+   "group": "Pad",
+   "doc": "Type of sides definition"
+  },
+  {
+   "name": "Type",
+   "default": "0L",
+   "group": "Side1",
+   "doc": "Pad type for side 1"
+  },
+  {
+   "name": "Type2",
+   "default": "0L",
+   "group": "Side2",
+   "doc": "Pad type for side 2",
+   "enum": [
+    "Length",
+    "UpToLast",
+    "UpToFirst",
+    "UpToFace",
+    "?TwoLengths",
+    "UpToShape"
+   ]
+  },
+  {
+   "name": "Length",
+   "default": "10.0",
+   "group": "Side1",
+   "doc": "Pad length"
+  },
+  {
+   "name": "Length2",
+   "default": "10.0",
+   "group": "Side2",
+   "doc": "Pad length in 2nd direction"
+  },
+  {
+   "name": "UseCustomVector",
+   "default": "false",
+   "group": "Pad",
+   "doc": "Use custom vector for pad direction"
+  },
+  {
+   "name": "Direction",
+   "default": "Base::Vector3d(1.0, 1.0, 1.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ReferenceAxis",
+   "default": "nullptr",
+   "group": "Pad",
+   "doc": "Reference axis of direction"
+  },
+  {
+   "name": "AlongSketchNormal",
+   "default": "true",
+   "group": "Pad",
+   "doc": "Measure pad length along the sketch normal direction"
+  },
+  {
+   "name": "StartType",
+   "default": "0L",
+   "group": "Start",
+   "doc": "How to define the start plane"
+  },
+  {
+   "name": "StartOffset",
+   "default": "0.0",
+   "group": "Start",
+   "doc": "Offset from the start plane"
+  },
+  {
+   "name": "StartReference",
+   "default": "nullptr",
+   "group": "Start",
+   "doc": "Face, plane or sketch used as the start reference"
+  },
+  {
+   "name": "UpToFace",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Face where pad will end"
+  },
+  {
+   "name": "UpToShape",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Faces or shape(s) where pad will end"
+  },
+  {
+   "name": "UpToFace2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Face where pad will end on side2"
+  },
+  {
+   "name": "UpToShape2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Faces or shape(s) where pad will end on side2"
+  },
+  {
+   "name": "Offset",
+   "default": "0.0",
+   "group": "Side1",
+   "doc": "Offset from face in which pad will end"
+  },
+  {
+   "name": "Offset2",
+   "default": "0.0",
+   "group": "Side2",
+   "doc": "Offset from face in which pad will end on side 2"
+  },
+  {
+   "name": "TaperAngle",
+   "default": "0.0",
+   "group": "Side1",
+   "doc": "Taper angle"
+  },
+  {
+   "name": "TaperAngle2",
+   "default": "0.0",
+   "group": "Side2",
+   "doc": "Taper angle for 2nd direction"
+  }
+ ],
+ "PartDesign::Pipe": [
+  {
+   "name": "Sections",
+   "default": "nullptr",
+   "group": "Sweep",
+   "doc": "List of sections"
+  },
+  {
+   "name": "Spine",
+   "default": "nullptr",
+   "group": "Sweep",
+   "doc": "Path to sweep along"
+  },
+  {
+   "name": "SpineTangent",
+   "default": "false",
+   "group": "Sweep",
+   "doc": "Include tangent edges into path"
+  },
+  {
+   "name": "AuxiliarySpine",
+   "default": "nullptr",
+   "group": "Sweep",
+   "doc": "Secondary path to orient sweep"
+  },
+  {
+   "name": "AuxiliarySpineTangent",
+   "default": "false",
+   "group": "Sweep",
+   "doc": "Include tangent edges into secondary path"
+  },
+  {
+   "name": "AuxiliaryCurvilinear",
+   "default": "true",
+   "group": "Sweep",
+   "doc": "Calculate normal between equidistant points on both spines"
+  },
+  {
+   "name": "Mode",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Standard",
+    "Fixed",
+    "Frenet",
+    "Auxiliary",
+    "Binormal"
+   ]
+  },
+  {
+   "name": "Binormal",
+   "default": "Base::Vector3d(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Transition",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Transformed",
+    "Right corner",
+    "Round corner"
+   ]
+  },
+  {
+   "name": "Transformation",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Constant",
+    "Multisection",
+    "Linear",
+    "S-shape",
+    "Interpolation"
+   ]
+  }
+ ],
+ "PartDesign::Pocket": [
+  {
+   "name": "SideType",
+   "default": "0L",
+   "group": "Pocket",
+   "doc": "Type of sides definition"
+  },
+  {
+   "name": "Type",
+   "default": "(long)0",
+   "group": "Side1",
+   "doc": "Pocket type"
+  },
+  {
+   "name": "Type2",
+   "default": "(long)0",
+   "group": "Side2",
+   "doc": "Pocket type",
+   "enum": [
+    "Length",
+    "ThroughAll",
+    "UpToFirst",
+    "UpToFace",
+    "?TwoLengths",
+    "UpToShape"
+   ]
+  },
+  {
+   "name": "Length",
+   "default": "5.0",
+   "group": "Side1",
+   "doc": "Pocket length"
+  },
+  {
+   "name": "Length2",
+   "default": "5.0",
+   "group": "Side2",
+   "doc": "Pocket length in 2nd direction"
+  },
+  {
+   "name": "UseCustomVector",
+   "default": "false",
+   "group": "Pocket",
+   "doc": "Use custom vector for pocket direction"
+  },
+  {
+   "name": "Direction",
+   "default": "Base::Vector3d(1.0, 1.0, 1.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ReferenceAxis",
+   "default": "nullptr",
+   "group": "Pocket",
+   "doc": "Reference axis of direction"
+  },
+  {
+   "name": "AlongSketchNormal",
+   "default": "true",
+   "group": "Pocket",
+   "doc": "Measure pocket length along the sketch normal direction"
+  },
+  {
+   "name": "StartType",
+   "default": "0L",
+   "group": "Start",
+   "doc": "How to define the start plane"
+  },
+  {
+   "name": "StartOffset",
+   "default": "0.0",
+   "group": "Start",
+   "doc": "Offset from the start plane"
+  },
+  {
+   "name": "StartReference",
+   "default": "nullptr",
+   "group": "Start",
+   "doc": "Face, plane or sketch used as the start reference"
+  },
+  {
+   "name": "UpToFace",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Face where pocket will end"
+  },
+  {
+   "name": "UpToShape",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Face(s) or shape(s) where pocket will end"
+  },
+  {
+   "name": "UpToFace2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Face where pocket will end"
+  },
+  {
+   "name": "UpToShape2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Face(s) or shape(s) where pocket will end"
+  },
+  {
+   "name": "Offset",
+   "default": "0.0",
+   "group": "Side1",
+   "doc": "Offset from face in which pocket will end"
+  },
+  {
+   "name": "Offset2",
+   "default": "0.0",
+   "group": "Side2",
+   "doc": "Offset from face in which pocket will end on side 2"
+  },
+  {
+   "name": "TaperAngle",
+   "default": "0.0",
+   "group": "Side1",
+   "doc": "Taper angle"
+  },
+  {
+   "name": "TaperAngle2",
+   "default": "0.0",
+   "group": "Side2",
+   "doc": "Taper angle for 2nd direction"
+  }
+ ],
+ "PartDesign::Box": [
+  {
+   "name": "Length",
+   "default": "10.0f",
+   "group": "Box",
+   "doc": "The length of the box"
+  },
+  {
+   "name": "Width",
+   "default": "10.0f",
+   "group": "Box",
+   "doc": "The width of the box"
+  },
+  {
+   "name": "Height",
+   "default": "10.0f",
+   "group": "Box",
+   "doc": "The height of the box"
+  }
+ ],
+ "PartDesign::Cylinder": [
+  {
+   "name": "Radius",
+   "default": "10.0f",
+   "group": "Cylinder",
+   "doc": "The radius of the cylinder"
+  },
+  {
+   "name": "Angle",
+   "default": "360.0f",
+   "group": "Cylinder",
+   "doc": "The closing angle of the cylinder "
+  },
+  {
+   "name": "Height",
+   "default": "10.0f",
+   "group": "Cylinder",
+   "doc": "The height of the cylinder"
+  }
+ ],
+ "PartDesign::Sphere": [
+  {
+   "name": "Radius",
+   "default": "5.0",
+   "group": "Sphere",
+   "doc": "The radius of the sphere"
+  },
+  {
+   "name": "Angle1",
+   "default": "-90.0f",
+   "group": "Sphere",
+   "doc": "The angle of the sphere"
+  },
+  {
+   "name": "Angle2",
+   "default": "90.0f",
+   "group": "Sphere",
+   "doc": "The angle of the sphere"
+  },
+  {
+   "name": "Angle3",
+   "default": "360.0f",
+   "group": "Sphere",
+   "doc": "The angle of the sphere"
+  }
+ ],
+ "PartDesign::Cone": [
+  {
+   "name": "Radius1",
+   "default": "2.0",
+   "group": "Cone",
+   "doc": "The radius of the cone"
+  },
+  {
+   "name": "Radius2",
+   "default": "4.0",
+   "group": "Cone",
+   "doc": "The radius of the cone"
+  },
+  {
+   "name": "Height",
+   "default": "10.0",
+   "group": "Cone",
+   "doc": "The height of the cone"
+  },
+  {
+   "name": "Angle",
+   "default": "360.0",
+   "group": "Cone",
+   "doc": "The angle of the cone"
+  }
+ ],
+ "PartDesign::Ellipsoid": [
+  {
+   "name": "Radius1",
+   "default": "2.0",
+   "group": "Ellipsoid",
+   "doc": "Radius in local Z-direction"
+  },
+  {
+   "name": "Radius2",
+   "default": "4.0",
+   "group": "Ellipsoid",
+   "doc": "Radius in local X-direction"
+  },
+  {
+   "name": "Radius3",
+   "default": "0.0",
+   "group": "Ellipsoid",
+   "doc": "Radius in local Y-direction\\nIf zero, it is equal to Radius2"
+  },
+  {
+   "name": "Angle1",
+   "default": "-90.0f",
+   "group": "Ellipsoid",
+   "doc": "The angle of the ellipsoid"
+  },
+  {
+   "name": "Angle2",
+   "default": "90.0f",
+   "group": "Ellipsoid",
+   "doc": "The angle of the ellipsoid"
+  },
+  {
+   "name": "Angle3",
+   "default": "360.0f",
+   "group": "Ellipsoid",
+   "doc": "The angle of the ellipsoid"
+  }
+ ],
+ "PartDesign::Torus": [
+  {
+   "name": "Radius1",
+   "default": "10.0",
+   "group": "Torus",
+   "doc": "Radius in local XY-plane"
+  },
+  {
+   "name": "Radius2",
+   "default": "2.0",
+   "group": "Torus",
+   "doc": "Radius in local XZ-plane"
+  },
+  {
+   "name": "Angle1",
+   "default": "-180.0",
+   "group": "Torus",
+   "doc": "The angle of the torus"
+  },
+  {
+   "name": "Angle2",
+   "default": "180.0",
+   "group": "Torus",
+   "doc": "The angle of the torus"
+  },
+  {
+   "name": "Angle3",
+   "default": "360.0",
+   "group": "Torus",
+   "doc": "The angle of the torus"
+  }
+ ],
+ "PartDesign::Prism": [
+  {
+   "name": "Polygon",
+   "default": "6.0",
+   "group": "Prism",
+   "doc": "Number of sides in the polygon, of the prism"
+  },
+  {
+   "name": "Circumradius",
+   "default": "2.0",
+   "group": "Prism",
+   "doc": "Circumradius (centre to vertex) of the polygon, of the prism"
+  },
+  {
+   "name": "Height",
+   "default": "10.0f",
+   "group": "Prism",
+   "doc": "The height of the prism"
+  }
+ ],
+ "PartDesign::Wedge": [
+  {
+   "name": "Xmin",
+   "default": "0.0f",
+   "group": "Wedge",
+   "doc": "Xmin of the wedge"
+  },
+  {
+   "name": "Ymin",
+   "default": "0.0f",
+   "group": "Wedge",
+   "doc": "Ymin of the wedge"
+  },
+  {
+   "name": "Zmin",
+   "default": "0.0f",
+   "group": "Wedge",
+   "doc": "Zmin of the wedge"
+  },
+  {
+   "name": "X2min",
+   "default": "2.0f",
+   "group": "Wedge",
+   "doc": "X2min of the wedge"
+  },
+  {
+   "name": "Z2min",
+   "default": "2.0f",
+   "group": "Wedge",
+   "doc": "Z2min of the wedge"
+  },
+  {
+   "name": "Xmax",
+   "default": "10.0f",
+   "group": "Wedge",
+   "doc": "Xmax of the wedge"
+  },
+  {
+   "name": "Ymax",
+   "default": "10.0f",
+   "group": "Wedge",
+   "doc": "Ymax of the wedge"
+  },
+  {
+   "name": "Zmax",
+   "default": "10.0f",
+   "group": "Wedge",
+   "doc": "Zmax of the wedge"
+  },
+  {
+   "name": "X2max",
+   "default": "8.0f",
+   "group": "Wedge",
+   "doc": "X2max of the wedge"
+  },
+  {
+   "name": "Z2max",
+   "default": "8.0f",
+   "group": "Wedge",
+   "doc": "Z2max of the wedge"
+  }
+ ],
+ "PartDesign::FeatureRefine": [
+  {
+   "name": "Refine",
+   "default": "false",
+   "group": "Part Design",
+   "doc": "Refine shape (clean up redundant edges) after operations"
+  },
+  {
+   "name": "FuzzyTolerance",
+   "default": "0.0),\n        \"Part Design\",\n        (App::PropertyType)(App",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::Revolution": [
+  {
+   "name": "SideType",
+   "default": "0L",
+   "group": "Revolution",
+   "doc": "Type of side definition"
+  },
+  {
+   "name": "Type",
+   "default": "0L",
+   "group": "Side1",
+   "doc": "Revolution type for side 1"
+  },
+  {
+   "name": "Type2",
+   "default": "0L",
+   "group": "Side2",
+   "doc": "Revolution type for side 2",
+   "enum": [
+    "Angle",
+    "UpToLast",
+    "UpToFirst",
+    "UpToFace",
+    "?TwoAngles"
+   ]
+  },
+  {
+   "name": "Base",
+   "default": "Base::Vector3d(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Axis",
+   "default": "Base::Vector3d::UnitY",
+   "group": "Revolution",
+   "doc": "Axis"
+  },
+  {
+   "name": "ProjectAxis",
+   "default": "false",
+   "group": "Revolution",
+   "doc": "Projects the reference axis onto the profile plane"
+  },
+  {
+   "name": "Angle",
+   "default": "fullAngle",
+   "group": "Side1",
+   "doc": "Angle"
+  },
+  {
+   "name": "Angle2",
+   "default": "emptyAngle",
+   "group": "Side2",
+   "doc": "Revolution angle in 2nd direction"
+  },
+  {
+   "name": "UpToFace",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Face where revolution will end"
+  },
+  {
+   "name": "UpToFace2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Face where revolution will end on side 2"
+  },
+  {
+   "name": "ReferenceAxis",
+   "default": "nullptr",
+   "group": "Revolution",
+   "doc": "Reference axis of revolution"
+  },
+  {
+   "name": "FuseOrder",
+   "default": "BaseFirst",
+   "group": "Compatibility",
+   "doc": "Order of fuse operation to preserve compatibility with files created using FreeCAD 1.0",
+   "enum": [
+    "BaseFirst",
+    "FeatureFirst"
+   ]
+  }
+ ],
+ "PartDesign::Revolved": [
+  {
+   "name": "StartType",
+   "default": "0L",
+   "group": "Start",
+   "doc": "How to define the revolution start"
+  },
+  {
+   "name": "StartOffset",
+   "default": "0.0",
+   "group": "Start",
+   "doc": "Angular offset from the profile or selected start reference"
+  },
+  {
+   "name": "StartReference",
+   "default": "nullptr",
+   "group": "Start",
+   "doc": "Face, plane or sketch used as the start reference"
+  }
+ ],
+ "PartDesign::Scaled": [
+  {
+   "name": "Factor",
+   "default": "2.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Occurrences",
+   "default": "2",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::ProfileBased": [
+  {
+   "name": "Profile",
+   "default": "nullptr",
+   "group": "SketchBased",
+   "doc": "Reference to sketch"
+  },
+  {
+   "name": "Midplane",
+   "default": "0",
+   "group": "SketchBased",
+   "doc": "Extrude symmetric to sketch face"
+  },
+  {
+   "name": "Reversed",
+   "default": "0",
+   "group": "SketchBased",
+   "doc": "Reverse extrusion direction"
+  },
+  {
+   "name": "UpToFace",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Face where feature will end"
+  },
+  {
+   "name": "UpToShape",
+   "default": "nullptr",
+   "group": "Side1",
+   "doc": "Shape where feature will end"
+  },
+  {
+   "name": "UpToFace2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Face where feature will end"
+  },
+  {
+   "name": "UpToShape2",
+   "default": "nullptr",
+   "group": "Side2",
+   "doc": "Shape where feature will end"
+  },
+  {
+   "name": "AllowMultiFace",
+   "default": "false",
+   "group": "SketchBased",
+   "doc": "Allow multiple faces in profile"
+  }
+ ],
+ "PartDesign::Thickness": [
+  {
+   "name": "Value",
+   "default": "1.0",
+   "group": "Thickness",
+   "doc": "Thickness value"
+  },
+  {
+   "name": "Mode",
+   "default": "0L",
+   "group": "Thickness",
+   "doc": "Mode",
+   "enum": [
+    "Skin",
+    "Pipe",
+    "RectoVerso"
+   ]
+  },
+  {
+   "name": "Join",
+   "default": "0L",
+   "group": "Thickness",
+   "doc": "Join type",
+   "enum": [
+    "Arc",
+    "Intersection"
+   ]
+  },
+  {
+   "name": "Reversed",
+   "default": "true",
+   "group": "Thickness",
+   "doc": "Apply the thickness towards the solids interior"
+  },
+  {
+   "name": "Intersection",
+   "default": "false",
+   "group": "Thickness",
+   "doc": "Enable intersection-handling"
+  }
+ ],
+ "PartDesign::Transformed": [
+  {
+   "name": "Originals",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "TransformMode",
+   "default": "static_cast<long>(Mode::Features",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SuppressedIndices",
+   "default": "std::vector<long>(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "PartDesign::ShapeBinder": [
+  {
+   "name": "Support",
+   "default": "nullptr, nullptr",
+   "group": "",
+   "doc": "Support of the geometry"
+  },
+  {
+   "name": "TraceSupport",
+   "default": "false",
+   "group": "",
+   "doc": "Trace support shape"
+  }
+ ],
+ "PartDesign::SubShapeBinder": [
+  {
+   "name": "Support",
+   "default": "nullptr",
+   "group": "",
+   "doc": "Support of the geometry"
+  },
+  {
+   "name": "Fuse",
+   "default": "false",
+   "group": "Base",
+   "doc": "Fuse solids from bound shapes"
+  },
+  {
+   "name": "MakeFace",
+   "default": "true",
+   "group": "Base",
+   "doc": "Create face using wires from bound shapes"
+  },
+  {
+   "name": "Offset",
+   "default": "0.0",
+   "group": "Offsetting",
+   "doc": "2D offset face or wires, 0.0 = no offset"
+  },
+  {
+   "name": "OffsetJoinType",
+   "default": "(long)0",
+   "group": "Offsetting",
+   "doc": "Arcs, Tangent, Intersection",
+   "enum": [
+    "Arcs",
+    "Tangent",
+    "Intersection"
+   ]
+  },
+  {
+   "name": "OffsetFill",
+   "default": "false",
+   "group": "Offsetting",
+   "doc": "True = make face between original wire and offset."
+  },
+  {
+   "name": "OffsetOpenResult",
+   "default": "false",
+   "group": "Offsetting",
+   "doc": "False = make closed offset from open wire."
+  },
+  {
+   "name": "OffsetIntersection",
+   "default": "false",
+   "group": "Offsetting",
+   "doc": "False = offset child wires independently."
+  },
+  {
+   "name": "ClaimChildren",
+   "default": "false",
+   "group": "Base",
+   "doc": "Claim linked object as children"
+  },
+  {
+   "name": "Relative",
+   "default": "true",
+   "group": "Base",
+   "doc": "Enable relative sub-object binding"
+  },
+  {
+   "name": "BindMode",
+   "default": "(long)0),\n        \"Base\",\n        App::Prop_None,\n        \"S",
+   "group": "Base",
+   "doc": "Refine shape (clean up redundant edges) after adding/subtracting",
+   "enum": [
+    "Synchronized",
+    "Frozen",
+    "Detached"
+   ]
+  },
+  {
+   "name": "_Version",
+   "default": "0",
+   "group": "Base",
+   "doc": ""
+  },
+  {
+   "name": "_CopiedLink",
+   "default": "nullptr",
+   "group": "Base",
+   "doc": ""
+  }
+ ],
+ "Part::AttachExtension": [
+  {
+   "name": "AttacherType",
+   "default": "\"Attacher::AttachEngine3D\"",
+   "group": "Attachment",
+   "doc": "Class name of attach engine object driving the attachment."
+  },
+  {
+   "name": "AttacherEngine",
+   "default": "0L",
+   "group": "Attachment",
+   "doc": "Attach engine object driving the attachment."
+  },
+  {
+   "name": "AttachmentSupport",
+   "default": "nullptr, nullptr",
+   "group": "Attachment",
+   "doc": "Support of the 2D geometry"
+  },
+  {
+   "name": "MapMode",
+   "default": "mmDeactivated",
+   "group": "Attachment",
+   "doc": "Mode of attachment to other object"
+  },
+  {
+   "name": "MapReversed",
+   "default": "false",
+   "group": "Attachment",
+   "doc": "Reverse Z-direction (flip sketch upside down)"
+  },
+  {
+   "name": "MapPathParameter",
+   "default": "0.0",
+   "group": "Attachment",
+   "doc": "Sets point of curve to map the sketch to. 0..1 = start..end"
+  },
+  {
+   "name": "AttachmentOffset",
+   "default": "Base::Placement(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::BodyBase": [
+  {
+   "name": "Tip",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "BaseFeature",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::CircularPatternExtension": [
+  {
+   "name": "Axis",
+   "default": "nullptr",
+   "group": "CircularPattern",
+   "doc": "The axis and center of the circular pattern."
+  },
+  {
+   "name": "RadialDistance",
+   "default": "50.0",
+   "group": "CircularPattern",
+   "doc": "Distance between consecutive concentric circles."
+  },
+  {
+   "name": "TangentialDistance",
+   "default": "25.0",
+   "group": "CircularPattern",
+   "doc": "Approximate distance between consecutive elements on the same circle."
+  },
+  {
+   "name": "NumberCircles",
+   "default": "3",
+   "group": "CircularPattern",
+   "doc": "Number of concentric circles, including the original element."
+  },
+  {
+   "name": "Symmetry",
+   "default": "1",
+   "group": "CircularPattern",
+   "doc": "Number of symmetry divisions used to round each circle's element count."
+  },
+  {
+   "name": "StartAtShape",
+   "default": "false",
+   "group": "CircularPattern",
+   "doc": "Place the existing shape in the first circle, else use the axis' origin as center."
+  },
+  {
+   "name": "BinormalAxis",
+   "default": "nullptr",
+   "group": "CircularPattern",
+   "doc": "The axis representing the binormal of the first transformation on the first circle."
+  },
+  {
+   "name": "FlipBinormalAxis",
+   "default": "false",
+   "group": "CircularPattern",
+   "doc": "Flip the binormal axis' direction."
+  }
+ ],
+ "Part::Compound": [
+  {
+   "name": "Links",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Extrusion": [
+  {
+   "name": "Base",
+   "default": "nullptr",
+   "group": "Extrude",
+   "doc": "Shape to extrude"
+  },
+  {
+   "name": "Dir",
+   "default": "Base::Vector3d(0.0, 0.0, 1.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "DirMode",
+   "default": "dmCustom",
+   "group": "Extrude",
+   "doc": "Sets, how Dir is updated.",
+   "enum": [
+    "Custom",
+    "Edge",
+    "Normal"
+   ]
+  },
+  {
+   "name": "DirLink",
+   "default": "nullptr",
+   "group": "Extrude",
+   "doc": "Link to edge defining extrusion direction."
+  },
+  {
+   "name": "LengthFwd",
+   "default": "0.0",
+   "group": "Extrude",
+   "doc": "Length of extrusion along direction. If both LengthFwd and LengthRev are zero, magnitude of Dir is used."
+  },
+  {
+   "name": "LengthRev",
+   "default": "0.0",
+   "group": "Extrude",
+   "doc": "Length of additional extrusion, against direction."
+  },
+  {
+   "name": "Solid",
+   "default": "false",
+   "group": "Extrude",
+   "doc": "If true, extruding a wire yields a solid. If false, a shell."
+  },
+  {
+   "name": "Reversed",
+   "default": "false",
+   "group": "Extrude",
+   "doc": "Set to true to swap the direction of extrusion."
+  },
+  {
+   "name": "Symmetric",
+   "default": "false",
+   "group": "Extrude",
+   "doc": "If true, extrusion is done in both directions to a total of LengthFwd. LengthRev is ignored."
+  },
+  {
+   "name": "TaperAngle",
+   "default": "0.0",
+   "group": "Extrude",
+   "doc": "Sets the angle of slope (draft) to apply to the sides. The angle is for outward taper; negative value yields inward tapering."
+  },
+  {
+   "name": "TaperAngleRev",
+   "default": "0.0",
+   "group": "Extrude",
+   "doc": "Taper angle of reverse part of extrusion."
+  },
+  {
+   "name": "FaceMakerClass",
+   "default": "\"Part::FaceMakerExtrusion\"",
+   "group": "Extrude",
+   "doc": "If Solid is true, this sets the facemaker class to use when converting wires to faces. Otherwise, ignored."
+  },
+  {
+   "name": "FaceMakerMode",
+   "default": "3L",
+   "group": "Extrude",
+   "doc": "If Solid is true, this sets the facemaker class to use when converting wires to faces. Otherwise, ignored."
+  },
+  {
+   "name": "InnerWireTaper",
+   "default": "static_cast<long>(InnerWireTaper::Inverted",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Inverted",
+    "SameAsOuter"
+   ]
+  }
+ ],
+ "Part::Face": [
+  {
+   "name": "Sources",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "FaceMakerClass",
+   "default": "\"Part::FaceMakerCheese\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::FeatureGeometrySet": [
+  {
+   "name": "GeometrySet",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Mirroring": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Base",
+   "default": "Base::Vector3d(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Normal",
+   "default": "Base::Vector3d(0, 0, 1",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Offset": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": "Offset",
+   "doc": "Source shape"
+  },
+  {
+   "name": "Value",
+   "default": "1.0",
+   "group": "Offset",
+   "doc": "Offset value"
+  },
+  {
+   "name": "Mode",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Skin",
+    "Pipe",
+    "RectoVerso"
+   ]
+  },
+  {
+   "name": "Join",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Arc",
+    "Tangent",
+    "Intersection"
+   ]
+  },
+  {
+   "name": "Intersection",
+   "default": "false",
+   "group": "Offset",
+   "doc": "Intersection"
+  },
+  {
+   "name": "SelfIntersection",
+   "default": "false",
+   "group": "Offset",
+   "doc": "Self Intersection"
+  },
+  {
+   "name": "Fill",
+   "default": "false",
+   "group": "Offset",
+   "doc": "Fill offset"
+  }
+ ],
+ "Part::Boolean": [
+  {
+   "name": "Base",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Tool",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "History",
+   "default": "ShapeHistory(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Refine",
+   "default": "0",
+   "group": "Boolean",
+   "doc": "Refine shape (clean up redundant edges) after this boolean operation"
+  }
+ ],
+ "Part::Box": [
+  {
+   "name": "Length",
+   "default": "10.0f",
+   "group": "Box",
+   "doc": "The length of the box"
+  },
+  {
+   "name": "Width",
+   "default": "10.0f",
+   "group": "Box",
+   "doc": "The width of the box"
+  },
+  {
+   "name": "Height",
+   "default": "10.0f",
+   "group": "Box",
+   "doc": "The height of the box"
+  }
+ ],
+ "Part::Circle": [
+  {
+   "name": "Radius",
+   "default": "2.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Angle1",
+   "default": "0.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Angle2",
+   "default": "360.0f",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::MultiCommon": [
+  {
+   "name": "Shapes",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "History",
+   "default": "ShapeHistory(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Refine",
+   "default": "0",
+   "group": "Boolean",
+   "doc": "Refine shape (clean up redundant edges) after this boolean operation"
+  },
+  {
+   "name": "Behavior",
+   "default": "CommonOfAllShapes),\n        \"Compatibility\",\n        App::Pr",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "CommonOfAllShapes",
+    "CommonOfFirstAndRest"
+   ]
+  }
+ ],
+ "Part::CurveNet": [
+  {
+   "name": "FileName",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::MultiFuse": [
+  {
+   "name": "Shapes",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "History",
+   "default": "ShapeHistory(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Refine",
+   "default": "0",
+   "group": "Boolean",
+   "doc": "Refine shape (clean up redundant edges) after this boolean operation"
+  }
+ ],
+ "Part::ImportBrep": [
+  {
+   "name": "FileName",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::ImportIges": [
+  {
+   "name": "FileName",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::ImportStep": [
+  {
+   "name": "FileName",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Polygon": [
+  {
+   "name": "Nodes",
+   "default": "Base::Vector3d(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Close",
+   "default": "false",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Section": [
+  {
+   "name": "Approximation",
+   "default": "false",
+   "group": "Section",
+   "doc": "Approximate the output edges"
+  }
+ ],
+ "Part::ProjectOnSurface": [
+  {
+   "name": "Mode",
+   "default": "0L",
+   "group": "Projection",
+   "doc": "Projection mode"
+  },
+  {
+   "name": "Height",
+   "default": "0.0",
+   "group": "Projection",
+   "doc": "Extrusion height"
+  },
+  {
+   "name": "Offset",
+   "default": "0.0",
+   "group": "Projection",
+   "doc": "Offset of solid"
+  },
+  {
+   "name": "Direction",
+   "default": "Base::Vector3d(0, 0, 1",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SupportFace",
+   "default": "nullptr",
+   "group": "Projection",
+   "doc": "Support faceo"
+  },
+  {
+   "name": "Projection",
+   "default": "nullptr",
+   "group": "Projection",
+   "doc": "Shapes to project onto support face"
+  }
+ ],
+ "Part::Revolution": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": "Revolve",
+   "doc": "Shape to revolve"
+  },
+  {
+   "name": "Base",
+   "default": "Base::Vector3d(0.0, 0.0, 0.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Axis",
+   "default": "Base::Vector3d(0.0, 0.0, 1.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "AxisLink",
+   "default": "nullptr",
+   "group": "Revolve",
+   "doc": "Link to edge to use as revolution axis."
+  },
+  {
+   "name": "Angle",
+   "default": "360.0),\n        \"Revolve\",\n        App::Prop_None,\n        \"",
+   "group": "Revolve",
+   "doc": "Extend revolution symmetrically from the profile."
+  },
+  {
+   "name": "Solid",
+   "default": "false",
+   "group": "Revolve",
+   "doc": "Make revolution a solid if possible"
+  },
+  {
+   "name": "FaceMakerClass",
+   "default": "\"\"",
+   "group": "Revolve",
+   "doc": "Facemaker to use if Solid is true."
+  }
+ ],
+ "Part::Scale": [
+  {
+   "name": "Base",
+   "default": "nullptr",
+   "group": "Scale",
+   "doc": "Shape to scale"
+  },
+  {
+   "name": "Uniform",
+   "default": "true",
+   "group": "Scale",
+   "doc": "If true, scale equally in all directions"
+  },
+  {
+   "name": "UniformScale",
+   "default": "1.0",
+   "group": "Scale",
+   "doc": "Uniform scale factor - 1.0 means no scaling"
+  },
+  {
+   "name": "XScale",
+   "default": "1.0",
+   "group": "Scale",
+   "doc": "Scale factor in X-direction - 1.0 means no scaling"
+  },
+  {
+   "name": "YScale",
+   "default": "1.0",
+   "group": "Scale",
+   "doc": "Scale factor in Y-direction - 1.0 means no scaling"
+  },
+  {
+   "name": "ZScale",
+   "default": "1.0",
+   "group": "Scale",
+   "doc": "Scale factor in Z-direction - 1.0 means no scaling"
+  }
+ ],
+ "Part::LinearPatternExtension": [
+  {
+   "name": "Direction",
+   "default": "nullptr),\n        \"Direction 1\",\n        App::Prop_None,\n   ",
+   "group": "Direction 1",
+   "doc": "Reverse the first direction of the pattern"
+  },
+  {
+   "name": "Mode",
+   "default": "long(initialMode",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Extent",
+    "Spacing"
+   ]
+  },
+  {
+   "name": "Length",
+   "default": "100.0),\n        \"Direction 1\",\n        App::Prop_None,\n     ",
+   "group": "Direction 1",
+   "doc": "The total number of instances in the first direction, including the original feature."
+  },
+  {
+   "name": "Direction2",
+   "default": "nullptr),\n        \"Direction 2\",\n        App::Prop_None,\n   ",
+   "group": "Direction 2",
+   "doc": "Reverse the second direction of the pattern"
+  },
+  {
+   "name": "Mode2",
+   "default": "long(initialMode",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Extent",
+    "Spacing"
+   ]
+  },
+  {
+   "name": "Length2",
+   "default": "100.0),\n        \"Direction 2\",\n        App::Prop_None,\n     ",
+   "group": "Direction 2",
+   "doc": "The total number of instances in the second direction, including the original feature."
+  }
+ ],
+ "Part::Feature": [
+  {
+   "name": "Shape",
+   "default": "TopoDS_Shape(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ShapeMaterial",
+   "default": "*mat",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::FilletBase": [
+  {
+   "name": "Base",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Edges",
+   "default": "0, 0, 0",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::FeatureReference": [
+  {
+   "name": "Reference",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::RuledSurface": [
+  {
+   "name": "Curve1",
+   "default": "nullptr",
+   "group": "Ruled Surface",
+   "doc": "Curve of ruled surface"
+  },
+  {
+   "name": "Curve2",
+   "default": "nullptr",
+   "group": "Ruled Surface",
+   "doc": "Curve of ruled surface"
+  },
+  {
+   "name": "Orientation",
+   "default": "(long)0",
+   "group": "Ruled Surface",
+   "doc": "Orientation of ruled surface",
+   "enum": [
+    "Automatic",
+    "Forward",
+    "Reversed"
+   ]
+  }
+ ],
+ "Part::Loft": [
+  {
+   "name": "Sections",
+   "default": "nullptr",
+   "group": "Loft",
+   "doc": "List of sections"
+  },
+  {
+   "name": "Solid",
+   "default": "true",
+   "group": "Loft",
+   "doc": "Create solid"
+  },
+  {
+   "name": "Ruled",
+   "default": "false",
+   "group": "Loft",
+   "doc": "Ruled surface"
+  },
+  {
+   "name": "Closed",
+   "default": "false",
+   "group": "Loft",
+   "doc": "Close Last to First Profile"
+  },
+  {
+   "name": "MaxDegree",
+   "default": "5",
+   "group": "Loft",
+   "doc": "Maximum Degree"
+  },
+  {
+   "name": "Linearize",
+   "default": "false",
+   "group": "Loft",
+   "doc": "Linearize the result shape by simplifying linear edge and planar face into line and plane"
+  }
+ ],
+ "Part::Sweep": [
+  {
+   "name": "Sections",
+   "default": "nullptr",
+   "group": "Sweep",
+   "doc": "List of sections"
+  },
+  {
+   "name": "Spine",
+   "default": "nullptr",
+   "group": "Sweep",
+   "doc": "Path to sweep along"
+  },
+  {
+   "name": "Solid",
+   "default": "true",
+   "group": "Sweep",
+   "doc": "Create solid"
+  },
+  {
+   "name": "Frenet",
+   "default": "true",
+   "group": "Sweep",
+   "doc": "Frenet"
+  },
+  {
+   "name": "Transition",
+   "default": "long(1",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Transformed",
+    "Right corner",
+    "Round corner"
+   ]
+  },
+  {
+   "name": "Linearize",
+   "default": "false",
+   "group": "Sweep",
+   "doc": "Linearize the result shape by simplifying linear edge and planar face into line and plane"
+  }
+ ],
+ "Part::Thickness": [
+  {
+   "name": "Faces",
+   "default": "nullptr",
+   "group": "Thickness",
+   "doc": "Faces to be removed"
+  },
+  {
+   "name": "Value",
+   "default": "1.0",
+   "group": "Thickness",
+   "doc": "Thickness value"
+  },
+  {
+   "name": "Mode",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Skin",
+    "Pipe",
+    "RectoVerso"
+   ]
+  },
+  {
+   "name": "Join",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Arc",
+    "Tangent",
+    "Intersection"
+   ]
+  },
+  {
+   "name": "Intersection",
+   "default": "false",
+   "group": "Thickness",
+   "doc": "Intersection"
+  },
+  {
+   "name": "SelfIntersection",
+   "default": "false",
+   "group": "Thickness",
+   "doc": "Self Intersection"
+  }
+ ],
+ "Part::Refine": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": "Refine",
+   "doc": "Source shape"
+  }
+ ],
+ "Part::Reverse": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": "Reverse",
+   "doc": "Source shape"
+  }
+ ],
+ "Part::PathPatternExtension": [
+  {
+   "name": "Path",
+   "default": "nullptr",
+   "group": "PathPattern",
+   "doc": "Path edges used by the pattern."
+  },
+  {
+   "name": "Count",
+   "default": "4",
+   "group": "PathPattern",
+   "doc": "Maximum number of occurrences."
+  },
+  {
+   "name": "SpacingMode",
+   "default": "static_cast<long>(PathPatternSpacingMode::FixedCount",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Fixed count",
+    "Fixed spacing",
+    "Fixed count and spacing"
+   ]
+  },
+  {
+   "name": "Spacing",
+   "default": "20.0",
+   "group": "PathPattern",
+   "doc": "Distance between occurrences."
+  },
+  {
+   "name": "StartOffset",
+   "default": "0.0",
+   "group": "PathPattern",
+   "doc": "Unused distance at path start."
+  },
+  {
+   "name": "EndOffset",
+   "default": "0.0",
+   "group": "PathPattern",
+   "doc": "Unused distance at path end."
+  },
+  {
+   "name": "ReversePath",
+   "default": "false",
+   "group": "PathPattern",
+   "doc": "Traverses the path in reverse."
+  },
+  {
+   "name": "Align",
+   "default": "false",
+   "group": "PathPattern",
+   "doc": "Aligns the occurrence X axes to the path."
+  },
+  {
+   "name": "VerticalVector",
+   "default": "Base::Vector3d::UnitZ",
+   "group": "PathPattern",
+   "doc": "Preferred local Z direction when aligning occurrences."
+  }
+ ],
+ "Part::PointPatternExtension": [
+  {
+   "name": "PointObject",
+   "default": "nullptr",
+   "group": "PointPattern",
+   "doc": "Sketch or shape object whose vertices define the pattern positions."
+  },
+  {
+   "name": "OriginPointIndex",
+   "default": "0",
+   "group": "PointPattern",
+   "doc": "The origin point index, used for the identity transformation."
+  },
+  {
+   "name": "RelativeToFirst",
+   "default": "false",
+   "group": "PointPattern",
+   "doc": "Moves all transformations relative to the first one."
+  }
+ ],
+ "Part::PolarPatternExtension": [
+  {
+   "name": "Axis",
+   "default": "nullptr),\n        \"PolarPattern\",\n        App::Prop_None,\n  ",
+   "group": "PolarPattern",
+   "doc": "Reverses the pattern direction from counter-clockwise (default) to clockwise."
+  },
+  {
+   "name": "Mode",
+   "default": "long(initialMode",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Angle",
+   "default": "360.0),\n        \"PolarPattern\",\n        App::Prop_None,\n    ",
+   "group": "PolarPattern",
+   "doc": "The total number of instances in the pattern, including the original feature."
+  }
+ ],
+ "Part::PreviewExtension": [
+  {
+   "name": "PreviewShape",
+   "default": "TopoShape(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Vertex": [
+  {
+   "name": "X",
+   "default": "0.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Y",
+   "default": "0.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Z",
+   "default": "0.0f",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::Line": [
+  {
+   "name": "X1",
+   "default": "0.0",
+   "group": "Vertex 1 - Start",
+   "doc": "X value of the start vertex"
+  },
+  {
+   "name": "Y1",
+   "default": "0.0",
+   "group": "Vertex 1 - Start",
+   "doc": "Y value of the start vertex"
+  },
+  {
+   "name": "Z1",
+   "default": "0.0",
+   "group": "Vertex 1 - Start",
+   "doc": "Z value of the start vertex"
+  },
+  {
+   "name": "X2",
+   "default": "0.0",
+   "group": "Vertex 2 - Finish",
+   "doc": "X value of the finish vertex"
+  },
+  {
+   "name": "Y2",
+   "default": "0.0",
+   "group": "Vertex 2 - Finish",
+   "doc": "Y value of the finish vertex"
+  },
+  {
+   "name": "Z2",
+   "default": "1.0",
+   "group": "Vertex 2 - Finish",
+   "doc": "Z value of the finish vertex"
+  }
+ ],
+ "Part::Plane": [
+  {
+   "name": "Length",
+   "default": "100.0f",
+   "group": "Plane",
+   "doc": "The length of the plane"
+  },
+  {
+   "name": "Width",
+   "default": "100.0f",
+   "group": "Plane",
+   "doc": "The width of the plane"
+  }
+ ],
+ "Part::Sphere": [
+  {
+   "name": "Radius",
+   "default": "5.0",
+   "group": "Sphere",
+   "doc": "The radius of the sphere"
+  },
+  {
+   "name": "Angle1",
+   "default": "-90.0f",
+   "group": "Sphere",
+   "doc": "The angle of the sphere"
+  },
+  {
+   "name": "Angle2",
+   "default": "90.0f",
+   "group": "Sphere",
+   "doc": "The angle of the sphere"
+  },
+  {
+   "name": "Angle3",
+   "default": "360.0f",
+   "group": "Sphere",
+   "doc": "The angle of the sphere"
+  }
+ ],
+ "Part::Ellipsoid": [
+  {
+   "name": "Radius1",
+   "default": "2.0",
+   "group": "Ellipsoid",
+   "doc": "The radius of the ellipsoid"
+  },
+  {
+   "name": "Radius2",
+   "default": "4.0",
+   "group": "Ellipsoid",
+   "doc": "The radius of the ellipsoid"
+  },
+  {
+   "name": "Radius3",
+   "default": "0.0",
+   "group": "Ellipsoid",
+   "doc": "The radius of the ellipsoid"
+  },
+  {
+   "name": "Angle1",
+   "default": "-90.0f",
+   "group": "Ellipsoid",
+   "doc": "The angle of the ellipsoid"
+  },
+  {
+   "name": "Angle2",
+   "default": "90.0f",
+   "group": "Ellipsoid",
+   "doc": "The angle of the ellipsoid"
+  },
+  {
+   "name": "Angle3",
+   "default": "360.0f",
+   "group": "Ellipsoid",
+   "doc": "The angle of the ellipsoid"
+  }
+ ],
+ "Part::Cylinder": [
+  {
+   "name": "Radius",
+   "default": "2.0",
+   "group": "Cylinder",
+   "doc": "The radius of the cylinder"
+  },
+  {
+   "name": "Height",
+   "default": "10.0f",
+   "group": "Cylinder",
+   "doc": "The height of the cylinder"
+  },
+  {
+   "name": "Angle",
+   "default": "360.0f",
+   "group": "Cylinder",
+   "doc": "The rotation angle of the cylinder"
+  }
+ ],
+ "Part::Prism": [
+  {
+   "name": "Polygon",
+   "default": "6.0",
+   "group": "Prism",
+   "doc": "Number of sides in the polygon, of the prism"
+  },
+  {
+   "name": "Circumradius",
+   "default": "2.0",
+   "group": "Prism",
+   "doc": "Circumradius (centre to vertex) of the polygon, of the prism"
+  },
+  {
+   "name": "Height",
+   "default": "10.0f",
+   "group": "Prism",
+   "doc": "The height of the prism"
+  }
+ ],
+ "Part::RegularPolygon": [
+  {
+   "name": "Polygon",
+   "default": "6.0",
+   "group": "RegularPolygon",
+   "doc": "Number of sides in the regular polygon"
+  },
+  {
+   "name": "Circumradius",
+   "default": "2.0",
+   "group": "RegularPolygon",
+   "doc": "Circumradius (centre to vertex) of the polygon"
+  }
+ ],
+ "Part::Cone": [
+  {
+   "name": "Radius1",
+   "default": "2.0",
+   "group": "Cone",
+   "doc": "The radius of the cone"
+  },
+  {
+   "name": "Radius2",
+   "default": "4.0",
+   "group": "Cone",
+   "doc": "The radius of the cone"
+  },
+  {
+   "name": "Height",
+   "default": "10.0",
+   "group": "Cone",
+   "doc": "The height of the cone"
+  },
+  {
+   "name": "Angle",
+   "default": "360.0",
+   "group": "Cone",
+   "doc": "The angle of the cone"
+  }
+ ],
+ "Part::Torus": [
+  {
+   "name": "Radius1",
+   "default": "10.0",
+   "group": "Torus",
+   "doc": "The radius of the torus"
+  },
+  {
+   "name": "Radius2",
+   "default": "2.0",
+   "group": "Torus",
+   "doc": "The radius of the torus"
+  },
+  {
+   "name": "Angle1",
+   "default": "-180.0",
+   "group": "Torus",
+   "doc": "The angle of the torus"
+  },
+  {
+   "name": "Angle2",
+   "default": "180.0",
+   "group": "Torus",
+   "doc": "The angle of the torus"
+  },
+  {
+   "name": "Angle3",
+   "default": "360.0",
+   "group": "Torus",
+   "doc": "The angle of the torus"
+  }
+ ],
+ "Part::Helix": [
+  {
+   "name": "Pitch",
+   "default": "1.0",
+   "group": "Helix",
+   "doc": "The pitch of the helix"
+  },
+  {
+   "name": "Height",
+   "default": "2.0",
+   "group": "Helix",
+   "doc": "The height of the helix"
+  },
+  {
+   "name": "Radius",
+   "default": "1.0",
+   "group": "Helix",
+   "doc": "The radius of the helix"
+  },
+  {
+   "name": "SegmentLength",
+   "default": "0.0",
+   "group": "Helix",
+   "doc": "The number of turns per helix subdivision"
+  },
+  {
+   "name": "Angle",
+   "default": "0.0",
+   "group": "Helix",
+   "doc": "If angle is != 0 a conical otherwise a cylindircal surface is used"
+  },
+  {
+   "name": "LocalCoord",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Right-handed",
+    "Left-handed"
+   ]
+  },
+  {
+   "name": "Style",
+   "default": "long(0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Old style",
+    "New style"
+   ]
+  },
+  {
+   "name": "Length",
+   "default": "1.0",
+   "group": "Helix",
+   "doc": "The length of the helix"
+  }
+ ],
+ "Part::Spiral": [
+  {
+   "name": "Growth",
+   "default": "1.0",
+   "group": "Spiral",
+   "doc": "The growth of the spiral per rotation"
+  },
+  {
+   "name": "Radius",
+   "default": "1.0",
+   "group": "Spiral",
+   "doc": "The radius of the spiral"
+  },
+  {
+   "name": "Rotations",
+   "default": "2.0",
+   "group": "Spiral",
+   "doc": "The number of rotations"
+  },
+  {
+   "name": "SegmentLength",
+   "default": "1.0",
+   "group": "Spiral",
+   "doc": "The number of turns per spiral subdivision"
+  },
+  {
+   "name": "Length",
+   "default": "1.0",
+   "group": "Spiral",
+   "doc": "The length of the spiral"
+  }
+ ],
+ "Part::Wedge": [
+  {
+   "name": "Xmin",
+   "default": "0.0f",
+   "group": "Wedge",
+   "doc": "Xmin of the wedge"
+  },
+  {
+   "name": "Ymin",
+   "default": "0.0f",
+   "group": "Wedge",
+   "doc": "Ymin of the wedge"
+  },
+  {
+   "name": "Zmin",
+   "default": "0.0f",
+   "group": "Wedge",
+   "doc": "Zmin of the wedge"
+  },
+  {
+   "name": "X2min",
+   "default": "2.0f",
+   "group": "Wedge",
+   "doc": "X2min of the wedge"
+  },
+  {
+   "name": "Z2min",
+   "default": "2.0f",
+   "group": "Wedge",
+   "doc": "Z2min of the wedge"
+  },
+  {
+   "name": "Xmax",
+   "default": "10.0f",
+   "group": "Wedge",
+   "doc": "Xmax of the wedge"
+  },
+  {
+   "name": "Ymax",
+   "default": "10.0f",
+   "group": "Wedge",
+   "doc": "Ymax of the wedge"
+  },
+  {
+   "name": "Zmax",
+   "default": "10.0f",
+   "group": "Wedge",
+   "doc": "Zmax of the wedge"
+  },
+  {
+   "name": "X2max",
+   "default": "8.0f",
+   "group": "Wedge",
+   "doc": "X2max of the wedge"
+  },
+  {
+   "name": "Z2max",
+   "default": "8.0f",
+   "group": "Wedge",
+   "doc": "Z2max of the wedge"
+  }
+ ],
+ "Part::Ellipse": [
+  {
+   "name": "MajorRadius",
+   "default": "4.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "MinorRadius",
+   "default": "4.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Angle1",
+   "default": "0.0f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Angle2",
+   "default": "360.0f",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Part::PrismExtension": [
+  {
+   "name": "FirstAngle",
+   "default": "0.0f",
+   "group": "Prism",
+   "doc": "Angle in first direction"
+  },
+  {
+   "name": "SecondAngle",
+   "default": "0.0f",
+   "group": "Prism",
+   "doc": "Angle in second direction"
+  }
+ ],
+ "Sketcher::SketchObject": [
+  {
+   "name": "Geometry",
+   "default": "nullptr",
+   "group": "Sketch",
+   "doc": "Sketch geometry"
+  },
+  {
+   "name": "Constraints",
+   "default": "nullptr",
+   "group": "Sketch",
+   "doc": "Sketch constraints"
+  },
+  {
+   "name": "ExternalGeometry",
+   "default": "nullptr, nullptr",
+   "group": "Sketch",
+   "doc": "Sketch external geometry"
+  },
+  {
+   "name": "ExternalTypes",
+   "default": "{}",
+   "group": "Sketch",
+   "doc": "Sketch external geometry type: 0 = projection, 1 = intersection, 2 = both."
+  },
+  {
+   "name": "FullyConstrained",
+   "default": "false",
+   "group": "Sketch",
+   "doc": "Sketch is fully constrained"
+  },
+  {
+   "name": "Exports",
+   "default": "nullptr",
+   "group": "Sketch",
+   "doc": "Sketch export geometry"
+  },
+  {
+   "name": "ExternalGeo",
+   "default": "nullptr",
+   "group": "Sketch",
+   "doc": "Sketch external geometry"
+  },
+  {
+   "name": "ArcFitTolerance",
+   "default": "0.0",
+   "group": "Sketch",
+   "doc": "Tolerance for fitting arcs of projected external geometry"
+  },
+  {
+   "name": "InternalShape",
+   "default": "Part::TopoShape(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "MakeInternals",
+   "default": "false",
+   "group": "Internal Geometry",
+   "doc": "Enables selection of closed profiles within a sketch as input for operations"
+  },
+  {
+   "name": "_InternalFaceVersion",
+   "default": "0",
+   "group": "Base",
+   "doc": ""
+  }
+ ],
+ "Sketcher::SketchObjectSF": [
+  {
+   "name": "SketchFlatFile",
+   "default": "nullptr",
+   "group": "",
+   "doc": "SketchFlat file (*.skf) which defines this sketch"
+  }
+ ],
+ "Surface::Cut": [
+  {
+   "name": "ShapeList",
+   "default": "nullptr, \"TopoDS_Shape\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Surface::Extend": [
+  {
+   "name": "Face",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Tolerance",
+   "default": "0.1",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ExtendUNeg",
+   "default": "0.05",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ExtendUPos",
+   "default": "0.05",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ExtendUSymetric",
+   "default": "true",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ExtendVNeg",
+   "default": "0.05",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ExtendVPos",
+   "default": "0.05",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ExtendVSymetric",
+   "default": "true",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SampleU",
+   "default": "32",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SampleV",
+   "default": "32",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Surface::Filling": [
+  {
+   "name": "BoundaryEdges",
+   "default": "nullptr,\"\"",
+   "group": "Filling",
+   "doc": "Boundary Edges (C0 is required for edges without a corresponding face)"
+  },
+  {
+   "name": "BoundaryFaces",
+   "default": "\"\"",
+   "group": "Filling",
+   "doc": "Boundary Faces"
+  },
+  {
+   "name": "BoundaryOrder",
+   "default": "-1",
+   "group": "Filling",
+   "doc": "Order of constraint on boundary faces (C0, G1 and G2 are possible)"
+  },
+  {
+   "name": "UnboundEdges",
+   "default": "nullptr,\"\"",
+   "group": "Filling",
+   "doc": "Unbound constraint edges (C0 is required for edges without a corresponding face)"
+  },
+  {
+   "name": "UnboundFaces",
+   "default": "\"\"",
+   "group": "Filling",
+   "doc": "Unbound constraint faces"
+  },
+  {
+   "name": "UnboundOrder",
+   "default": "-1",
+   "group": "Filling",
+   "doc": "Order of constraint on curve faces (C0, G1 and G2 are possible)"
+  },
+  {
+   "name": "FreeFaces",
+   "default": "nullptr,\"\"",
+   "group": "Filling",
+   "doc": "Free constraint on a face"
+  },
+  {
+   "name": "FreeOrder",
+   "default": "0",
+   "group": "Filling",
+   "doc": "Order of constraint on free faces"
+  },
+  {
+   "name": "Points",
+   "default": "nullptr,\"\"",
+   "group": "Filling",
+   "doc": "Constraint Points (on Surface)"
+  },
+  {
+   "name": "InitialFace",
+   "default": "nullptr",
+   "group": "Filling",
+   "doc": "Initial surface to use"
+  },
+  {
+   "name": "Degree",
+   "default": "3",
+   "group": "Filling",
+   "doc": "Starting degree"
+  },
+  {
+   "name": "PointsOnCurve",
+   "default": "15",
+   "group": "Filling",
+   "doc": "Number of points on an edge for constraint"
+  },
+  {
+   "name": "Iterations",
+   "default": "2",
+   "group": "Filling",
+   "doc": "Number of iterations"
+  },
+  {
+   "name": "Anisotropy",
+   "default": "false",
+   "group": "Filling",
+   "doc": "Anisotropy"
+  },
+  {
+   "name": "Tolerance2d",
+   "default": "0.00001",
+   "group": "Filling",
+   "doc": "2D Tolerance"
+  },
+  {
+   "name": "Tolerance3d",
+   "default": "0.0001",
+   "group": "Filling",
+   "doc": "3D Tolerance"
+  },
+  {
+   "name": "TolAngular",
+   "default": "0.01",
+   "group": "Filling",
+   "doc": "G1 tolerance"
+  },
+  {
+   "name": "TolCurvature",
+   "default": "0.1",
+   "group": "Filling",
+   "doc": "G2 tolerance"
+  },
+  {
+   "name": "MaximumDegree",
+   "default": "8",
+   "group": "Filling",
+   "doc": "Maximum curve degree"
+  },
+  {
+   "name": "MaximumSegments",
+   "default": "9",
+   "group": "Filling",
+   "doc": "Maximum number of segments"
+  }
+ ],
+ "Surface::GeomFillSurface": [
+  {
+   "name": "FillType",
+   "default": "(long)0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Stretched",
+    "Coons",
+    "Curved"
+   ]
+  },
+  {
+   "name": "BoundaryList",
+   "default": "nullptr, \"Dummy\"",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ReversedList",
+   "default": "false",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Surface::Sections": [
+  {
+   "name": "NSections",
+   "default": "nullptr",
+   "group": "Sections",
+   "doc": "Section curves"
+  }
+ ],
+ "Surface::Sewing": [
+  {
+   "name": "ShapeList",
+   "default": "nullptr, \"\"",
+   "group": "Sewing",
+   "doc": "Input shapes"
+  },
+  {
+   "name": "Tolerance",
+   "default": "Precision::Confusion(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SewingOption",
+   "default": "true",
+   "group": "Sewing",
+   "doc": "Sewing option"
+  },
+  {
+   "name": "DegenerateShape",
+   "default": "true",
+   "group": "Sewing",
+   "doc": "Analysis of degenerated shapes"
+  },
+  {
+   "name": "CutFreeEdges",
+   "default": "true",
+   "group": "Sewing",
+   "doc": "Cutting of free edges"
+  },
+  {
+   "name": "Nonmanifold",
+   "default": "false",
+   "group": "Sewing",
+   "doc": "Non-manifold processing"
+  }
+ ],
+ "TechDraw::CosmeticExtension": [
+  {
+   "name": "CosmeticVertexes",
+   "default": "nullptr), cgroup, App::Prop_Output, \"CosmeticVertex Save/Res",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawGeomHatch": [
+  {
+   "name": "Source",
+   "default": "nullptr), vgroup, App::PropertyType::Prop_None,\n            ",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "PatIncluded",
+   "default": "\"\"), vgroup, App::Prop_None,\n                      \"Embedded",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawLeaderLine": [
+  {
+   "name": "LeaderParent",
+   "default": "nullptr), group, (App::PropertyType)(App::Prop_None),\n      ",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "StartSymbol",
+   "default": "FilledArrow",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "EndSymbol",
+   "default": "NoEnd",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Scalable",
+   "default": "false), group, App::Prop_None, \"Scale line with LeaderParent",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawProjGroup": [
+  {
+   "name": "Source",
+   "default": "nullptr), group, App::Prop_None, \"Shape to view\");\n    Sourc",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawProjGroupItem": [
+  {
+   "name": "Type",
+   "default": "(long)0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "DrawProjGroupItem",
+    "Front",
+    "DrawProjGroupItem",
+    "Left",
+    "DrawProjGroupItem",
+    "Right",
+    "DrawProjGroupItem",
+    "Rear",
+    "DrawProjGroupItem",
+    "Top",
+    "DrawProjGroupItem",
+    "Bottom",
+    "DrawProjGroupItem",
+    "FrontTopLeft",
+    "DrawProjGroupItem",
+    "FrontTopRight",
+    "DrawProjGroupItem",
+    "FrontBottomLeft",
+    "DrawProjGroupItem",
+    "FrontBottomRight"
+   ]
+  },
+  {
+   "name": "RotationVector",
+   "default": "1.0, 0.0, 0.0",
+   "group": "Base",
+   "doc": "Deprecated. Use XDirection."
+  }
+ ],
+ "TechDraw::DrawTemplate": [
+  {
+   "name": "Orientation",
+   "default": "0l",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Portrait",
+    "Landscape"
+   ]
+  }
+ ],
+ "TechDraw::DrawTileWeld": [
+  {
+   "name": "LeftText",
+   "default": "\"\"), group, (App::PropertyType)(App::Prop_None),\n           ",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawView": [
+  {
+   "name": "X",
+   "default": "0.0), group, App::Prop_None, \"X position\");\n    ADD_PROPERTY",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Scale",
+   "default": "prefScale(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Caption",
+   "default": "\"\"), group, App::Prop_Output, \"Short text about the view\");\n",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewAnnotation": [
+  {
+   "name": "Text",
+   "default": "\"Default Text\"), vgroup, App::Prop_None, \"Annotation text\");",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "TextColor",
+   "default": "Preferences::normalColor(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "TextSize",
+   "default": "Preferences::labelFontSizeMM(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewBalloon": [
+  {
+   "name": "Text",
+   "default": "\"\"",
+   "group": "",
+   "doc": "The text to be displayed"
+  },
+  {
+   "name": "SourceView",
+   "default": "nullptr",
+   "group": "",
+   "doc": "Source view for balloon"
+  },
+  {
+   "name": "OriginX",
+   "default": "0",
+   "group": "",
+   "doc": "Balloon origin x"
+  },
+  {
+   "name": "OriginY",
+   "default": "0",
+   "group": "",
+   "doc": "Balloon origin y"
+  },
+  {
+   "name": "EndType",
+   "default": "static_cast<int>(Preferences::balloonArrow(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "EndTypeScale",
+   "default": "1.0",
+   "group": "",
+   "doc": "End symbol scale factor"
+  },
+  {
+   "name": "BubbleShape",
+   "default": "Preferences::balloonShape(",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Circular",
+    "None",
+    "Triangle",
+    "Inspection",
+    "Hexagon",
+    "Square",
+    "Rectangle",
+    "Line"
+   ]
+  },
+  {
+   "name": "ShapeScale",
+   "default": "1.0",
+   "group": "",
+   "doc": "Balloon shape scale"
+  },
+  {
+   "name": "TextWrapLen",
+   "default": "-1",
+   "group": "",
+   "doc": "Text wrap length; -1 means no wrap"
+  },
+  {
+   "name": "KinkLength",
+   "default": "Preferences::balloonKinkLength(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewDetail": [
+  {
+   "name": "BaseView",
+   "default": "nullptr), dgroup, App::Prop_None,\n                      \"2D ",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ShowHighlight",
+   "default": "Preferences::showDetailHighlight(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewDimension": [
+  {
+   "name": "References2D",
+   "default": "nullptr, nullptr",
+   "group": "",
+   "doc": "Projected Geometry References"
+  },
+  {
+   "name": "References3D",
+   "default": "nullptr, nullptr",
+   "group": "",
+   "doc": "3D Geometry References"
+  },
+  {
+   "name": "FormatSpec",
+   "default": "getDefaultFormatSpec(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "FormatSpecOverTolerance",
+   "default": "getDefaultFormatSpec(true",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "FormatSpecUnderTolerance",
+   "default": "getDefaultFormatSpec(true",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Arbitrary",
+   "default": "false",
+   "group": "Format",
+   "doc": "Value overridden by user"
+  },
+  {
+   "name": "ArbitraryTolerances",
+   "default": "false",
+   "group": "Format",
+   "doc": "Tolerance values overridden by user"
+  },
+  {
+   "name": "Type",
+   "default": "(long)0",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Distance",
+    "DistanceX",
+    "DistanceY",
+    "DistanceZ",
+    "Radius",
+    "Diameter",
+    "Angle",
+    "Angle3Pt",
+    "Area"
+   ]
+  },
+  {
+   "name": "MeasureType",
+   "default": "(long)1",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "True",
+    "Projected"
+   ]
+  },
+  {
+   "name": "TheoreticalExact",
+   "default": "false",
+   "group": "",
+   "doc": "If theoretical exact (basic) dimension"
+  },
+  {
+   "name": "EqualTolerance",
+   "default": "true",
+   "group": "",
+   "doc": "If over- and undertolerance are equal"
+  },
+  {
+   "name": "OverTolerance",
+   "default": "0.0),\n                      \"\",\n                      App::P",
+   "group": "",
+   "doc": "The dimensional value is displayed inverted"
+  },
+  {
+   "name": "ShowSupplementary",
+   "default": "false",
+   "group": "",
+   "doc": "Toggle supplementary angle\\nAngle displayed is dependent on selection order"
+  },
+  {
+   "name": "AngleOverride",
+   "default": "false",
+   "group": "Override",
+   "doc": "User specified angles"
+  },
+  {
+   "name": "LineAngle",
+   "default": "0.0",
+   "group": "Override",
+   "doc": "Dimension line angle"
+  },
+  {
+   "name": "ExtensionAngle",
+   "default": "0.0",
+   "group": "Override",
+   "doc": "Extension line angle"
+  },
+  {
+   "name": "UseAreaLeaderPoint",
+   "default": "false",
+   "group": "Area",
+   "doc": "If true, the area leader end pt uses user clicked pt instead of face center."
+  },
+  {
+   "name": "AreaLeaderPoint",
+   "default": "Base::Vector3d(0,0,0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SavedGeometry",
+   "default": "",
+   "group": "References",
+   "doc": "Reference Geometry"
+  },
+  {
+   "name": "BoxCorners",
+   "default": "",
+   "group": "References",
+   "doc": "Feature bounding box corners as of last reference update.  Used by autocorrect"
+  },
+  {
+   "name": "UseActualArea",
+   "default": "true",
+   "group": "Area",
+   "doc": "If true, area dimensions return the area of the face minus the areas of any enclosed faces. \\\n                       If false, the area of the face's "
+  },
+  {
+   "name": "ShowUnits",
+   "default": "Preferences::showUnits(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewPart": [
+  {
+   "name": "Source",
+   "default": "nullptr), group, App::Prop_None, \"3D Shape to view\");\n    So",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "CoarseView",
+   "default": "Preferences::getPreferenceGroup(\"General\")->GetBool(\"CoarseV",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SmoothVisible",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"SmoothViz\",",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SeamVisible",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"SeamViz\", f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "IsoVisible",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"IsoViz\", fa",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "HardHidden",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"HardHid\", f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SmoothHidden",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"SmoothHid\",",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SeamHidden",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"SeamHid\", f",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "IsoHidden",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"IsoHid\", fa",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "IsoCount",
+   "default": "Preferences::getPreferenceGroup(\"HLR\")->GetBool(\"IsoCount\", ",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "ScrubCount",
+   "default": "Preferences::scrubCount(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewSection": [
+  {
+   "name": "SectionSymbol",
+   "default": "\"\"),\n                      sgroup,\n                      App",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "CutSurfaceDisplay",
+   "default": "prefCutSurface(",
+   "group": null,
+   "doc": "",
+   "enum": [
+    "Hide",
+    "Color",
+    "SvgHatch",
+    "PatHatch"
+   ]
+  },
+  {
+   "name": "FileHatchPattern",
+   "default": "DrawHatch::prefSvgHatch(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "FileGeomPattern",
+   "default": "DrawGeomHatch::prefGeomHatchFile(",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "SvgIncluded",
+   "default": "\"\"),\n                      fgroup,\n                      App",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "HatchScale",
+   "default": "1.0), fgroup, App::Prop_None, \"Hatch pattern size adjustment",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::DrawViewSpreadsheet": [
+  {
+   "name": "Source",
+   "default": "nullptr), vgroup, App::Prop_None, \"Spreadsheet to view\");\n  ",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "TechDraw::FeatureProjection": [
+  {
+   "name": "Source",
+   "default": "nullptr), group, App::Prop_None, \"Shape to project\");\n    AD",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Assembly::AssemblyLink": [
+  {
+   "name": "Rigid",
+   "default": "true),\n        \"General\",\n        (App::PropertyType)(App::P",
+   "group": "General",
+   "doc": "The linked assembly."
+  }
+ ],
+ "Assembly::BomObject": [
+  {
+   "name": "columnsNames",
+   "default": "\"Index\"",
+   "group": "Bom",
+   "doc": "List of the columns of the Bill of Materials."
+  },
+  {
+   "name": "detailSubAssemblies",
+   "default": "true",
+   "group": "Bom",
+   "doc": "Detail sub-assemblies components."
+  },
+  {
+   "name": "detailParts",
+   "default": "true",
+   "group": "Bom",
+   "doc": "Detail Parts sub-components."
+  },
+  {
+   "name": "onlyParts",
+   "default": "false",
+   "group": "Bom",
+   "doc": "Only Part containers will be added. Solids like PartDesign Bodies will be ignored."
+  }
+ ],
+ "Spreadsheet::Sheet": [
+  {
+   "name": "cells",
+   "default": "",
+   "group": "Spreadsheet",
+   "doc": "Cell contents"
+  },
+  {
+   "name": "columnWidths",
+   "default": "",
+   "group": "Spreadsheet",
+   "doc": "Column widths"
+  },
+  {
+   "name": "rowHeights",
+   "default": "",
+   "group": "Spreadsheet",
+   "doc": "Row heights"
+  },
+  {
+   "name": "rowHeights",
+   "default": "",
+   "group": "Spreadsheet",
+   "doc": "Row heights"
+  }
+ ],
+ "Mesh::Curvature": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "CurvInfo",
+   "default": "CurvatureInfo(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::FixDefects": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Epsilon",
+   "default": "0",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::FixDeformations": [
+  {
+   "name": "MaxAngle",
+   "default": "5.0F",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::FillHoles": [
+  {
+   "name": "FillupHolesOfLength",
+   "default": "0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "MaxArea",
+   "default": "0.1F",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::RemoveComponents": [
+  {
+   "name": "RemoveCompOfSize",
+   "default": "0",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Export": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "FileName",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Format",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Import": [
+  {
+   "name": "FileName",
+   "default": "\"\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::SegmentByMesh": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Tool",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Base",
+   "default": "0.0, 0.0, 0.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Normal",
+   "default": "0.0, 0.0, 1.0",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::SetOperations": [
+  {
+   "name": "Source1",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Source2",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "OperationType",
+   "default": "\"union\"",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Sphere": [
+  {
+   "name": "Radius",
+   "default": "5.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Sampling",
+   "default": "50",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Ellipsoid": [
+  {
+   "name": "Radius1",
+   "default": "2.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Radius2",
+   "default": "4.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Sampling",
+   "default": "50",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Cylinder": [
+  {
+   "name": "Radius",
+   "default": "2.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Length",
+   "default": "10.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "EdgeLength",
+   "default": "1.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Closed",
+   "default": "true",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Sampling",
+   "default": "50",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Cone": [
+  {
+   "name": "Radius1",
+   "default": "2.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Radius2",
+   "default": "4.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Length",
+   "default": "10.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "EdgeLength",
+   "default": "1.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Closed",
+   "default": "true",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Sampling",
+   "default": "50",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Torus": [
+  {
+   "name": "Radius1",
+   "default": "10.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Radius2",
+   "default": "2.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Sampling",
+   "default": "50",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Cube": [
+  {
+   "name": "Length",
+   "default": "10.0F",
+   "group": "Cube",
+   "doc": "The length of the cube"
+  },
+  {
+   "name": "Width",
+   "default": "10.0F",
+   "group": "Cube",
+   "doc": "The width of the cube"
+  },
+  {
+   "name": "Height",
+   "default": "10.0F",
+   "group": "Cube",
+   "doc": "The height of the cube"
+  }
+ ],
+ "Mesh::Transform": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Position",
+   "default": "Matrix4D(",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::TransformDemolding": [
+  {
+   "name": "Source",
+   "default": "nullptr",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Rotation",
+   "default": "0.0",
+   "group": null,
+   "doc": ""
+  },
+  {
+   "name": "Axis",
+   "default": "0.0, 0.0, 1.0",
+   "group": null,
+   "doc": ""
+  }
+ ],
+ "Mesh::Feature": [
+  {
+   "name": "Mesh",
+   "default": "MeshObject(",
+   "group": null,
+   "doc": ""
+  }
+ ]
+}

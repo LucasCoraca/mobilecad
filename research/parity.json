@@ -1,0 +1,9109 @@
+{
+ "summary": {
+  "Assembly": {
+   "total": 31,
+   "mobile": 31,
+   "na": 0,
+   "creates": 2,
+   "make": 0,
+   "dialog": 6,
+   "gui": 2,
+   "other": 21,
+   "unknown": 0
+  },
+  "BIM": {
+   "total": 131,
+   "mobile": 131,
+   "na": 0,
+   "creates": 9,
+   "make": 30,
+   "dialog": 9,
+   "gui": 42,
+   "other": 33,
+   "unknown": 8
+  },
+  "Draft": {
+   "total": 82,
+   "mobile": 82,
+   "na": 0,
+   "creates": 2,
+   "make": 3,
+   "dialog": 8,
+   "gui": 27,
+   "other": 25,
+   "unknown": 17
+  },
+  "Std (core, all workbenches)": {
+   "total": 128,
+   "mobile": 128,
+   "na": 71,
+   "creates": 8,
+   "make": 0,
+   "dialog": 7,
+   "gui": 69,
+   "other": 43,
+   "unknown": 1
+  },
+  "CAM": {
+   "total": 46,
+   "mobile": 46,
+   "na": 0,
+   "creates": 7,
+   "make": 1,
+   "dialog": 0,
+   "gui": 17,
+   "other": 21,
+   "unknown": 0
+  },
+  "Fem": {
+   "total": 97,
+   "mobile": 95,
+   "na": 0,
+   "creates": 21,
+   "make": 6,
+   "dialog": 0,
+   "gui": 8,
+   "other": 19,
+   "unknown": 43
+  },
+  "Inspection": {
+   "total": 2,
+   "mobile": 2,
+   "na": 0,
+   "creates": 0,
+   "make": 0,
+   "dialog": 1,
+   "gui": 0,
+   "other": 1,
+   "unknown": 0
+  },
+  "Material": {
+   "total": 1,
+   "mobile": 1,
+   "na": 1,
+   "creates": 0,
+   "make": 0,
+   "dialog": 0,
+   "gui": 1,
+   "other": 0,
+   "unknown": 0
+  },
+  "PartDesign": {
+   "total": 50,
+   "mobile": 50,
+   "na": 1,
+   "creates": 33,
+   "make": 0,
+   "dialog": 4,
+   "gui": 2,
+   "other": 9,
+   "unknown": 2
+  },
+  "Mesh": {
+   "total": 33,
+   "mobile": 33,
+   "na": 0,
+   "creates": 3,
+   "make": 0,
+   "dialog": 5,
+   "gui": 8,
+   "other": 17,
+   "unknown": 0
+  },
+  "ReverseEngineering": {
+   "total": 15,
+   "mobile": 13,
+   "na": 0,
+   "creates": 6,
+   "make": 0,
+   "dialog": 6,
+   "gui": 0,
+   "other": 3,
+   "unknown": 0
+  },
+  "MeshPart": {
+   "total": 7,
+   "mobile": 7,
+   "na": 0,
+   "creates": 0,
+   "make": 0,
+   "dialog": 3,
+   "gui": 4,
+   "other": 0,
+   "unknown": 0
+  },
+  "OpenSCAD": {
+   "total": 15,
+   "mobile": 15,
+   "na": 0,
+   "creates": 5,
+   "make": 0,
+   "dialog": 2,
+   "gui": 8,
+   "other": 0,
+   "unknown": 0
+  },
+  "Part": {
+   "total": 66,
+   "mobile": 66,
+   "na": 1,
+   "creates": 21,
+   "make": 0,
+   "dialog": 13,
+   "gui": 19,
+   "other": 12,
+   "unknown": 1
+  },
+  "TemplatePyMod": {
+   "total": 12,
+   "mobile": 12,
+   "na": 1,
+   "creates": 1,
+   "make": 0,
+   "dialog": 0,
+   "gui": 4,
+   "other": 7,
+   "unknown": 0
+  },
+  "Sketcher": {
+   "total": 97,
+   "mobile": 97,
+   "na": 0,
+   "creates": 3,
+   "make": 0,
+   "dialog": 1,
+   "gui": 6,
+   "other": 87,
+   "unknown": 0
+  },
+  "Points": {
+   "total": 6,
+   "mobile": 6,
+   "na": 0,
+   "creates": 0,
+   "make": 0,
+   "dialog": 0,
+   "gui": 3,
+   "other": 3,
+   "unknown": 0
+  },
+  "Robot": {
+   "total": 15,
+   "mobile": 15,
+   "na": 0,
+   "creates": 4,
+   "make": 0,
+   "dialog": 1,
+   "gui": 7,
+   "other": 2,
+   "unknown": 1
+  },
+  "Spreadsheet": {
+   "total": 15,
+   "mobile": 15,
+   "na": 0,
+   "creates": 1,
+   "make": 0,
+   "dialog": 0,
+   "gui": 14,
+   "other": 0,
+   "unknown": 0
+  },
+  "Start": {
+   "total": 1,
+   "mobile": 1,
+   "na": 0,
+   "creates": 0,
+   "make": 0,
+   "dialog": 0,
+   "gui": 1,
+   "other": 0,
+   "unknown": 0
+  },
+  "Surface": {
+   "total": 7,
+   "mobile": 7,
+   "na": 0,
+   "creates": 6,
+   "make": 0,
+   "dialog": 0,
+   "gui": 0,
+   "other": 1,
+   "unknown": 0
+  },
+  "TechDraw": {
+   "total": 127,
+   "mobile": 127,
+   "na": 0,
+   "creates": 12,
+   "make": 0,
+   "dialog": 58,
+   "gui": 10,
+   "other": 45,
+   "unknown": 2
+  }
+ },
+ "rows": {
+  "Assembly_CreateAssembly": {
+   "wb": "Assembly",
+   "label": "New Assembly",
+   "kind": "creates",
+   "what": [
+    "Assembly::AssemblyObject",
+    "Assembly::JointGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_SolveAssembly": {
+   "wb": "Assembly",
+   "label": "Solve Assembly",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateView": {
+   "wb": "Assembly",
+   "label": "Exploded View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateSnapshot": {
+   "wb": "Assembly",
+   "label": "Snapshot",
+   "kind": "creates",
+   "what": [
+    "App::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateSimulation": {
+   "wb": "Assembly",
+   "label": "Simulation",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateBom": {
+   "wb": "Assembly",
+   "label": "Bill of Materials",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_LinkSelectLinked": {
+   "wb": "Assembly",
+   "label": "Go to Linked Assembly",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_ExportASMT": {
+   "wb": "Assembly",
+   "label": "Export ASMT File",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_SelectJointsOfComponent": {
+   "wb": "Assembly",
+   "label": "Select Component Joints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_ToggleGrounded": {
+   "wb": "Assembly",
+   "label": "Toggle Grounded",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointRigidGroup": {
+   "wb": "Assembly",
+   "label": "Create Rigid Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointFixed": {
+   "wb": "Assembly",
+   "label": "Assembly_CreateJointFixed",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointRevolute": {
+   "wb": "Assembly",
+   "label": "Revolute Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointCylindrical": {
+   "wb": "Assembly",
+   "label": "Cylindrical Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointSlider": {
+   "wb": "Assembly",
+   "label": "Slider Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointBall": {
+   "wb": "Assembly",
+   "label": "Ball Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointDistance": {
+   "wb": "Assembly",
+   "label": "Distance Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointParallel": {
+   "wb": "Assembly",
+   "label": "Parallel Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointPerpendicular": {
+   "wb": "Assembly",
+   "label": "Perpendicular Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointAngle": {
+   "wb": "Assembly",
+   "label": "Angle Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointRackPinion": {
+   "wb": "Assembly",
+   "label": "Rack and Pinion Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointScrew": {
+   "wb": "Assembly",
+   "label": "Screw Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_ActivateAssembly": {
+   "wb": "Assembly",
+   "label": "Activate Assembly",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_SelectConflictingConstraints": {
+   "wb": "Assembly",
+   "label": "Select Conflicting Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_SelectRedundantConstraints": {
+   "wb": "Assembly",
+   "label": "Select Redundant Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_SelectMalformedConstraints": {
+   "wb": "Assembly",
+   "label": "Select Malformed Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_SelectComponentsWithDoFs": {
+   "wb": "Assembly",
+   "label": "Select Components With DoFs",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointGears": {
+   "wb": "Assembly",
+   "label": "Gears Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_CreateJointBelt": {
+   "wb": "Assembly",
+   "label": "Belt Joint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_InsertNewPart": {
+   "wb": "Assembly",
+   "label": "New Part",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Assembly_InsertLink": {
+   "wb": "Assembly",
+   "label": "Insert Component",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Sketch": {
+   "wb": "BIM",
+   "label": "New Sketch",
+   "kind": "creates",
+   "what": [
+    "Sketcher::SketchObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Line": {
+   "wb": "Draft",
+   "label": "Line",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Wire": {
+   "wb": "Draft",
+   "label": "Polyline",
+   "kind": "make",
+   "what": [
+    "Draft.make_wire"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Rectangle": {
+   "wb": "Draft",
+   "label": "Rectangle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Circle": {
+   "wb": "Draft",
+   "label": "Circle",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Ellipse": {
+   "wb": "Draft",
+   "label": "Ellipse",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Polygon": {
+   "wb": "Draft",
+   "label": "Polygon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Point": {
+   "wb": "Draft",
+   "label": "Point",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Fillet": {
+   "wb": "Draft",
+   "label": "Fillet",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_DimensionAligned": {
+   "wb": "BIM",
+   "label": "Aligned Dimension",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_DimensionHorizontal": {
+   "wb": "BIM",
+   "label": "Horizontal Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_DimensionVertical": {
+   "wb": "BIM",
+   "label": "Vertical Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Text": {
+   "wb": "BIM",
+   "label": "Text",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Leader": {
+   "wb": "BIM",
+   "label": "Leader",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Label": {
+   "wb": "Draft",
+   "label": "Label",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Hatch": {
+   "wb": "Draft",
+   "label": "Hatch",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Grid": {
+   "wb": "BIM",
+   "label": "Grid",
+   "kind": "make",
+   "what": [
+    "Arch.makeGrid"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_SectionPlane": {
+   "wb": "BIM",
+   "label": "Section Plane",
+   "kind": "make",
+   "what": [
+    "Arch.makeSectionPlane"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_TDPage": {
+   "wb": "BIM",
+   "label": "New Page",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawPage",
+    "TechDraw::DrawSVGTemplate"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_TDView": {
+   "wb": "BIM",
+   "label": "New View",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewArch",
+    "TechDraw::DrawViewDraft"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Site": {
+   "wb": "BIM",
+   "label": "Site",
+   "kind": "make",
+   "what": [
+    "Arch.makeSite"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Building": {
+   "wb": "BIM",
+   "label": "Building",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Level": {
+   "wb": "BIM",
+   "label": "Level",
+   "kind": "make",
+   "what": [
+    "Arch.makeFloor"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Space": {
+   "wb": "BIM",
+   "label": "Space",
+   "kind": "make",
+   "what": [
+    "Arch.makeSpace"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Wall": {
+   "wb": "BIM",
+   "label": "Wall",
+   "kind": "make",
+   "what": [
+    "Arch.makeWall"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_CurtainWall": {
+   "wb": "BIM",
+   "label": "Curtain Wall",
+   "kind": "make",
+   "what": [
+    "Arch.makeCurtainWall"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Column": {
+   "wb": "BIM",
+   "label": "Column",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Beam": {
+   "wb": "BIM",
+   "label": "Beam",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Slab": {
+   "wb": "BIM",
+   "label": "Slab",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Door": {
+   "wb": "BIM",
+   "label": "Door",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Window": {
+   "wb": "BIM",
+   "label": "Window",
+   "kind": "make",
+   "what": [
+    "Arch.makeWindow"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Covering": {
+   "wb": "BIM",
+   "label": "Covering",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Pipe": {
+   "wb": "BIM",
+   "label": "Pipe",
+   "kind": "make",
+   "what": [
+    "Arch.makePipe"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_PipeConnector": {
+   "wb": "BIM",
+   "label": "Connector",
+   "kind": "make",
+   "what": [
+    "Arch.makePipeConnector"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Stairs": {
+   "wb": "BIM",
+   "label": "Stairs",
+   "kind": "make",
+   "what": [
+    "Arch.makeStairs"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Roof": {
+   "wb": "BIM",
+   "label": "Roof",
+   "kind": "make",
+   "what": [
+    "Arch.makeRoof"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Panel": {
+   "wb": "BIM",
+   "label": "Panel",
+   "kind": "make",
+   "what": [
+    "Arch.makePanel"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Frame": {
+   "wb": "BIM",
+   "label": "Frame",
+   "kind": "make",
+   "what": [
+    "Arch.makeFrame"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Fence": {
+   "wb": "BIM",
+   "label": "Fence",
+   "kind": "make",
+   "what": [
+    "Arch.makeFence"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Truss": {
+   "wb": "BIM",
+   "label": "Truss",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Equipment": {
+   "wb": "BIM",
+   "label": "Equipment",
+   "kind": "make",
+   "what": [
+    "Arch.makeEquipment"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Rebar": {
+   "wb": "BIM",
+   "label": "Custom Rebar",
+   "kind": "make",
+   "what": [
+    "Arch.makeRebar"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Move": {
+   "wb": "Draft",
+   "label": "Move",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Rotate": {
+   "wb": "Draft",
+   "label": "Rotate",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Scale": {
+   "wb": "Draft",
+   "label": "Scale",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Mirror": {
+   "wb": "Draft",
+   "label": "Mirror",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Copy": {
+   "wb": "BIM",
+   "label": "Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_SimpleCopy": {
+   "wb": "BIM",
+   "label": "Simple Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Compound": {
+   "wb": "BIM",
+   "label": "Compound",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Trimex": {
+   "wb": "BIM",
+   "label": "BIM_Trimex",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Join": {
+   "wb": "Draft",
+   "label": "Join",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Split": {
+   "wb": "Draft",
+   "label": "Split",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Stretch": {
+   "wb": "Draft",
+   "label": "Stretch",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Draft2Sketch": {
+   "wb": "Draft",
+   "label": "Draft to Sketch",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Edit": {
+   "wb": "Draft",
+   "label": "Edit",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Upgrade": {
+   "wb": "Draft",
+   "label": "Upgrade",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Downgrade": {
+   "wb": "Draft",
+   "label": "Downgrade",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Add": {
+   "wb": "BIM",
+   "label": "Add Component",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Remove": {
+   "wb": "BIM",
+   "label": "Remove Component",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_CutPlane": {
+   "wb": "BIM",
+   "label": "Cut With Plane",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Setup": {
+   "wb": "BIM",
+   "label": "BIM Setup",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_ProjectManager": {
+   "wb": "BIM",
+   "label": "Setup Project",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Windows": {
+   "wb": "BIM",
+   "label": "Manage Doors and Windows",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Layers": {
+   "wb": "BIM",
+   "label": "Manage Layers",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Material": {
+   "wb": "BIM",
+   "label": "Material",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Preflight": {
+   "wb": "BIM",
+   "label": "Preflight Checks",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_AnnotationStyleEditor": {
+   "wb": "Draft",
+   "label": "Annotation Styles",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Trash": {
+   "wb": "BIM",
+   "label": "Move to Trash",
+   "kind": "creates",
+   "what": [
+    "App::DocumentObjectGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_WPView": {
+   "wb": "BIM",
+   "label": "Working Plane View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_SelectGroup": {
+   "wb": "Draft",
+   "label": "Select Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Slope": {
+   "wb": "Draft",
+   "label": "Set Slope",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_WorkingPlaneProxy": {
+   "wb": "Draft",
+   "label": "Working Plane Proxy",
+   "kind": "make",
+   "what": [
+    "Draft.make_working_plane_proxy"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_AddConstruction": {
+   "wb": "Draft",
+   "label": "Add to Construction Group",
+   "kind": "creates",
+   "what": [
+    "App::DocumentObjectGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_SplitMesh": {
+   "wb": "BIM",
+   "label": "Split Mesh",
+   "kind": "creates",
+   "what": [
+    "App::DocumentObjectGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_MeshToShape": {
+   "wb": "BIM",
+   "label": "Mesh to Shape",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_SelectNonSolidMeshes": {
+   "wb": "BIM",
+   "label": "Select Non-Manifold Meshes",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_RemoveShape": {
+   "wb": "BIM",
+   "label": "Remove Shape From BIM",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_CloseHoles": {
+   "wb": "BIM",
+   "label": "Close Holes",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_MergeWalls": {
+   "wb": "BIM",
+   "label": "Merge Walls",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Check": {
+   "wb": "BIM",
+   "label": "Check",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_ToggleIfcBrepFlag": {
+   "wb": "BIM",
+   "label": "Toggle IFC B-Rep Flag",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_ToggleSubs": {
+   "wb": "BIM",
+   "label": "Toggle Subcomponents",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Diff": {
+   "wb": "BIM",
+   "label": "IFC Shape Diff",
+   "kind": "creates",
+   "what": [
+    "App::DocumentObjectGroup",
+    "App::MaterialObjectPython",
+    "Part::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_IfcExplorer": {
+   "wb": "BIM",
+   "label": "IFC Explorer",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_IfcSpreadsheet": {
+   "wb": "BIM",
+   "label": "New IFC Spreadsheet",
+   "kind": "make",
+   "what": [
+    "Arch.makeIfcSpreadsheet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_ImagePlane": {
+   "wb": "BIM",
+   "label": "Image Plane",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Rewire": {
+   "wb": "BIM",
+   "label": "Rewire",
+   "kind": "creates",
+   "what": [
+    "Part::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Glue": {
+   "wb": "BIM",
+   "label": "Glue",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Reextrude": {
+   "wb": "BIM",
+   "label": "Re-Extrude",
+   "kind": "creates",
+   "what": [
+    "Part::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Project": {
+   "wb": "BIM",
+   "label": "IFC Project",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Switch": {
+   "wb": "BIM",
+   "label": "Nudge Switch",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Up": {
+   "wb": "BIM",
+   "label": "Nudge Up",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Down": {
+   "wb": "BIM",
+   "label": "Nudge Down",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Left": {
+   "wb": "BIM",
+   "label": "Nudge Left",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Right": {
+   "wb": "BIM",
+   "label": "Nudge Right",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_RotateLeft": {
+   "wb": "BIM",
+   "label": "Nudge Rotate Left",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_RotateRight": {
+   "wb": "BIM",
+   "label": "Nudge Rotate Right",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Extend": {
+   "wb": "BIM",
+   "label": "Nudge Extend",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Nudge_Shrink": {
+   "wb": "BIM",
+   "label": "Nudge Shrink",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_SetWPFront": {
+   "wb": "BIM",
+   "label": "Working Plane Front",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_SetWPTop": {
+   "wb": "BIM",
+   "label": "Working Plane Top",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_SetWPSide": {
+   "wb": "BIM",
+   "label": "Working Plane Side",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_SelectPlane": {
+   "wb": "Draft",
+   "label": "Working Plane",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Arc": {
+   "wb": "Draft",
+   "label": "Arc",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Arc_3Points": {
+   "wb": "Draft",
+   "label": "Arc From 3 Points",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_BSpline": {
+   "wb": "Draft",
+   "label": "B-Spline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_BezCurve": {
+   "wb": "Draft",
+   "label": "B\u00e9zier Curve",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_CubicBezCurve": {
+   "wb": "Draft",
+   "label": "Cubic B\u00e9zier Curve",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Axis": {
+   "wb": "BIM",
+   "label": "Axis",
+   "kind": "make",
+   "what": [
+    "Arch.makeAxis"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_AxisSystem": {
+   "wb": "BIM",
+   "label": "Axis System",
+   "kind": "make",
+   "what": [
+    "Arch.makeAxisSystem"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Offset2D": {
+   "wb": "BIM",
+   "label": "2D Offset",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Offset": {
+   "wb": "Draft",
+   "label": "Offset",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_OrthoArray": {
+   "wb": "Draft",
+   "label": "Array",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PathLinkArray": {
+   "wb": "Draft",
+   "label": "Path Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PolarArray": {
+   "wb": "Draft",
+   "label": "Polar Array",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PointLinkArray": {
+   "wb": "Draft",
+   "label": "Point Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Fuse": {
+   "wb": "BIM",
+   "label": "Union",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Cut": {
+   "wb": "BIM",
+   "label": "Difference",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Common": {
+   "wb": "BIM",
+   "label": "Intersection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_ExtrudeFace": {
+   "wb": "BIM",
+   "label": "Extrude Face",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Extrude": {
+   "wb": "BIM",
+   "label": "Extrude",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_IfcElements": {
+   "wb": "BIM",
+   "label": "Manage IFC Elements",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_IfcQuantities": {
+   "wb": "BIM",
+   "label": "Manage IFC Quantities",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_IfcProperties": {
+   "wb": "BIM",
+   "label": "Manage IFC Properties",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Classification": {
+   "wb": "BIM",
+   "label": "Manage Classification",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Report": {
+   "wb": "BIM",
+   "label": "Report",
+   "kind": "make",
+   "what": [
+    "Arch.makeReport"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Schedule": {
+   "wb": "BIM",
+   "label": "Schedule",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Survey": {
+   "wb": "BIM",
+   "label": "Survey",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Clone": {
+   "wb": "BIM",
+   "label": "Clone",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_LinkMake": {
+   "wb": "BIM",
+   "label": "Make Link",
+   "kind": "creates",
+   "what": [
+    "App::Link"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Unclone": {
+   "wb": "BIM",
+   "label": "Unclone",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Profile": {
+   "wb": "BIM",
+   "label": "Profile",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Box": {
+   "wb": "BIM",
+   "label": "Box",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Builder": {
+   "wb": "BIM",
+   "label": "Shape Builder",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Facebinder": {
+   "wb": "Draft",
+   "label": "Facebinder",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Library": {
+   "wb": "BIM",
+   "label": "Objects Library",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Component": {
+   "wb": "BIM",
+   "label": "Component",
+   "kind": "make",
+   "what": [
+    "Arch.makeComponent"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Reference": {
+   "wb": "BIM",
+   "label": "External Reference",
+   "kind": "make",
+   "what": [
+    "Arch.makeReference"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_DrawingView": {
+   "wb": "BIM",
+   "label": "2D Drawing",
+   "kind": "make",
+   "what": [
+    "Arch.make2DDrawing",
+    "Draft.make_shape_2d_view"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Shape2DView": {
+   "wb": "BIM",
+   "label": "BIM_Shape2DView",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Shape2DCut": {
+   "wb": "BIM",
+   "label": "BIM_Shape2DCut",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_UpdateShape2DView": {
+   "wb": "Draft",
+   "label": "Force 2D View Update",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Welcome": {
+   "wb": "BIM",
+   "label": "BIM Welcome Screen",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Views": {
+   "wb": "BIM",
+   "label": "Views Manager",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Examples": {
+   "wb": "BIM",
+   "label": "BIM Examples",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ReportBug": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Report an &Issue",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Tutorial": {
+   "wb": "BIM",
+   "label": "BIM Tutorial",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Help": {
+   "wb": "BIM",
+   "label": "BIM Help",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Ungroup": {
+   "wb": "BIM",
+   "label": "Remove From Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_EmptyTrash": {
+   "wb": "BIM",
+   "label": "Empty Trash",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_AddToGroup": {
+   "wb": "Draft",
+   "label": "Add to Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_ResetCloneColors": {
+   "wb": "BIM",
+   "label": "Reset Colors",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Reorder": {
+   "wb": "BIM",
+   "label": "Reorder Children",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_MoveView": {
+   "wb": "BIM",
+   "label": "Move View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Floor": {
+   "wb": "BIM",
+   "label": "Level",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_StructuralSystem": {
+   "wb": "BIM",
+   "label": "Structural System",
+   "kind": "make",
+   "what": [
+    "Arch.makeStructuralSystem"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_StructuresFromSelection": {
+   "wb": "BIM",
+   "label": "Multiple Structures",
+   "kind": "make",
+   "what": [
+    "Arch.makeStructure"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Background": {
+   "wb": "BIM",
+   "label": "Toggle Background",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_CloneComponent": {
+   "wb": "BIM",
+   "label": "Clone Component",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Panel_Cut": {
+   "wb": "BIM",
+   "label": "Panel Cut",
+   "kind": "make",
+   "what": [
+    "Arch.makePanelCut"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Panel_Sheet": {
+   "wb": "BIM",
+   "label": "Panel Sheet",
+   "kind": "make",
+   "what": [
+    "Arch.makePanelSheet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Nest": {
+   "wb": "BIM",
+   "label": "Nest",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "BIM_Convert": {
+   "wb": "BIM",
+   "label": "Convert to BIM",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_Material": {
+   "wb": "BIM",
+   "label": "Material",
+   "kind": "make",
+   "what": [
+    "Arch.makeMaterial"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Arch_MultiMaterial": {
+   "wb": "BIM",
+   "label": "Multi-Material",
+   "kind": "make",
+   "what": [
+    "Arch.makeMultiMaterial"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_Diff": {
+   "wb": "BIM",
+   "label": "IFC File Diff",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_Expand": {
+   "wb": "BIM",
+   "label": "IFC Expand",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_ConvertDocument": {
+   "wb": "BIM",
+   "label": "Convert Document",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_MakeProject": {
+   "wb": "BIM",
+   "label": "Convert to IFC Project",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_Save": {
+   "wb": "BIM",
+   "label": "Save IFC File",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_SaveAs": {
+   "wb": "BIM",
+   "label": "Save IFC File As\u2026",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "IFC_UpdateIOS": {
+   "wb": "BIM",
+   "label": "IfcOpenShell Update",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Job": {
+   "wb": "CAM",
+   "label": "New Job",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Workplane": {
+   "wb": "CAM",
+   "label": "Work Plane",
+   "kind": "make",
+   "what": [
+    "PathWorkplane.createWorkplane"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Sanity": {
+   "wb": "CAM",
+   "label": "Sanity Check",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Post": {
+   "wb": "CAM",
+   "label": "Post Process",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_PostSelected": {
+   "wb": "CAM",
+   "label": "Post Process Selected",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Inspect": {
+   "wb": "CAM",
+   "label": "Inspect Toolpath",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_SelectLoop": {
+   "wb": "CAM",
+   "label": "Finish Selecting Loop",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_OpActiveToggle": {
+   "wb": "CAM",
+   "label": "Toggle Operation",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_SimulatorGL": {
+   "wb": "CAM",
+   "label": "CAM Simulator",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Simulator": {
+   "wb": "CAM",
+   "label": "Legacy CAM Simulator",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Comment": {
+   "wb": "CAM",
+   "label": "Comment",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Stop": {
+   "wb": "CAM",
+   "label": "Stop",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_OperationCopy": {
+   "wb": "CAM",
+   "label": "Copy Operation",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Array": {
+   "wb": "CAM",
+   "label": "Array",
+   "kind": "creates",
+   "what": [
+    "Path::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_SimpleCopy": {
+   "wb": "CAM",
+   "label": "Simple Copy",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupArray": {
+   "wb": "CAM",
+   "label": "Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupAxisMap": {
+   "wb": "CAM",
+   "label": "Axis Map",
+   "kind": "creates",
+   "what": [
+    "Path::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupPathBoundary": {
+   "wb": "CAM",
+   "label": "Boundary",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupPathBoundary2": {
+   "wb": "CAM",
+   "label": "Boundary2",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupDogbone": {
+   "wb": "CAM",
+   "label": "Dogbone",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupDragKnife": {
+   "wb": "CAM",
+   "label": "Drag Knife",
+   "kind": "creates",
+   "what": [
+    "Path::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupLeadInOut": {
+   "wb": "CAM",
+   "label": "Lead In/Out",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupMirror": {
+   "wb": "CAM",
+   "label": "Mirror",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupPlungeMilling": {
+   "wb": "CAM",
+   "label": "Plunge Milling",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupRampEntry": {
+   "wb": "CAM",
+   "label": "Ramp Entry",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupTag": {
+   "wb": "CAM",
+   "label": "Tag",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_DressupZCorrect": {
+   "wb": "CAM",
+   "label": "Z Depth Correction",
+   "kind": "creates",
+   "what": [
+    "Path::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_PathShape": {
+   "wb": "CAM",
+   "label": "Path from Shape",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Area": {
+   "wb": "CAM",
+   "label": "Area",
+   "kind": "creates",
+   "what": [
+    "Part::Feature",
+    "Path::FeatureArea",
+    "Path::FeatureAreaView"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Area_Workplane": {
+   "wb": "CAM",
+   "label": "Area Workplane",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Camotics": {
+   "wb": "CAM",
+   "label": "CAMotics",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ExportTemplate": {
+   "wb": "CAM",
+   "label": "Export Template",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_PropertyBag": {
+   "wb": "CAM",
+   "label": "CAM_PropertyBag",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_SetStartPoint": {
+   "wb": "CAM",
+   "label": "Start Point Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolBitSave": {
+   "wb": "CAM",
+   "label": "menuTxt",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolBitSaveAs": {
+   "wb": "CAM",
+   "label": "menuTxt",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Compound": {
+   "wb": "CAM",
+   "label": "Compound",
+   "kind": "creates",
+   "what": [
+    "Path::FeatureCompound"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Shape": {
+   "wb": "CAM",
+   "label": "From Shape",
+   "kind": "creates",
+   "what": [
+    "Part::Feature",
+    "Path::FeatureShape"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Copy": {
+   "wb": "CAM",
+   "label": "Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolController": {
+   "wb": "CAM",
+   "label": "Tool Controller",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolBitLibraryOpen": {
+   "wb": "CAM",
+   "label": "Toolbit Library Manager",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolBitDock": {
+   "wb": "CAM",
+   "label": "Add Toolbit\u2026",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolBitCreate": {
+   "wb": "CAM",
+   "label": "New Toolbit",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_ToolBitLoad": {
+   "wb": "CAM",
+   "label": "Load Tool",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_Fixture": {
+   "wb": "CAM",
+   "label": "Fixture",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "CAM_QuickValidate": {
+   "wb": "CAM",
+   "label": "Quick Validate",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Hyperlink": {
+   "wb": "Draft",
+   "label": "Open Links",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_ShapeString": {
+   "wb": "Draft",
+   "label": "Shape From Text",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Text": {
+   "wb": "Draft",
+   "label": "Text",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Dimension": {
+   "wb": "Draft",
+   "label": "Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Trimex": {
+   "wb": "Draft",
+   "label": "Trimex",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Clone": {
+   "wb": "Draft",
+   "label": "Clone",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_SubelementHighlight": {
+   "wb": "Draft",
+   "label": "Highlight Subelements",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_WireToBSpline": {
+   "wb": "Draft",
+   "label": "Convert Wire/B-Spline",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_FlipDimension": {
+   "wb": "Draft",
+   "label": "Flip Dimension",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_SetStyle": {
+   "wb": "Draft",
+   "label": "Set Style",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_ApplyStyle": {
+   "wb": "Draft",
+   "label": "Apply Current Style",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Layer": {
+   "wb": "Draft",
+   "label": "New Layer",
+   "kind": "make",
+   "what": [
+    "Draft.make_layer"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_LayerManager": {
+   "wb": "Draft",
+   "label": "Manage Layers",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_AddNamedGroup": {
+   "wb": "Draft",
+   "label": "New Named Group",
+   "kind": "creates",
+   "what": [
+    "App::DocumentObjectGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_ToggleConstructionMode": {
+   "wb": "Draft",
+   "label": "Toggle Construction Mode",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_AddToLayer": {
+   "wb": "Draft",
+   "label": "Add to Layer",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_ToggleDisplayMode": {
+   "wb": "Draft",
+   "label": "Toggle Wireframe",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_ToggleGrid": {
+   "wb": "Draft",
+   "label": "Toggle Grid",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Heal": {
+   "wb": "Draft",
+   "label": "Heal",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_ShowSnapBar": {
+   "wb": "Draft",
+   "label": "Show Snap Toolbar",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Lock": {
+   "wb": "Draft",
+   "label": "Snap Lock",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Endpoint": {
+   "wb": "Draft",
+   "label": "Snap Endpoint",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Midpoint": {
+   "wb": "Draft",
+   "label": "Snap Midpoint",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Center": {
+   "wb": "Draft",
+   "label": "Snap Center",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Angle": {
+   "wb": "Draft",
+   "label": "Snap Angle",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Intersection": {
+   "wb": "Draft",
+   "label": "Snap Intersection",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Perpendicular": {
+   "wb": "Draft",
+   "label": "Snap Perpendicular",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Extension": {
+   "wb": "Draft",
+   "label": "Snap Extension",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Parallel": {
+   "wb": "Draft",
+   "label": "Snap Parallel",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Special": {
+   "wb": "Draft",
+   "label": "Snap Special",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Near": {
+   "wb": "Draft",
+   "label": "Snap Near",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Ortho": {
+   "wb": "Draft",
+   "label": "Snap Ortho",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Grid": {
+   "wb": "Draft",
+   "label": "Snap Grid",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_WorkingPlane": {
+   "wb": "Draft",
+   "label": "Snap Working Plane",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Snap_Dimensions": {
+   "wb": "Draft",
+   "label": "Snap Dimensions",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PathTwistedArray": {
+   "wb": "Draft",
+   "label": "Twisted Path Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PathTwistedLinkArray": {
+   "wb": "Draft",
+   "label": "Twisted Path Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PointArray": {
+   "wb": "Draft",
+   "label": "Point Array",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_PathArray": {
+   "wb": "Draft",
+   "label": "Path Array",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_AutoGroup": {
+   "wb": "Draft",
+   "label": "Auto-Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_CircularArray": {
+   "wb": "Draft",
+   "label": "Circular Array",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Draft_Shape2DView": {
+   "wb": "Draft",
+   "label": "Shape 2D View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshClear": {
+   "wb": "Fem",
+   "label": "FEM_MeshClear",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshClearGroups": {
+   "wb": "Fem",
+   "label": "FEM_MeshClearGroups",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshDisplayInfo": {
+   "wb": "Fem",
+   "label": "FEM_MeshDisplayInfo",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_Analysis": {
+   "wb": "Fem",
+   "label": "FEM_Analysis",
+   "kind": "make",
+   "what": [
+    "ObjectsFem.makeAnalysis"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MaterialSolid": {
+   "wb": "Fem",
+   "label": "FEM_MaterialSolid",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MaterialFluid": {
+   "wb": "Fem",
+   "label": "FEM_MaterialFluid",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MaterialMechanicalNonlinear": {
+   "wb": "Fem",
+   "label": "FEM_MaterialMechanicalNonlinear",
+   "kind": "make",
+   "what": [
+    "ObjectsFem.makeMaterialMechanicalNonlinear"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MaterialReinforced": {
+   "wb": "Fem",
+   "label": "FEM_MaterialReinforced",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MaterialEditor": {
+   "wb": "Fem",
+   "label": "FEM_MaterialEditor",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ElementGeometry1D": {
+   "wb": "Fem",
+   "label": "FEM_ElementGeometry1D",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ElementRotation1D": {
+   "wb": "Fem",
+   "label": "FEM_ElementRotation1D",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ElementGeometry2D": {
+   "wb": "Fem",
+   "label": "FEM_ElementGeometry2D",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ElementFluid1D": {
+   "wb": "Fem",
+   "label": "FEM_ElementFluid1D",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintInitialFlowVelocity": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintInitialFlowVelocity",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintInitialPressure": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintInitialPressure",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintFlowVelocity": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintFlowVelocity",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintPlaneRotation": {
+   "wb": "Fem",
+   "label": "Plane Multi-Point Constraint",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintPlaneRotation"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintSectionPrint": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintSectionPrint",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintTransform": {
+   "wb": "Fem",
+   "label": "Local Coordinate System",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintTransform"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintFixed": {
+   "wb": "Fem",
+   "label": "Fixed Boundary Condition",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintFixed"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintRigidBody": {
+   "wb": "Fem",
+   "label": "Rigid Body Constraint",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintRigidBody"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintDisplacement": {
+   "wb": "Fem",
+   "label": "Displacement Boundary Condition",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintDisplacement"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintContact": {
+   "wb": "Fem",
+   "label": "Contact Constraint",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintContact"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintTie": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintTie",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintSpring": {
+   "wb": "Fem",
+   "label": "Spring Boundary Condition",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintSpring"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintForce": {
+   "wb": "Fem",
+   "label": "Force Load",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintForce"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintPressure": {
+   "wb": "Fem",
+   "label": "Pressure Load",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintPressure"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintCentrif": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintCentrif",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintSelfWeight": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintSelfWeight",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintInitialTemperature": {
+   "wb": "Fem",
+   "label": "Initial Temperature",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintInitialTemperature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintHeatflux": {
+   "wb": "Fem",
+   "label": "Heat Flux Load",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintHeatflux"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintTemperature": {
+   "wb": "Fem",
+   "label": "Temperature Boundary Condition",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintTemperature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintBodyHeatSource": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintBodyHeatSource",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshNetgenFromShape": {
+   "wb": "Fem",
+   "label": "FEM_MeshNetgenFromShape",
+   "kind": "make",
+   "what": [
+    "ObjectsFem.makeMeshNetgen",
+    "ObjectsFem.makeMeshNetgenLegacy"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshGmshFromShape": {
+   "wb": "Fem",
+   "label": "FEM_MeshGmshFromShape",
+   "kind": "make",
+   "what": [
+    "ObjectsFem.makeMeshGmsh"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshRegion": {
+   "wb": "Fem",
+   "label": "FEM_MeshRegion",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshGroup": {
+   "wb": "Fem",
+   "label": "FEM_MeshGroup",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_FEMMesh2Mesh": {
+   "wb": "Fem",
+   "label": "FEM_FEMMesh2Mesh",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationFlow": {
+   "wb": "Fem",
+   "label": "FEM_EquationFlow",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationFlux": {
+   "wb": "Fem",
+   "label": "FEM_EquationFlux",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationHeat": {
+   "wb": "Fem",
+   "label": "FEM_EquationHeat",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverControl": {
+   "wb": "Fem",
+   "label": "FEM_SolverControl",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverRun": {
+   "wb": "Fem",
+   "label": "FEM_SolverRun",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ResultsPurge": {
+   "wb": "Fem",
+   "label": "FEM_ResultsPurge",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ResultShow": {
+   "wb": "Fem",
+   "label": "FEM_ResultShow",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostApplyChanges": {
+   "wb": "Fem",
+   "label": "Apply Changes to Pipeline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostPipelineFromResult": {
+   "wb": "Fem",
+   "label": "Post Pipeline From Result",
+   "kind": "creates",
+   "what": [
+    "Fem::FemPostPipeline"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostBranchFilter": {
+   "wb": "Fem",
+   "label": "Pipeline Branch",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterWarp": {
+   "wb": "Fem",
+   "label": "Warp Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterClipScalar": {
+   "wb": "Fem",
+   "label": "Scalar Clip Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterCutFunction": {
+   "wb": "Fem",
+   "label": "Function Cut Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterClipRegion": {
+   "wb": "Fem",
+   "label": "Region Clip Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterContours": {
+   "wb": "Fem",
+   "label": "Contours Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterGlyph": {
+   "wb": "Fem",
+   "label": "FEM_PostFilterGlyph",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": false
+  },
+  "FEM_PostFilterDataAlongLine": {
+   "wb": "Fem",
+   "label": "Line Clip Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterLinearizedStresses": {
+   "wb": "Fem",
+   "label": "Stress Linearization Plot",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterDataAtPoint": {
+   "wb": "Fem",
+   "label": "Data at Point Clip Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostFilterCalculator": {
+   "wb": "Fem",
+   "label": "Calculator Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostCreateFunctions": {
+   "wb": "Fem",
+   "label": "Filter Functions",
+   "kind": "creates",
+   "what": [
+    "Fem::FemPost",
+    "Fem::FemPostFunctionProvider"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_PostVisualization": {
+   "wb": "Fem",
+   "label": "Data Visualizations",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": false
+  },
+  "FEM_ClippingPlaneAdd": {
+   "wb": "Fem",
+   "label": "FEM_ClippingPlaneAdd",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ClippingPlaneRemoveAll": {
+   "wb": "Fem",
+   "label": "FEM_ClippingPlaneRemoveAll",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_Examples": {
+   "wb": "Fem",
+   "label": "FEM_Examples",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintElectromagnetic": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintElectromagnetic",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintCurrentDensity": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintCurrentDensity",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintMagnetization": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintMagnetization",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintElectricChargeDensity": {
+   "wb": "Fem",
+   "label": "FEM_ConstraintElectricChargeDensity",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintFluidBoundary": {
+   "wb": "Fem",
+   "label": "Fluid Boundary Condition",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintFluidBoundary"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintBearing": {
+   "wb": "Fem",
+   "label": "Bearing Constraint",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintBearing"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintGear": {
+   "wb": "Fem",
+   "label": "Gear Constraint",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintGear"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstraintPulley": {
+   "wb": "Fem",
+   "label": "Pulley Constraint",
+   "kind": "creates",
+   "what": [
+    "Fem::ConstraintPulley"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_ConstantVacuumPermittivity": {
+   "wb": "Fem",
+   "label": "FEM_ConstantVacuumPermittivity",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_CreateNodesSet": {
+   "wb": "Fem",
+   "label": "Nodes Set",
+   "kind": "creates",
+   "what": [
+    "Fem::FemSetNodesObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_CreateElementsSet": {
+   "wb": "Fem",
+   "label": "Erase Elements",
+   "kind": "creates",
+   "what": [
+    "Fem::FemSetElementNodesObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_FemAddPart": {
+   "wb": "Fem",
+   "label": "Add Part to Analysis",
+   "kind": "creates",
+   "what": [
+    "Fem::FemAnalysis",
+    "Fem::FemMeshShapeNetgenObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_DefineNodesSet": {
+   "wb": "Fem",
+   "label": "Node Set by Polygon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_DefineElementsSet": {
+   "wb": "Fem",
+   "label": "Element Set From Polygon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationDeformation": {
+   "wb": "Fem",
+   "label": "FEM_EquationDeformation",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationElasticity": {
+   "wb": "Fem",
+   "label": "FEM_EquationElasticity",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationElectricforce": {
+   "wb": "Fem",
+   "label": "FEM_EquationElectricforce",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationElectrostatic": {
+   "wb": "Fem",
+   "label": "FEM_EquationElectrostatic",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationMagnetodynamic": {
+   "wb": "Fem",
+   "label": "FEM_EquationMagnetodynamic",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationMagnetodynamic2D": {
+   "wb": "Fem",
+   "label": "FEM_EquationMagnetodynamic2D",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_EquationStaticCurrent": {
+   "wb": "Fem",
+   "label": "FEM_EquationStaticCurrent",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshBoundaryLayer": {
+   "wb": "Fem",
+   "label": "FEM_MeshBoundaryLayer",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshDistance": {
+   "wb": "Fem",
+   "label": "FEM_MeshDistance",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshManipulate": {
+   "wb": "Fem",
+   "label": "FEM_MeshManipulate",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshAdvanced": {
+   "wb": "Fem",
+   "label": "FEM_MeshAdvanced",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshShape": {
+   "wb": "Fem",
+   "label": "FEM_MeshShape",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshTransfiniteCurve": {
+   "wb": "Fem",
+   "label": "FEM_MeshTransfiniteCurve",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshTransfiniteSurface": {
+   "wb": "Fem",
+   "label": "FEM_MeshTransfiniteSurface",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_MeshTransfiniteVolume": {
+   "wb": "Fem",
+   "label": "FEM_MeshTransfiniteVolume",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverCalculiXCcxTools": {
+   "wb": "Fem",
+   "label": "FEM_SolverCalculiXCcxTools",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverCalculiX": {
+   "wb": "Fem",
+   "label": "FEM_SolverCalculiX",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverElmer": {
+   "wb": "Fem",
+   "label": "FEM_SolverElmer",
+   "kind": "make",
+   "what": [
+    "ObjectsFem.makeSolverElmer"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverMystran": {
+   "wb": "Fem",
+   "label": "FEM_SolverMystran",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "FEM_SolverZ88": {
+   "wb": "Fem",
+   "label": "FEM_SolverZ88",
+   "kind": "make",
+   "what": [
+    "ObjectsFem.makeSolverZ88"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Inspection_VisualInspection": {
+   "wb": "Inspection",
+   "label": "Visual Inspection",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Inspection_InspectElement": {
+   "wb": "Inspection",
+   "label": "Inspection\u2026",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Material_Edit": {
+   "wb": "Material",
+   "label": "Edit",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SetAppearance": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Appearance",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SetMaterial": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Material",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Materials_InspectAppearance": {
+   "wb": "PartDesign",
+   "label": "Inspect Appearance",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Materials_InspectMaterial": {
+   "wb": "PartDesign",
+   "label": "Inspect Material",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Materials_MigrateToExternal": {
+   "wb": "Material",
+   "label": "Migrate",
+   "kind": "dialog",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Mesh_Import": {
+   "wb": "Mesh",
+   "label": "Import Mesh\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Export": {
+   "wb": "Mesh",
+   "label": "Export Mesh\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_VertexCurvature": {
+   "wb": "ReverseEngineering",
+   "label": "Curvature Plot",
+   "kind": "creates",
+   "what": [
+    "Mesh::Curvature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Evaluation": {
+   "wb": "Mesh",
+   "label": "Evaluate and Repair",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_EvaluateFacet": {
+   "wb": "Mesh",
+   "label": "Face Info",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_CurvatureInfo": {
+   "wb": "ReverseEngineering",
+   "label": "Curvature Info",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_EvaluateSolid": {
+   "wb": "Mesh",
+   "label": "Evaluate Solid",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_BoundingBox": {
+   "wb": "Mesh",
+   "label": "Bounding Box Info",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Union": {
+   "wb": "Mesh",
+   "label": "Union",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Intersection": {
+   "wb": "Mesh",
+   "label": "Intersection",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Difference": {
+   "wb": "Mesh",
+   "label": "Difference",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_PolyCut": {
+   "wb": "Mesh",
+   "label": "Cut",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_PolyTrim": {
+   "wb": "Mesh",
+   "label": "Trim",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_PolySegm": {
+   "wb": "Mesh",
+   "label": "Segment",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_TrimByPlane": {
+   "wb": "Mesh",
+   "label": "Trim With Plane",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_SectionByPlane": {
+   "wb": "Mesh",
+   "label": "Section From Plane",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_CrossSections": {
+   "wb": "Mesh",
+   "label": "Cross-Sections",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_FromPartShape": {
+   "wb": "Mesh",
+   "label": "Mesh From Shape",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_RemeshGmsh": {
+   "wb": "ReverseEngineering",
+   "label": "Refinement",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_HarmonizeNormals": {
+   "wb": "Mesh",
+   "label": "Harmonize Normals",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_FlipNormals": {
+   "wb": "Mesh",
+   "label": "Flip Normals",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_FillupHoles": {
+   "wb": "Mesh",
+   "label": "Fill Holes",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_FillInteractiveHole": {
+   "wb": "Mesh",
+   "label": "Close Hole",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_AddFacet": {
+   "wb": "Mesh",
+   "label": "Add Triangle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_RemoveComponents": {
+   "wb": "Mesh",
+   "label": "Remove Components",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_RemoveCompByHand": {
+   "wb": "Mesh",
+   "label": "Remove Components Manually",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Segmentation": {
+   "wb": "Mesh",
+   "label": "Segmentation",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_SegmentationBestFit": {
+   "wb": "Mesh",
+   "label": "Segmentation From Best-Fit Surfaces",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Smoothing": {
+   "wb": "Mesh",
+   "label": "Smooth",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Decimating": {
+   "wb": "Mesh",
+   "label": "Decimate",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Scale": {
+   "wb": "Mesh",
+   "label": "Scale",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_BuildRegularSolid": {
+   "wb": "Mesh",
+   "label": "Regular Solid",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_Merge": {
+   "wb": "Mesh",
+   "label": "Merge",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_SplitComponents": {
+   "wb": "Mesh",
+   "label": "Split by Components",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_CreateFlatMesh": {
+   "wb": "MeshPart",
+   "label": "Unwrap Mesh",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_CreateFlatFace": {
+   "wb": "MeshPart",
+   "label": "Unwrap Face",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_FromGeometry": {
+   "wb": "Mesh",
+   "label": "Mesh From Geometry",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Mesh_PolySplit": {
+   "wb": "Mesh",
+   "label": "Split",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_Mesher": {
+   "wb": "MeshPart",
+   "label": "Mesh From Shape",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_TrimByPlane": {
+   "wb": "MeshPart",
+   "label": "Trim Mesh",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_SectionByPlane": {
+   "wb": "MeshPart",
+   "label": "Section",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_CrossSections": {
+   "wb": "MeshPart",
+   "label": "Cross-Sections",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "MeshPart_CurveOnMesh": {
+   "wb": "MeshPart",
+   "label": "Curve on Mesh",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_ReplaceObject": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_ReplaceObject', 'Replace Object')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_RemoveSubtree": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_RemoveSubtree', 'Remove Objects and Children')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_RefineShapeFeature": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_RefineShapeFeature', 'Refine Shape Feature')",
+   "kind": "creates",
+   "what": [
+    "Part::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_MirrorMeshFeature": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_MirrorMeshFeature', 'Mirror Mesh Feature')",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_ScaleMeshFeature": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_ScaleMeshFeature', 'Scale Mesh Feature')",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_ResizeMeshFeature": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_ResizeMeshFeature', 'Resize Mesh Feature')",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_IncreaseToleranceFeature": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_IncreaseToleranceFeature', 'Increase Tolerance Feature')",
+   "kind": "creates",
+   "what": [
+    "Part::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_Edgestofaces": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_Edgestofaces', 'Convert Edges to Faces')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_ExpandPlacements": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_ExpandPlacements', 'Expand Placements')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_ExplodeGroup": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_ExplodeGroup', 'Explode Group')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_CheckGeometry": {
+   "wb": "PartDesign",
+   "label": "Check Geometry",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Primitives": {
+   "wb": "Part",
+   "label": "Primitive",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Builder": {
+   "wb": "Part",
+   "label": "Shape Builder",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Cut": {
+   "wb": "Part",
+   "label": "Cut",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Fuse": {
+   "wb": "Part",
+   "label": "Union",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Common": {
+   "wb": "Part",
+   "label": "Intersection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Extrude": {
+   "wb": "Part",
+   "label": "Extrude",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Revolve": {
+   "wb": "Part",
+   "label": "Revolve",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_AddOpenSCADElement": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_AddOpenSCADElement', 'Add OpenSCAD Element')",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_MeshBoolean": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_MeshBoolean','Mesh Boolean')",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_Hull": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_Hull', 'Hull')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_Minkowski": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_Minkowski', 'Minkowski Sum')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "OpenSCAD_ColorCodeShape": {
+   "wb": "OpenSCAD",
+   "label": "QtCore.QT_TRANSLATE_NOOP('OpenSCAD_ColorCodeShape', 'Color Shapes')",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Box": {
+   "wb": "Part",
+   "label": "Cube",
+   "kind": "creates",
+   "what": [
+    "Part::Box"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Cylinder": {
+   "wb": "Part",
+   "label": "Cylinder",
+   "kind": "creates",
+   "what": [
+    "Part::Cylinder"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Sphere": {
+   "wb": "Part",
+   "label": "Sphere",
+   "kind": "creates",
+   "what": [
+    "Part::Sphere"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Cone": {
+   "wb": "Part",
+   "label": "Cone",
+   "kind": "creates",
+   "what": [
+    "Part::Cone"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Torus": {
+   "wb": "Part",
+   "label": "Torus",
+   "kind": "creates",
+   "what": [
+    "Part::Torus"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Tube": {
+   "wb": "Part",
+   "label": "Tube",
+   "kind": "creates",
+   "what": [
+    "Part::FeaturePython"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_SimpleCopy": {
+   "wb": "Part",
+   "label": "Simple Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_TransformedCopy": {
+   "wb": "Part",
+   "label": "Transformed Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ElementCopy": {
+   "wb": "Part",
+   "label": "Shape Element Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_RefineShape": {
+   "wb": "Part",
+   "label": "Refine Shape",
+   "kind": "creates",
+   "what": [
+    "Part::Refine"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Boolean": {
+   "wb": "Part",
+   "label": "Boolean Operation",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_JoinConnect": {
+   "wb": "TemplatePyMod",
+   "label": "Connect Shapes",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_JoinEmbed": {
+   "wb": "TemplatePyMod",
+   "label": "Embed Shapes",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_JoinCutout": {
+   "wb": "TemplatePyMod",
+   "label": "Cutout Shape",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_BooleanFragments": {
+   "wb": "Part",
+   "label": "Boolean Fragments",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_SliceApart": {
+   "wb": "Part",
+   "label": "Slice Apart",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Slice": {
+   "wb": "Part",
+   "label": "Slice to Compound",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_XOR": {
+   "wb": "Part",
+   "label": "Boolean XOR",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Compound": {
+   "wb": "Part",
+   "label": "Compound",
+   "kind": "creates",
+   "what": [
+    "Part::Compound"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ExplodeCompound": {
+   "wb": "Part",
+   "label": "Explode Compound",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_CompoundFilter": {
+   "wb": "Part",
+   "label": "Compound Filter",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ToleranceSet": {
+   "wb": "Part",
+   "label": "Set Tolerance",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_BoxSelection": {
+   "wb": "Part",
+   "label": "Box Selection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ShapeFromMesh": {
+   "wb": "Part",
+   "label": "Shape From Mesh",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_PointsFromMesh": {
+   "wb": "Part",
+   "label": "Points From Shape",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_MakeSolid": {
+   "wb": "Part",
+   "label": "Convert to Solid",
+   "kind": "creates",
+   "what": [
+    "Part::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ReverseShape": {
+   "wb": "Part",
+   "label": "Reverse Shapes",
+   "kind": "creates",
+   "what": [
+    "Part::Reverse"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_NewSketch": {
+   "wb": "Sketcher",
+   "label": "New Sketch",
+   "kind": "creates",
+   "what": [
+    "Sketcher::SketchObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Mirror": {
+   "wb": "Part",
+   "label": "Mirror",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Scale": {
+   "wb": "Part",
+   "label": "Scale",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Fillet": {
+   "wb": "Part",
+   "label": "Fillet",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Chamfer": {
+   "wb": "Part",
+   "label": "Chamfer",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_MakeFace": {
+   "wb": "Part",
+   "label": "Face From Wires",
+   "kind": "creates",
+   "what": [
+    "Part::Face"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_RuledSurface": {
+   "wb": "Part",
+   "label": "Ruled Surface",
+   "kind": "creates",
+   "what": [
+    "Part::RuledSurface"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Loft": {
+   "wb": "Part",
+   "label": "Loft",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Sweep": {
+   "wb": "Part",
+   "label": "Sweep",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Section": {
+   "wb": "Part",
+   "label": "Section",
+   "kind": "creates",
+   "what": [
+    "Part::Section"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_CrossSections": {
+   "wb": "Part",
+   "label": "Cross-Sections",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Offset": {
+   "wb": "Part",
+   "label": "3D Offset",
+   "kind": "creates",
+   "what": [
+    "Part::Offset"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Offset2D": {
+   "wb": "Part",
+   "label": "2D Offset",
+   "kind": "creates",
+   "what": [
+    "Part::Offset2D"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Thickness": {
+   "wb": "Part",
+   "label": "Thickness",
+   "kind": "creates",
+   "what": [
+    "Part::Thickness"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ProjectionOnSurface": {
+   "wb": "Part",
+   "label": "Project on Surface",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_SectionCut": {
+   "wb": "Part",
+   "label": "Persiste&nt Section Cut",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_EditAttachment": {
+   "wb": "Part",
+   "label": "Part_EditAttachment",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Defeaturing": {
+   "wb": "Part",
+   "label": "Defeaturing",
+   "kind": "creates",
+   "what": [
+    "Part::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_RandomColor": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Random &Color",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ColorPerFace": {
+   "wb": "PartDesign",
+   "label": "Appearance per &Face",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_PickCurveNet": {
+   "wb": "Part",
+   "label": "Pick Curve Network",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Part_NewDoc": {
+   "wb": "Part",
+   "label": "New Document",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Box2": {
+   "wb": "Part",
+   "label": "Box Fix 1",
+   "kind": "creates",
+   "what": [
+    "Part::Box"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Box3": {
+   "wb": "Part",
+   "label": "Box Fix 2",
+   "kind": "creates",
+   "what": [
+    "Part::Box"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Import": {
+   "wb": "Part",
+   "label": "Import CAD File",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_Export": {
+   "wb": "Part",
+   "label": "Export CAD File",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ImportCurveNet": {
+   "wb": "Part",
+   "label": "Import Curve Network",
+   "kind": "creates",
+   "what": [
+    "Part::CurveNet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_ShapeInfo": {
+   "wb": "Part",
+   "label": "Shape Info",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_LinkArrayCircular": {
+   "wb": "Part",
+   "label": "Circular Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_LinkArrayPath": {
+   "wb": "Part",
+   "label": "Path Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_LinkArrayPoint": {
+   "wb": "Part",
+   "label": "Point Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_LinkArrayLinear": {
+   "wb": "Part",
+   "label": "Linear Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_LinkArrayPolar": {
+   "wb": "Part",
+   "label": "Polar Link Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_CoordinateSystem": {
+   "wb": "PartDesign",
+   "label": "Coordinate System",
+   "kind": "creates",
+   "what": [
+    "Part::LocalCoordinateSystem"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_DatumPlane": {
+   "wb": "PartDesign",
+   "label": "Datum Plane",
+   "kind": "creates",
+   "what": [
+    "Part::DatumPlane"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_DatumLine": {
+   "wb": "PartDesign",
+   "label": "Datum Line",
+   "kind": "creates",
+   "what": [
+    "Part::DatumLine"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_DatumPoint": {
+   "wb": "PartDesign",
+   "label": "Datum Point",
+   "kind": "creates",
+   "what": [
+    "Part::DatumPoint"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_SimpleCylinder": {
+   "wb": "Part",
+   "label": "Cylinder",
+   "kind": "creates",
+   "what": [
+    "Part::Feature"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Part_SelectFilter": {
+   "wb": "Part",
+   "label": "Selection Filter",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_VertexSelection": {
+   "wb": "Part",
+   "label": "Vertex Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_EdgeSelection": {
+   "wb": "Part",
+   "label": "Edge Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_FaceSelection": {
+   "wb": "Part",
+   "label": "Face Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Part_RemoveSelectionGate": {
+   "wb": "Part",
+   "label": "No Selection Filters",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_InvoluteGear": {
+   "wb": "PartDesign",
+   "label": "PartDesign_InvoluteGear",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Sprocket": {
+   "wb": "PartDesign",
+   "label": "PartDesign_Sprocket",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_MoveTip": {
+   "wb": "PartDesign",
+   "label": "Set Tip",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleFreeze": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Freeze",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_MoveFeature": {
+   "wb": "PartDesign",
+   "label": "Move Object To\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_MoveFeatureInTree": {
+   "wb": "PartDesign",
+   "label": "Move Feature After\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_MultiTransform": {
+   "wb": "PartDesign",
+   "label": "Multi-Transform",
+   "kind": "creates",
+   "what": [
+    "PartDesign::MultiTransform"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Body": {
+   "wb": "PartDesign",
+   "label": "New Body",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Body"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Fillet": {
+   "wb": "PartDesign",
+   "label": "Fillet",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Fillet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Chamfer": {
+   "wb": "PartDesign",
+   "label": "Chamfer",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Chamfer"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_NewSketch": {
+   "wb": "PartDesign",
+   "label": "New Sketch",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Draft": {
+   "wb": "PartDesign",
+   "label": "Draft",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Draft"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Thickness": {
+   "wb": "PartDesign",
+   "label": "Thickness",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Thickness"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Defeaturing": {
+   "wb": "PartDesign",
+   "label": "Defeaturing",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Boolean": {
+   "wb": "PartDesign",
+   "label": "Boolean Operation",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Boolean"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Pad": {
+   "wb": "PartDesign",
+   "label": "Pad",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Pad"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Pocket": {
+   "wb": "PartDesign",
+   "label": "Pocket",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Pocket"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Hole": {
+   "wb": "PartDesign",
+   "label": "Hole",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Hole"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Revolution": {
+   "wb": "PartDesign",
+   "label": "Revolve",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Revolution"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Groove": {
+   "wb": "PartDesign",
+   "label": "Groove",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Groove"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_AdditiveLoft": {
+   "wb": "PartDesign",
+   "label": "Additive Loft",
+   "kind": "creates",
+   "what": [
+    "PartDesign::AdditiveLoft"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_SubtractiveLoft": {
+   "wb": "PartDesign",
+   "label": "Subtractive Loft",
+   "kind": "creates",
+   "what": [
+    "PartDesign::SubtractiveLoft"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_AdditivePipe": {
+   "wb": "PartDesign",
+   "label": "Additive Pipe",
+   "kind": "creates",
+   "what": [
+    "PartDesign::AdditivePipe"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_SubtractivePipe": {
+   "wb": "PartDesign",
+   "label": "Subtractive Pipe",
+   "kind": "creates",
+   "what": [
+    "PartDesign::SubtractivePipe"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_AdditiveHelix": {
+   "wb": "PartDesign",
+   "label": "Additive Helix",
+   "kind": "creates",
+   "what": [
+    "PartDesign::AdditiveHelix"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_SubtractiveHelix": {
+   "wb": "PartDesign",
+   "label": "Subtractive Helix",
+   "kind": "creates",
+   "what": [
+    "PartDesign::SubtractiveHelix"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Mirrored": {
+   "wb": "PartDesign",
+   "label": "Mirror",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Mirrored"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_LinearPattern": {
+   "wb": "PartDesign",
+   "label": "Linear Pattern",
+   "kind": "creates",
+   "what": [
+    "PartDesign::LinearPattern"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_PolarPattern": {
+   "wb": "PartDesign",
+   "label": "Polar Pattern",
+   "kind": "creates",
+   "what": [
+    "PartDesign::PolarPattern"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_CircularPattern": {
+   "wb": "PartDesign",
+   "label": "Circular Pattern",
+   "kind": "creates",
+   "what": [
+    "PartDesign::CircularPattern"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_PathPattern": {
+   "wb": "PartDesign",
+   "label": "Path Pattern",
+   "kind": "creates",
+   "what": [
+    "PartDesign::PathPattern"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_PointPattern": {
+   "wb": "PartDesign",
+   "label": "Point Pattern",
+   "kind": "creates",
+   "what": [
+    "PartDesign::PointPattern"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_EditSketch": {
+   "wb": "Sketcher",
+   "label": "Edit Sketch",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_MapSketch": {
+   "wb": "Sketcher",
+   "label": "Attach Sketch",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ReorientSketch": {
+   "wb": "Sketcher",
+   "label": "Reorient Sketch",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ValidateSketch": {
+   "wb": "Sketcher",
+   "label": "Validate Sketch",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_MergeSketches": {
+   "wb": "Sketcher",
+   "label": "Merge Sketches",
+   "kind": "creates",
+   "what": [
+    "Sketcher::SketchObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_MirrorSketch": {
+   "wb": "Sketcher",
+   "label": "Mirror Sketch",
+   "kind": "creates",
+   "what": [
+    "Sketcher::SketchObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_ShapeBinder": {
+   "wb": "PartDesign",
+   "label": "Shape Binder",
+   "kind": "creates",
+   "what": [
+    "PartDesign::ShapeBinder"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_SubShapeBinder": {
+   "wb": "PartDesign",
+   "label": "Sub-Shape Binder",
+   "kind": "creates",
+   "what": [
+    "PartDesign::SubShapeBinder"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Clone": {
+   "wb": "PartDesign",
+   "label": "Clone",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Body",
+    "PartDesign::FeatureBase"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_WizardShaft": {
+   "wb": "PartDesign",
+   "label": "PartDesign_WizardShaft",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DuplicateSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Duplicate Selecti&on",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_DuplicateSelection": {
+   "wb": "PartDesign",
+   "label": "Duplicate &Object",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Plane": {
+   "wb": "PartDesign",
+   "label": "Datum Plane",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Line": {
+   "wb": "PartDesign",
+   "label": "Datum Line",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Point": {
+   "wb": "PartDesign",
+   "label": "Datum Point",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_CoordinateSystem": {
+   "wb": "PartDesign",
+   "label": "Local Coordinate System",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Scaled": {
+   "wb": "PartDesign",
+   "label": "Scale",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Scaled"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_Migrate": {
+   "wb": "PartDesign",
+   "label": "Migrate",
+   "kind": "creates",
+   "what": [
+    "PartDesign::Body"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "PartDesign_WizardShaftCallBack": {
+   "wb": "PartDesign",
+   "label": "PartDesign_WizardShaftCallBack",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Points_Import": {
+   "wb": "Points",
+   "label": "Import Points\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Points_Export": {
+   "wb": "Points",
+   "label": "Export Points\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Points_Convert": {
+   "wb": "Points",
+   "label": "Convert to Points",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Points_Structure": {
+   "wb": "Points",
+   "label": "Structured Point Cloud",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Points_Merge": {
+   "wb": "Points",
+   "label": "Merge Point Clouds",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Points_PolyCut": {
+   "wb": "Points",
+   "label": "Cut Point Cloud",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_PoissonReconstruction": {
+   "wb": "ReverseEngineering",
+   "label": "Poisson\u2026",
+   "kind": "dialog",
+   "what": [],
+   "mobile": false,
+   "na": false
+  },
+  "Reen_ViewTriangulation": {
+   "wb": "ReverseEngineering",
+   "label": "Structured Point Clouds",
+   "kind": "creates",
+   "what": [
+    "Mesh::Feature"
+   ],
+   "mobile": false,
+   "na": false
+  },
+  "Reen_Segmentation": {
+   "wb": "ReverseEngineering",
+   "label": "Mesh Segmentation\u2026",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_SegmentationManual": {
+   "wb": "ReverseEngineering",
+   "label": "Manual Segmentation\u2026",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_SegmentationFromComponents": {
+   "wb": "ReverseEngineering",
+   "label": "From Components",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_MeshBoundary": {
+   "wb": "ReverseEngineering",
+   "label": "Wire From Mesh Boundary\u2026",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_ApproxPlane": {
+   "wb": "ReverseEngineering",
+   "label": "Plane",
+   "kind": "creates",
+   "what": [
+    "Part::Plane"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_ApproxCylinder": {
+   "wb": "ReverseEngineering",
+   "label": "Cylinder",
+   "kind": "creates",
+   "what": [
+    "Part::Cylinder"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_ApproxSphere": {
+   "wb": "ReverseEngineering",
+   "label": "Sphere",
+   "kind": "creates",
+   "what": [
+    "Part::Sphere"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_ApproxPolynomial": {
+   "wb": "ReverseEngineering",
+   "label": "Polynomial Surface",
+   "kind": "creates",
+   "what": [
+    "Part::Spline"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_ApproxSurface": {
+   "wb": "ReverseEngineering",
+   "label": "Approximate B-Spline Surface\u2026",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Reen_ApproxCurve": {
+   "wb": "ReverseEngineering",
+   "label": "Approximate B-Spline Curve\u2026",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_InsertWaypoint": {
+   "wb": "Robot",
+   "label": "Insert in Trajectory",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_InsertWaypointPreselect": {
+   "wb": "Robot",
+   "label": "Insert in Trajectory",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_AddToolShape": {
+   "wb": "Robot",
+   "label": "Tool",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_SetHomePos": {
+   "wb": "Robot",
+   "label": "Set Home Position",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_RestoreHomePos": {
+   "wb": "Robot",
+   "label": "Move to Home",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_TrajectoryDressUp": {
+   "wb": "Robot",
+   "label": "Dress-Up Trajectory",
+   "kind": "creates",
+   "what": [
+    "Robot::TrajectoryDressUpObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_TrajectoryCompound": {
+   "wb": "Robot",
+   "label": "Trajectory Compound",
+   "kind": "creates",
+   "what": [
+    "Robot::TrajectoryCompound"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_Create": {
+   "wb": "Robot",
+   "label": "Place Robot",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_CreateTrajectory": {
+   "wb": "Robot",
+   "label": "Trajectory",
+   "kind": "creates",
+   "what": [
+    "Robot::TrajectoryObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_Edge2Trac": {
+   "wb": "Robot",
+   "label": "Edge to Trajectory",
+   "kind": "creates",
+   "what": [
+    "Robot::Edge2TracObject"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_Simulate": {
+   "wb": "Robot",
+   "label": "Simulate Trajectory",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_ExportKukaCompact": {
+   "wb": "Robot",
+   "label": "Kuka Compact Subroutine",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_ExportKukaFull": {
+   "wb": "Robot",
+   "label": "Kuka Full Subroutine",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_SetDefaultOrientation": {
+   "wb": "Robot",
+   "label": "Set Default Orientation",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Robot_SetDefaultValues": {
+   "wb": "Robot",
+   "label": "Set Default Values",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ProfilesHexagon1": {
+   "wb": "Sketcher",
+   "label": "Creates a hexagonal profile",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_LeaveSketch": {
+   "wb": "Sketcher",
+   "label": "Leave Sketch",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CancelSketch": {
+   "wb": "Sketcher",
+   "label": "Cancel Editing",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ViewSketch": {
+   "wb": "Sketcher",
+   "label": "Align View to Sketch",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ViewSection": {
+   "wb": "Sketcher",
+   "label": "Toggle Section View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_StopOperation": {
+   "wb": "Sketcher",
+   "label": "Stop Operation",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreatePolyline": {
+   "wb": "Sketcher",
+   "label": "Polyline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateLine": {
+   "wb": "Sketcher",
+   "label": "Line",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateArc": {
+   "wb": "Sketcher",
+   "label": "Arc From Center",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Create3PointArc": {
+   "wb": "Sketcher",
+   "label": "Arc From 3 Points",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateArcOfEllipse": {
+   "wb": "Sketcher",
+   "label": "Elliptical Arc",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateArcOfHyperbola": {
+   "wb": "Sketcher",
+   "label": "Hyperbolic Arc",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateArcOfParabola": {
+   "wb": "Sketcher",
+   "label": "Parabolic Arc",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateCircle": {
+   "wb": "Sketcher",
+   "label": "Circle From Center",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Create3PointCircle": {
+   "wb": "Sketcher",
+   "label": "Circle From 3 Points",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateEllipseByCenter": {
+   "wb": "Sketcher",
+   "label": "Ellipse From Center",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateEllipseBy3Points": {
+   "wb": "Sketcher",
+   "label": "Ellipse From 3 Points",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateTriangle": {
+   "wb": "Sketcher",
+   "label": "Triangle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateSquare": {
+   "wb": "Sketcher",
+   "label": "Square",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreatePentagon": {
+   "wb": "Sketcher",
+   "label": "Pentagon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateHexagon": {
+   "wb": "Sketcher",
+   "label": "Hexagon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateHeptagon": {
+   "wb": "Sketcher",
+   "label": "Heptagon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateOctagon": {
+   "wb": "Sketcher",
+   "label": "Octagon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateRegularPolygon": {
+   "wb": "Sketcher",
+   "label": "Polygon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateRectangle": {
+   "wb": "Sketcher",
+   "label": "Rectangle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateRectangle_Center": {
+   "wb": "Sketcher",
+   "label": "Centered Rectangle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateOblong": {
+   "wb": "Sketcher",
+   "label": "Rounded Rectangle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateSlot": {
+   "wb": "Sketcher",
+   "label": "Slot",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateArcSlot": {
+   "wb": "Sketcher",
+   "label": "Arc Slot",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateBSpline": {
+   "wb": "Sketcher",
+   "label": "B-Spline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreatePeriodicBSpline": {
+   "wb": "Sketcher",
+   "label": "Periodic B-Spline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateBSplineByInterpolation": {
+   "wb": "Sketcher",
+   "label": "B-Spline From Knots",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreatePeriodicBSplineByInterpolation": {
+   "wb": "Sketcher",
+   "label": "Periodic B-Spline From Knots",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateFillet": {
+   "wb": "Sketcher",
+   "label": "Fillet",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateChamfer": {
+   "wb": "Sketcher",
+   "label": "Chamfer",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Trimming": {
+   "wb": "Sketcher",
+   "label": "Trim Edge",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Extend": {
+   "wb": "Sketcher",
+   "label": "Extend Edge",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Split": {
+   "wb": "Sketcher",
+   "label": "Split Edge",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreatePoint": {
+   "wb": "Sketcher",
+   "label": "Point",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreateText": {
+   "wb": "Sketcher",
+   "label": "Text",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ToggleConstruction": {
+   "wb": "Sketcher",
+   "label": "Toggle Construction Geometry",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ConstrainGroup": {
+   "wb": "Sketcher",
+   "label": "Group Constraint",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Dimension": {
+   "wb": "Sketcher",
+   "label": "Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ConstrainSnellsLaw": {
+   "wb": "Sketcher",
+   "label": "Refraction Constraint",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ToggleDrivingConstraint": {
+   "wb": "Sketcher",
+   "label": "Toggle Driving/Reference Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ToggleActiveConstraint": {
+   "wb": "Sketcher",
+   "label": "Toggle Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Projection": {
+   "wb": "Sketcher",
+   "label": "External Projection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Intersection": {
+   "wb": "Sketcher",
+   "label": "External Intersection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CarbonCopy": {
+   "wb": "Sketcher",
+   "label": "Carbon Copy",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectOrigin": {
+   "wb": "Sketcher",
+   "label": "Select Origin",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectHorizontalAxis": {
+   "wb": "Sketcher",
+   "label": "Select Horizontal Axis",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectVerticalAxis": {
+   "wb": "Sketcher",
+   "label": "Select Vertical Axis",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Translate": {
+   "wb": "Sketcher",
+   "label": "Move / Array Transform",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Rotate": {
+   "wb": "Sketcher",
+   "label": "Rotate / Polar Transform",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Scale": {
+   "wb": "Sketcher",
+   "label": "Scale",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Offset": {
+   "wb": "Sketcher",
+   "label": "Offset",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Symmetry": {
+   "wb": "Sketcher",
+   "label": "Mirror",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_RemoveAxesAlignment": {
+   "wb": "Sketcher",
+   "label": "Remove Axes Alignment",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_DeleteAllGeometry": {
+   "wb": "Sketcher",
+   "label": "Delete All Geometry",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_DeleteAllConstraints": {
+   "wb": "Sketcher",
+   "label": "Delete All Constraints",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CopyClipboard": {
+   "wb": "Sketcher",
+   "label": "C&opy Elements",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Cut": {
+   "wb": "Sketcher",
+   "label": "C&ut Elements",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Paste": {
+   "wb": "Sketcher",
+   "label": "P&aste Elements",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineConvertToNURBS": {
+   "wb": "Sketcher",
+   "label": "Geometry to B-Spline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineIncreaseDegree": {
+   "wb": "Sketcher",
+   "label": "Increase B-Spline Degree",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineDecreaseDegree": {
+   "wb": "Sketcher",
+   "label": "Decrease B-Spline Degree",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineIncreaseKnotMultiplicity": {
+   "wb": "Sketcher",
+   "label": "Increase Knot Multiplicity",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineDecreaseKnotMultiplicity": {
+   "wb": "Sketcher",
+   "label": "Decrease Knot Multiplicity",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineInsertKnot": {
+   "wb": "Sketcher",
+   "label": "Insert Knot",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_JoinCurves": {
+   "wb": "Sketcher",
+   "label": "Join Curves",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectElementsWithDoFs": {
+   "wb": "Sketcher",
+   "label": "Select Under-Constrained Elements",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectConstraints": {
+   "wb": "Sketcher",
+   "label": "Select Associated Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectRedundantConstraints": {
+   "wb": "Sketcher",
+   "label": "Select Redundant Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectConflictingConstraints": {
+   "wb": "Sketcher",
+   "label": "Select Conflicting Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ArcOverlay": {
+   "wb": "Sketcher",
+   "label": "Toggle Circular Helper for Arcs",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_RestoreInternalAlignmentGeometry": {
+   "wb": "Sketcher",
+   "label": "Toggle Internal Geometry",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SwitchVirtualSpace": {
+   "wb": "Sketcher",
+   "label": "Switch Virtual Space",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Grid": {
+   "wb": "Sketcher",
+   "label": "Toggle Grid",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_Snap": {
+   "wb": "Sketcher",
+   "label": "Toggle Snap",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_RenderingOrder": {
+   "wb": "Sketcher",
+   "label": "Rendering Order",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_ChangeDimensionConstraint": {
+   "wb": "Sketcher",
+   "label": "Edit Value",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_CreatePolylineLegacy": {
+   "wb": "Sketcher",
+   "label": "Polyline",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineDegree": {
+   "wb": "Sketcher",
+   "label": "Toggle B-Spline Degree",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplinePolygon": {
+   "wb": "Sketcher",
+   "label": "Toggle B-Spline Control Polygon",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineComb": {
+   "wb": "Sketcher",
+   "label": "Toggle B-Spline Curvature Comb",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplineKnotMultiplicity": {
+   "wb": "Sketcher",
+   "label": "Toggle B-Spline Knot Multiplicity",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_BSplinePoleWeight": {
+   "wb": "Sketcher",
+   "label": "Toggle B-Spline Control Point Weight",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectMalformedConstraints": {
+   "wb": "Sketcher",
+   "label": "Select Malformed Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_SelectPartiallyRedundantConstraints": {
+   "wb": "Sketcher",
+   "label": "Select Partially Redundant Constraints",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Sketcher_RectangularArray": {
+   "wb": "Sketcher",
+   "label": "Rectangular Array",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_AlignLeft": {
+   "wb": "Spreadsheet",
+   "label": "Align &Left",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_AlignCenter": {
+   "wb": "Spreadsheet",
+   "label": "Align Horizontal &Center",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_AlignRight": {
+   "wb": "Spreadsheet",
+   "label": "Align &Right",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_AlignTop": {
+   "wb": "Spreadsheet",
+   "label": "Align &Top",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_AlignVCenter": {
+   "wb": "Spreadsheet",
+   "label": "Align &Vertical Center",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_AlignBottom": {
+   "wb": "Spreadsheet",
+   "label": "Align &Bottom",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_StyleBold": {
+   "wb": "Spreadsheet",
+   "label": "&Bold Text",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_StyleItalic": {
+   "wb": "Spreadsheet",
+   "label": "&Italic Text",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_StyleUnderline": {
+   "wb": "Spreadsheet",
+   "label": "&Underline Text",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_CreateSheet": {
+   "wb": "Spreadsheet",
+   "label": "&New Spreadsheet",
+   "kind": "creates",
+   "what": [
+    "Spreadsheet::Sheet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_Import": {
+   "wb": "Spreadsheet",
+   "label": "&Import Spreadsheet",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_Export": {
+   "wb": "Spreadsheet",
+   "label": "&Export Spreadsheet",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_MergeCells": {
+   "wb": "Spreadsheet",
+   "label": "&Merge Cells",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_SplitCell": {
+   "wb": "Spreadsheet",
+   "label": "Sp&lit Cell",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Spreadsheet_SetAlias": {
+   "wb": "Spreadsheet",
+   "label": "Set Alias",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Start_Start": {
+   "wb": "Start",
+   "label": "&Start Page",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_Filling": {
+   "wb": "Surface",
+   "label": "Filling",
+   "kind": "creates",
+   "what": [
+    "Surface::Filling"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_GeomFillSurface": {
+   "wb": "Surface",
+   "label": "Fill Boundary Curves",
+   "kind": "creates",
+   "what": [
+    "Surface::GeomFillSurface"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_Sections": {
+   "wb": "Surface",
+   "label": "Sections",
+   "kind": "creates",
+   "what": [
+    "Surface::Sections"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_ExtendFace": {
+   "wb": "Surface",
+   "label": "Extend Face",
+   "kind": "creates",
+   "what": [
+    "Surface::Extend"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_CurveOnMesh": {
+   "wb": "Surface",
+   "label": "Curve on Mesh",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_BlendCurve": {
+   "wb": "Surface",
+   "label": "Blend Curve",
+   "kind": "creates",
+   "what": [
+    "Surface::FeatureBlendCurve"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Surface_Cut": {
+   "wb": "Surface",
+   "label": "Surface Cut",
+   "kind": "creates",
+   "what": [
+    "Part::Cut"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Dimension": {
+   "wb": "TechDraw",
+   "label": "Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_LengthDimension": {
+   "wb": "TechDraw",
+   "label": "Length Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_HorizontalDimension": {
+   "wb": "TechDraw",
+   "label": "Horizontal Length Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_VerticalDimension": {
+   "wb": "TechDraw",
+   "label": "Vertical Length Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_RadiusDimension": {
+   "wb": "TechDraw",
+   "label": "Radius Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_DiameterDimension": {
+   "wb": "TechDraw",
+   "label": "Diameter Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_AngleDimension": {
+   "wb": "TechDraw",
+   "label": "Angle Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_3PtAngleDimension": {
+   "wb": "TechDraw",
+   "label": "Angle Dimension From 3 Points",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_AreaDimension": {
+   "wb": "TechDraw",
+   "label": "Area Annotation",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_HorizontalExtentDimension": {
+   "wb": "TechDraw",
+   "label": "Horizontal Extent Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_VerticalExtentDimension": {
+   "wb": "TechDraw",
+   "label": "Vertical Extent Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_DimensionRepair": {
+   "wb": "TechDraw",
+   "label": "Repair Dimension References",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionSelectLineAttributes": {
+   "wb": "TechDraw",
+   "label": "Select Line Attributes, Cascade Spacing and Delta Distance",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionChangeLineAttributes": {
+   "wb": "TechDraw",
+   "label": "Change Line Attributes",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionExtendLine": {
+   "wb": "TechDraw",
+   "label": "Extend Line",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionShortenLine": {
+   "wb": "TechDraw",
+   "label": "Shorten Line",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionLockUnlockView": {
+   "wb": "TechDraw",
+   "label": "Toggle View Lock",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionPositionSectionView": {
+   "wb": "TechDraw",
+   "label": "Position Section View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionPosHorizChainDimension": {
+   "wb": "TechDraw",
+   "label": "Align Horizontal Chain Dimensions",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionPosVertChainDimension": {
+   "wb": "TechDraw",
+   "label": "Align Vertical Chain Dimensions",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionPosObliqueChainDimension": {
+   "wb": "TechDraw",
+   "label": "Align Oblique Chain Dimensions",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCascadeHorizDimension": {
+   "wb": "TechDraw",
+   "label": "Cascade Horizontal Dimensions",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCascadeVertDimension": {
+   "wb": "TechDraw",
+   "label": "Cascade Vertical Dimensions",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCascadeObliqueDimension": {
+   "wb": "TechDraw",
+   "label": "Cascade Oblique Dimensions",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionAreaAnnotation": {
+   "wb": "TechDraw",
+   "label": "Area Annotation",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionArcLengthAnnotation": {
+   "wb": "TechDraw",
+   "label": "Arc Length Annotation",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCustomizeFormat": {
+   "wb": "TechDraw",
+   "label": "Customize Format Label",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCircleCenterLines": {
+   "wb": "TechDraw",
+   "label": "Circle Centerlines",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionHoleCircle": {
+   "wb": "TechDraw",
+   "label": "Bolt Circle Centerlines",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionThreadHoleSide": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Thread Hole Side View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionThreadHoleBottom": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Thread Hole Bottom View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionThreadBoltSide": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Thread Bolt Side View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionThreadBoltBottom": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Thread Bolt Bottom View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionVertexAtIntersection": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Intersection Vertices",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_CommandAddOffsetVertex": {
+   "wb": "TechDraw",
+   "label": "Offset Vertex",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_CosmeticCircle": {
+   "wb": "TechDraw",
+   "label": "Cosmetic 1 Point Circle",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionDrawCosmCircle": {
+   "wb": "TechDraw",
+   "label": "Cosmetic 2 Point Circle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionDrawCosmCircle3Points": {
+   "wb": "TechDraw",
+   "label": "Cosmetic 3 Point Circle",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionDrawCosmArc": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Arc",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionLineParallel": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Parallel Line",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionLinePerpendicular": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Perpendicular Line",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateHorizChainDimension": {
+   "wb": "TechDraw",
+   "label": "Horizontal Chain Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateVertChainDimension": {
+   "wb": "TechDraw",
+   "label": "Vertical Chain Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateObliqueChainDimension": {
+   "wb": "TechDraw",
+   "label": "Oblique Chain Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateHorizCoordDimension": {
+   "wb": "TechDraw",
+   "label": "Horizontal Coordinate Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateVertCoordDimension": {
+   "wb": "TechDraw",
+   "label": "Vertical Coordinate Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateObliqueCoordDimension": {
+   "wb": "TechDraw",
+   "label": "Oblique Coordinate Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateHorizChamferDimension": {
+   "wb": "TechDraw",
+   "label": "Horizontal Chamfer Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateVertChamferDimension": {
+   "wb": "TechDraw",
+   "label": "Vertical Chamfer Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateLengthArc": {
+   "wb": "TechDraw",
+   "label": "Arc Length Dimension",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionInsertDiameter": {
+   "wb": "TechDraw",
+   "label": "Insert '\u2300' Prefix",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionInsertSquare": {
+   "wb": "TechDraw",
+   "label": "Insert '\u25a1' Prefix",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionInsertRepetition": {
+   "wb": "TechDraw",
+   "label": "Insert 'n\u00d7' Prefix",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionRemovePrefixChar": {
+   "wb": "TechDraw",
+   "label": "Remove Prefix",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionIncreaseDecimal": {
+   "wb": "TechDraw",
+   "label": "Increase Decimal Places",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionDecreaseDecimal": {
+   "wb": "TechDraw",
+   "label": "Decrease Decimal Places",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Annotation": {
+   "wb": "TechDraw",
+   "label": "Text Annotation",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewAnnotation"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_RichTextAnnotation": {
+   "wb": "TechDraw",
+   "label": "Rich Text Annotation",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Balloon": {
+   "wb": "TechDraw",
+   "label": "Balloon Annotation",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_AxoLengthDimension": {
+   "wb": "TechDraw",
+   "label": "Axonometric Length Dimension",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewDimension"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_StackTop": {
+   "wb": "TechDraw",
+   "label": "Stack Top",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_StackBottom": {
+   "wb": "TechDraw",
+   "label": "Stack Bottom",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_StackUp": {
+   "wb": "TechDraw",
+   "label": "Stack Up",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_StackDown": {
+   "wb": "TechDraw",
+   "label": "Stack Down",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_LeaderLine": {
+   "wb": "TechDraw",
+   "label": "Leader Line",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_FaceCenterLine": {
+   "wb": "TechDraw",
+   "label": "Centerline on Face",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_2LineCenterLine": {
+   "wb": "TechDraw",
+   "label": "Centerline Between 2 Lines",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_2PointCenterLine": {
+   "wb": "TechDraw",
+   "label": "Centerline Between 2 Points",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_2PointCosmeticLine": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Line Through 2 Points",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_DecorateLine": {
+   "wb": "TechDraw",
+   "label": "Edit Line Appearance",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ShowAll": {
+   "wb": "TechDraw",
+   "label": "Toggle Edge Visibility",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_CosmeticVertex": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Vertex",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Midpoints": {
+   "wb": "TechDraw",
+   "label": "Midpoint Vertices",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Quadrants": {
+   "wb": "TechDraw",
+   "label": "Quadrant Vertices",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_PageDefault": {
+   "wb": "TechDraw",
+   "label": "New Page",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_PageTemplate": {
+   "wb": "TechDraw",
+   "label": "New Page From Template",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_FillTemplateFields": {
+   "wb": "TechDraw",
+   "label": "Update Template Fields",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_RedrawPage": {
+   "wb": "TechDraw",
+   "label": "Redraw Page",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_PrintAll": {
+   "wb": "TechDraw",
+   "label": "Print All Pages",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExportPageSVG": {
+   "wb": "TechDraw",
+   "label": "Export Page as SVG",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExportPageDXF": {
+   "wb": "TechDraw",
+   "label": "Export Page as DXF",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExportPagePDF": {
+   "wb": "TechDraw",
+   "label": "Export Page as PDF",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_View": {
+   "wb": "TechDraw",
+   "label": "New View",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawProjGroupItem",
+    "TechDraw::DrawViewArch",
+    "TechDraw::DrawViewImage",
+    "TechDraw::DrawViewSpreadsheet",
+    "TechDraw::DrawViewSymbol"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_BrokenView": {
+   "wb": "TechDraw",
+   "label": "Broken View",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawBrokenView"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_SectionView": {
+   "wb": "TechDraw",
+   "label": "Section View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ComplexSection": {
+   "wb": "TechDraw",
+   "label": "Complex Section View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_DetailView": {
+   "wb": "TechDraw",
+   "label": "Detail View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ProjectionGroup": {
+   "wb": "TechDraw",
+   "label": "Projection Group",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawProjGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ClipGroup": {
+   "wb": "TechDraw",
+   "label": "Clip Group",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewClip"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Symbol": {
+   "wb": "TechDraw",
+   "label": "Insert SVG",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewSymbol"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Image": {
+   "wb": "TechDraw",
+   "label": "Bitmap Image",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewImage"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ShareView": {
+   "wb": "TechDraw",
+   "label": "Share View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ToggleFrame": {
+   "wb": "TechDraw",
+   "label": "Toggle View Frames",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ProjectShape": {
+   "wb": "TechDraw",
+   "label": "Project Shape",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ActiveView": {
+   "wb": "TechDraw",
+   "label": "Active View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_DraftView": {
+   "wb": "TechDraw",
+   "label": "Draft View",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewDraft"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ArchView": {
+   "wb": "TechDraw",
+   "label": "BIM View",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawViewArch"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_SpreadsheetView": {
+   "wb": "TechDraw",
+   "label": "Spreadsheet View",
+   "kind": "creates",
+   "what": [
+    "Spreadsheet::Sheet",
+    "TechDraw::DrawViewSpreadsheet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_Hatch": {
+   "wb": "TechDraw",
+   "label": "Image Hatch",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_GeometricHatch": {
+   "wb": "TechDraw",
+   "label": "Geometric Hatch",
+   "kind": "creates",
+   "what": [
+    "TechDraw::DrawGeomHatch"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_WeldSymbol": {
+   "wb": "TechDraw",
+   "label": "Weld Symbol",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_SurfaceFinishSymbols": {
+   "wb": "TechDraw",
+   "label": "Surface Finish Symbol",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_HoleShaftFit": {
+   "wb": "TechDraw",
+   "label": "Hole/Shaft Fit",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_AlignVertexesVertically": {
+   "wb": "TechDraw",
+   "label": "Align Vertices/Edge Vertically",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_AlignVertexesHorizontally": {
+   "wb": "TechDraw",
+   "label": "Align Vertices/Edge Horizontally",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_CosmeticEraser": {
+   "wb": "TechDraw",
+   "label": "Remove Cosmetic Object",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_SectionGroup": {
+   "wb": "TechDraw",
+   "label": "Section View (Simple or Complex)",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_StackGroup": {
+   "wb": "TechDraw",
+   "label": "View Stacking Order",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtentGroup": {
+   "wb": "TechDraw",
+   "label": "Extent Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionExtendShortenLineGroup": {
+   "wb": "TechDraw",
+   "label": "Extend Line",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCircleCenterLinesGroup": {
+   "wb": "TechDraw",
+   "label": "Circle Centerlines",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionThreadsGroup": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Thread Hole Side View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionDrawCirclesGroup": {
+   "wb": "TechDraw",
+   "label": "Cosmetic 1 Point Circle",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionLinePPGroup": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Parallel Line",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateChainDimensionGroup": {
+   "wb": "TechDraw",
+   "label": "Horizontal Chain Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCreateCoordDimensionGroup": {
+   "wb": "TechDraw",
+   "label": "Horizontal Coordinate Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionChamferDimensionGroup": {
+   "wb": "TechDraw",
+   "label": "Horizontal Chamfer Dimension",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionInsertPrefixGroup": {
+   "wb": "TechDraw",
+   "label": "Insert '\u2300' Prefix",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionIncreaseDecreaseGroup": {
+   "wb": "TechDraw",
+   "label": "Increase Decimal Places",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_CosmeticVertexGroup": {
+   "wb": "TechDraw",
+   "label": "Cosmetic Vertex",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_CenterLineGroup": {
+   "wb": "TechDraw",
+   "label": "Centerline",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ClipGroupAdd": {
+   "wb": "TechDraw",
+   "label": "Add View To Clip Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ClipGroupRemove": {
+   "wb": "TechDraw",
+   "label": "Remove From Clip Group",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionPosChainDimensionGroup": {
+   "wb": "TechDraw",
+   "label": "Align Horizontal Chain Dimensions",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ExtensionCascadeDimensionGroup": {
+   "wb": "TechDraw",
+   "label": "Cascade Horizontal Dimensions",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_ToggleGrid": {
+   "wb": "TechDraw",
+   "label": "Toggle Grid",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TechDraw_MoveView": {
+   "wb": "TechDraw",
+   "label": "Move View",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyGrp_1": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyGrp_1",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyGrp_2": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyGrp_2",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyGrp_3": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyGrp_3",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_New": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&New Document",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyMod_Cmd1": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyMod_Cmd1",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyMod_Cmd2": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyMod_Cmd2",
+   "kind": "creates",
+   "what": [
+    "Part::Polygon"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyMod_Cmd3": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyMod_Cmd3",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyMod_Cmd4": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyMod_Cmd4",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyMod_Cmd5": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyMod_Cmd5",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "TemplatePyMod_Cmd6": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyMod_Cmd6",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "TemplatePyCheckable": {
+   "wb": "TemplatePyMod",
+   "label": "TemplatePyCheckable",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkMakeGroup": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Link Group",
+   "kind": "creates",
+   "what": [
+    "App::Link",
+    "App::LinkGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkMake": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Make Link",
+   "kind": "creates",
+   "what": [
+    "App::Link"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkMakeRelative": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Make Sub-Link",
+   "kind": "creates",
+   "what": [
+    "App::Link"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkReplace": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Replace With Link",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkUnlink": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Unlink",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkImport": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Import Links",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkImportAll": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Import All Links",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkSelectLinked": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Go to Linked Object",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkSelectLinkedFinal": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Go to &Deepest Linked Object",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_LinkSelectAllLinks": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Select &All Links",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DlgMacroRecord": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Record &Macro",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DlgMacroExecute": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Ma&cros",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DlgMacroExecuteDirect": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Execute Macro",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_MacroAttachDebugger": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Attach to Remote Debugger",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_OpenMacrosFolder": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Open Macro Folder",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TileWindows": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Tile",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_CascadeWindows": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Cascade",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_CloseActiveWindow": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Close",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_CloseAllWindows": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Close A&ll",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ActivateNextWindow": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Next",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ActivatePrevWindow": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Previous",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Windows": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Choose Open &Window",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_UserInterface": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Dock Views",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockViewMenu": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Panels",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ToolBarMenu": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Toolbars",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ToggleToolBarLock": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Lock Toolbars",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewStatusBar": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Status Bar",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_WindowsMenu": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Activate Window",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_OpenGroup": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Open\u2026",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Open": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Open\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Import": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Import\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Export": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Export\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_MergeProjects": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Merge Document",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DependencyGraph": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Dependency Gra&ph",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ExportDependencyGraph": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Export Dependency &Graph\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Save": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Save",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SaveAs": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Save &As\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SaveCopy": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Save a Cop&y\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SaveAll": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Sa&ve All",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Revert": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Rever&t",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ProjectInfo": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Doc&ument Information",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ProjectUtil": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Do&cument Utility",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Print": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Print",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_PrintPreview": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Print Previe&w",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_PrintPdf": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Export P&DF",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Quit": {
+   "wb": "Std (core, all workbenches)",
+   "label": "E&xit",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Undo": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Undo",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Redo": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Redo",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Cut": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Cu&t",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Copy": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Copy",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Paste": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Paste",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SelectAll": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Select &All",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Delete": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Delete",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Refresh": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Recompute",
+   "kind": "unknown",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Transform": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Transform",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Placement": {
+   "wb": "Std (core, all workbenches)",
+   "label": "P&lacement",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TransformManip": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Trans&form",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Alignment": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Ali&gn To\u2026",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Edit": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Edit Mode",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Properties": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Propert&ies",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TestQM": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test Translation Files",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestReloadQM": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Reload Translation Files",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Test1": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test1",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Test2": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test2",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Test3": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test3",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Test4": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test4",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Test5": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test5",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_Test6": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test6",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestCmdFuncs": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test Functions",
+   "kind": "creates",
+   "what": [
+    "App::Annotation"
+   ],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestProgress1": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Breakable Bar",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestProgress2": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Unbreakable Bar",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestProgress3": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Nested Progress Bar",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestProgress4": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Mixed Nested Bar",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestProgress5": {
+   "wb": "Std (core, all workbenches)",
+   "label": "From Thread",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_MDITest1": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Remove MDI 1",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_MDITest2": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Remove MDI 2",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_MDITest3": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Remove MDI 3",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TestConsoleOutput": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Test Console Output",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_OrthographicCamera": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Orthographic View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_PerspectiveCamera": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Perspective View",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewSaveCamera": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Save Current Camera",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewRestoreCamera": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Restore Saved Camera",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_FreezeViews": {
+   "wb": "Std (core, all workbenches)",
+   "label": "F&reeze Display",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleClipPlane": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Clippin&g View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DrawStyle": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Draw Style",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleVisibility": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Visibility",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleTransparency": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Transparenc&y",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleSelectability": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Se&lectability",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ShowSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Sho&w Selection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_HideSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Hide Selection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SelectVisibleObjects": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Select Visible Objects",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleObjects": {
+   "wb": "Std (core, all workbenches)",
+   "label": "To&ggle All Objects",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ShowObjects": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Show &All Objects",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_HideObjects": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Hide All &Objects",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewHome": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Home",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewBottom": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Bottom",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewFront": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Front",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewLeft": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Left",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewRear": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Rear",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewRight": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Right",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewTop": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Top",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewIsometric": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Isometric",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewDimetric": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Dimetric",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewTrimetric": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Trimetric",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewRotateLeft": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Rotate &Left",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewRotateRight": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Rotates &Right",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewFitAll": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Fit All",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewFitSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Fit &Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewDock": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Docked",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewUndock": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Undocked",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_MainFullscreen": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Fullscreen",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewFullscreen": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Fullscreen",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewDockUndockFullscreen": {
+   "wb": "Std (core, all workbenches)",
+   "label": "D&ocument Window",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewScreenShot": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Save &Image\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewLoadImage": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Load Image\u2026",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewCreate": {
+   "wb": "Std (core, all workbenches)",
+   "label": "New 3D View",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ToggleNavigation": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Navigation/&Edit Mode",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_AxisCross": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle A&xis Cross",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewExample1": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Inventor Example #1",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewExample2": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Inventor Example #2",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewExample3": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Inventor Example #3",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewIvIssueCamPos": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Issue Camera &Position",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ViewZoomIn": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Zoom &In",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewZoomOut": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Zoom &Out",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ViewBoxZoom": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Box Zoom",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_BoxSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Box Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_BoxElementSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Bo&x Element Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TreeSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Go to Selection",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TreeCollapse": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Collapse Selected Items",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TreeExpand": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Expand Selected Items",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TreeSelectAllInstances": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Select All Instances",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SceneInspector": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Scene I&nspector",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TextureMapping": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Text&ure Mapping",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DemoMode": {
+   "wb": "Std (core, all workbenches)",
+   "label": "View &Turntable",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SelBack": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Selection &Back",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SelForward": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Selection &Forward",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TreeSingleDocument": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Single Document",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeMultiDocument": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Multi Document",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeCollapseDocument": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Collapse/E&xpand",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeSyncView": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Sync View",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeSyncSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Sync Selection",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeSyncPlacement": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Sync Placement",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreePreSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Preselection",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeRecordSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Record Selection",
+   "kind": "unknown",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_TreeDrag": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Initiate &Dragging",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_SelBoundingBox": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Bounding Box",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DockOverlayAll": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Overl&ay for All Panels",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayTransparentAll": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Tra&nsparent Panels",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayToggle": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Overlay",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayToggleTransparent": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Tran&sparent Mode",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayToggleLeft": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Left",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayToggleRight": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Right",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayToggleTop": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Top",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayToggleBottom": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle &Bottom",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DockOverlayMouseTransparent": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Bypass &Mouse Events in Overlay Panels",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ToggleBottomPanels": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Bottom Panels",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_StoreWorkingView": {
+   "wb": "Std (core, all workbenches)",
+   "label": "St&ore Working View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_RecallWorkingView": {
+   "wb": "Std (core, all workbenches)",
+   "label": "R&ecall Working View",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_AlignToSelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Align to Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ClarifySelection": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Clarify Selection",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Recompute": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Recompute",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleSuppress": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Toggle Suppressed",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_SendToPythonConsole": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Send to Python Console",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_ToggleSkipRecompute": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Skip Recomputes",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Part": {
+   "wb": "Std (core, all workbenches)",
+   "label": "New Part",
+   "kind": "creates",
+   "what": [
+    "App::Part"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Group": {
+   "wb": "Std (core, all workbenches)",
+   "label": "New Group",
+   "kind": "creates",
+   "what": [
+    "App::DocumentObjectGroup"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_VarSet": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Variable Set",
+   "kind": "creates",
+   "what": [
+    "App::VarSet"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Workbench": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Workbench",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_RecentFiles": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Open &Recent",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_RecentMacros": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Recent Macros",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_About": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&About %1",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_AboutQt": {
+   "wb": "Std (core, all workbenches)",
+   "label": "About &Qt",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_WhatsThis": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&What's This?",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_RestartInSafeMode": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Restart in Safe Mode",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DlgParameter": {
+   "wb": "Std (core, all workbenches)",
+   "label": "E&dit Parameters",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_DlgPreferences": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Prefere&nces",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DlgCustomize": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Cu&stomize",
+   "kind": "gui",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_CommandLine": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Command &Line",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_OnlineHelp": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Help",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_OnlineHelpWebsite": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Help Website",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_FreeCADDonation": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Donate to FreeCA&D",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_DevHandbook": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Developers Handbook",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_FreeCADWebsite": {
+   "wb": "Std (core, all workbenches)",
+   "label": "FreeCAD W&ebsite",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_FreeCADUserHub": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&User Documentation",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_FreeCADForum": {
+   "wb": "Std (core, all workbenches)",
+   "label": "FreeCAD &Forum",
+   "kind": "other",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_TextDocument": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Te&xt Document",
+   "kind": "creates",
+   "what": [
+    "App::TextDocument"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_UnitsCalculator": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Units Converter",
+   "kind": "gui",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_UserEditMode": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Edit &Mode",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_ReloadStyleSheet": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Reload Stylesheet",
+   "kind": "other",
+   "what": [],
+   "mobile": false,
+   "na": true
+  },
+  "Std_AnnotationLabel": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Annotation Label",
+   "kind": "creates",
+   "what": [
+    "App::AnnotationLabel"
+   ],
+   "mobile": true,
+   "na": false
+  },
+  "Std_Measure": {
+   "wb": "Std (core, all workbenches)",
+   "label": "&Measure",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  },
+  "Std_MassProperties": {
+   "wb": "Std (core, all workbenches)",
+   "label": "Mass Properties",
+   "kind": "dialog",
+   "what": [],
+   "mobile": true,
+   "na": false
+  }
+ }
+}

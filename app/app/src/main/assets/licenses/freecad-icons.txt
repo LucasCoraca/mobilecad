@@ -1,0 +1,87 @@
+Toolbar and command icons are from FreeCAD (https://github.com/FreeCAD/FreeCAD), LGPL-2.1-or-later unless noted below.
+Icons with their own license (file — author — license):
+
+Arch_CutPlane.svg — [wood galaxy] — https://creativecommons.org/licenses/by-sa/4.0
+Arch_Reference.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_ArchView.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Background.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Classification.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Glue.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Help.svg — Jakub Steiner — https://creativecommons.org/licenses/publicdomain
+BIM_IfcElements.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_IfcProperties.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_IfcQuantities.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_InsertView.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Layers.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Material.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_MoveView.svg — [agryson] Alexander Gryson — https://creativecommons.org/licenses/by-sa/2.0
+BIM_PageDefault.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Preflight.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Project.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Report.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Trash.svg — [maxwxyz] — https://creativecommons.org/licenses/by-sa/4.0
+BIM_Windows.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+Draft_AddToLayer.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+Draft_Edit.svg — [wmayer] — https://creativecommons.org/licenses/by-sa/4.0
+Draft_Ellipse.svg — [Yorik van Havre] — https://creativecommons.org/licenses/by-sa/4.0
+Draft_Label.svg — FreeCAD contributors — https://creativecommons.org/licenses/by-sa/4.0
+Draft_Layer.svg — [Yorik van Havre] — https://creativecommons.org/licenses/by-sa/4.0
+Draft_LayerManager.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/2.0
+Draft_Snap_Dimensions.svg — [Yorik van Havre] — https://creativecommons.org/licenses/by-sa/4.0
+Draft_SubelementHighlight.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+FEM_PostFilterCalculator.svg — Jakub Steiner — https://creativecommons.org/publicdomain/zero/1.0/
+FEM_SolverControl.svg — [Bitacovir] — https://creativecommons.org/licenses/by/4.0
+FEM_SolverRun.svg — [Bitacovir] — https://creativecommons.org/licenses/by/4.0
+FEM_SolverStandard.svg — [Bitacovir] — https://creativecommons.org/licenses/by/4.0
+FitSurface.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+IFC_document.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+MeshPart_CurveOnMesh.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Mesh_PolyTrim.svg — [bitacovir] — https://creativecommons.org/licenses/by/4.0
+Mesh_TrimByPlane.svg — [bitacovir] — https://creativecommons.org/licenses/by/4.0
+PartDesign_Migrate.svg — [bitacovir] — https://creativecommons.org/licenses/by-sa/2.0
+Part_ColorFace.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Part_CompoundFilter.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Part_ProjectionOnSurface.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Part_Thickness.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Points_Export_Point_cloud.svg — [agryson] Alexander Gryson — https://creativecommons.org/licenses/by-sa/2.0
+Points_Import_Point_cloud.svg — [agryson] ALexadner Gryson — https://creativecommons.org/licenses/by-sa/2.0
+Sketcher_ReorientSketch.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Sketcher_ValidateSketch.svg — [vocx] — https://creativecommons.org/licenses/by-sa/4.0
+Spreadsheet.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetAlignBottom.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetAlignCenter.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetAlignLeft.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetAlignRight.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetAlignTop.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetAlignVCenter.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetExport.svg — [maxwxyz] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetImport.svg — [maxwxyz] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetMergeCells.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetSplitCell.svg — [Eivind Kvedalen] — https://creativecommons.org/licenses/by-sa/4.0
+SpreadsheetStyleBold.svg — Lapo Calamandrei — https://creativecommons.org/licenses/publicdomain
+SpreadsheetStyleItalic.svg — Lapo Calamandrei — https://creativecommons.org/licenses/publicdomain
+SpreadsheetStyleUnderline.svg — Lapo Calamandrei — https://creativecommons.org/licenses/publicdomain
+Std_RandomColor.svg — bitacovir — https://creativecommons.org/licenses/by-sa/2.0
+Std_ToggleBottomPanels.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+Std_UserEditModeDefault.svg — [bitacovir] — https://creativecommons.org/licenses/by-sa/4.0
+Std_ViewScreenShot.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+TechDraw_FillTemplateFields.svg — [bitacovir] — https://creativecommons.org/publicdomain/zero/1.0/
+TechDraw_MoveView.svg — [agryson] Alexander Gryson — https://creativecommons.org/licenses/by-sa/2.0
+VarSet.svg — Andreas Nilsson — https://creativecommons.org/licenses/by-sa/2.0
+accessories-calculator.svg — Jakub Steiner — https://creativecommons.org/publicdomain/zero/1.0/
+accessories-text-editor.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+application-exit.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+applications-accessories.svg — jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+help-browser.svg — Tuomas Kuosmanen — https://creativecommons.org/licenses/by-sa/2.0
+internet-web-browser.svg — Jakub Steiner — https://creativecommons.org/licenses/publicdomain
+media-playback-start.svg — Lapo Calamandrei — https://creativecommons.org/licenses/by-sa/2.0
+preferences-part_design.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+process-stop.svg — Andreas Nilsson — https://creativecommons.org/licenses/publicdomain
+tree-sync-view.svg — Martin Ruskov — https://creativecommons.org/licenses/by-sa/2.0
+utilities-terminal.svg — Andreas Nilsson — https://creativecommons.org/licenses/by-sa/2.0
+view-fullscreen.svg — Jakub Steiner — https://creativecommons.org/licenses/by-sa/2.0
+zoom-all.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+zoom-border.svg — Martin Ruskov — https://creativecommons.org/licenses/by-sa/2.0
+zoom-in.svg — Martin Ruskov — https://creativecommons.org/licenses/by-sa/2.0
+zoom-out.svg — Martin Ruskov — https://creativecommons.org/licenses/by-sa/2.0
+zoom-selection.svg — Martin Ruskov — https://creativecommons.org/licenses/by-sa/2.0

@@ -1,0 +1,9 @@
+<resources>
+    <!-- before the UI draws (launch, system splash): white on light, near-black on dark (values-night) -->
+    <style name="Theme.FC" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#FFFFFF</item>
+        <item name="android:navigationBarColor">#FFFFFF</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">#FFFFFF</item>
+    </style>
+</resources>

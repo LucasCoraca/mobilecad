@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MobileCAD</title><link rel="icon" href="favicon.png">
+<meta name="description" content="Parametric CAD for Android phones and tablets, built on the FreeCAD engine.">
+<style>
+ :root { --fg:#16202B; --muted:#5F6B77; --soft:#8A96A3; --bg:#FFFFFF; --bg2:#F5F7FA; --card:#FFFFFF; --line:#E3E8EE;
+   --accent:#2A6FC9; --accent-ink:#FFFFFF; --bezel:#0F1318; --shadow:0 24px 60px rgba(16,32,52,.16), 0 4px 12px rgba(16,32,52,.08); }
+ @media (prefers-color-scheme: dark) { :root { --fg:#E6ECF2; --muted:#A3AEB8; --soft:#7E8A96; --bg:#121519; --bg2:#171B20; --card:#1C2127;
+   --line:#2A3037; --accent:#4C93E6; --bezel:#05070A; --shadow:0 24px 60px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.35); } }
+ * { box-sizing:border-box; }
+ body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing:antialiased; }
+ a { color:var(--accent); text-decoration:none; } a:hover { text-decoration:underline; }
+ .wrap { max-width:1120px; margin:0 auto; padding:0 20px; }
+ code { font-size:.9em; }
+ .nav { position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--line); }
+ .nav .wrap { display:flex; align-items:center; gap:12px; height:60px; }
+ .brand { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; color:var(--fg); } .brand:hover { text-decoration:none; } .brand img { width:30px; height:30px; }
+ .nav .links { margin-left:auto; display:flex; gap:22px; font-size:15px; align-items:center; } .nav .links a { color:var(--muted); } .nav .links a:hover { color:var(--fg); text-decoration:none; }
+ .nav .links a.cta { color:var(--accent); font-weight:600; }
+ @media (max-width:560px) { .nav .links a:not(.cta) { display:none; } }
+ .hero { padding:56px 0 40px; background:linear-gradient(180deg, var(--bg2), var(--bg)); }
+ .hero .wrap { display:grid; grid-template-columns:1fr 1.25fr; gap:48px; align-items:center; }
+ @media (max-width:880px) { .hero .wrap { grid-template-columns:1fr; } }
+ .eyebrow { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); font-weight:700; margin:0 0 10px; }
+ h1 { font-size:clamp(32px, 5vw, 48px); line-height:1.08; margin:0 0 16px; letter-spacing:-.02em; }
+ .lede { font-size:18px; color:var(--muted); margin:0 0 26px; max-width:34em; }
+ .btn { display:inline-flex; align-items:center; gap:8px; background:var(--accent); color:var(--accent-ink); padding:12px 20px; border-radius:10px; font-weight:600; font-size:15px; }
+ .btn:hover { text-decoration:none; filter:brightness(1.07); }
+ .btn.ghost { background:transparent; color:var(--fg); border:1px solid var(--line); }
+ .btns { display:flex; flex-wrap:wrap; gap:10px; }
+ .fine { font-size:13px; color:var(--soft); margin-top:14px; }
+ .stage { position:relative; padding:0 0 44px 0; }
+ .stage .frame.phone { position:absolute; right:-6px; bottom:0; width:26%; }
+ @media (max-width:880px) { .stage .frame.phone { right:6px; } }
+ .frame { display:block; padding:0; margin:0; border:0; background:var(--bezel); box-shadow:var(--shadow); cursor:zoom-in; width:100%; }
+ .frame img { display:block; width:100%; height:auto; }
+ .frame.tablet { border-radius:18px; padding:10px; } .frame.tablet img { border-radius:8px; }
+ .frame.phone { border-radius:28px; padding:7px; } .frame.phone img { border-radius:22px; }
+ .frame:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+ .features { display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; padding:28px 0 8px; }
+ @media (max-width:880px) { .features { grid-template-columns:repeat(2, 1fr); } }
+ @media (max-width:440px) { .features { grid-template-columns:1fr; } }
+ .feat { border:1px solid var(--line); border-radius:12px; padding:16px; background:var(--card); }
+ .feat b { display:block; margin-bottom:4px; } .feat span { color:var(--muted); font-size:14px; }
+ section { padding:48px 0 8px; scroll-margin-top:64px; }
+ h2 { font-size:28px; letter-spacing:-.01em; margin:0 0 6px; } .sub { color:var(--muted); margin:0 0 24px; }
+ .seg { display:inline-flex; border:1px solid var(--line); border-radius:10px; padding:3px; background:var(--bg2); margin-bottom:26px; }
+ .seg button { border:0; background:transparent; color:var(--muted); font:inherit; font-size:14px; font-weight:600; padding:7px 18px; border-radius:7px; cursor:pointer; }
+ .seg button[aria-selected="true"] { background:var(--card); color:var(--fg); box-shadow:0 1px 3px rgba(0,0,0,.12); }
+ .grid { display:grid; gap:36px 28px; } .grid.tab { grid-template-columns:repeat(2, 1fr); } .grid.phone { grid-template-columns:repeat(3, 1fr); max-width:860px; }
+ @media (max-width:760px) { .grid.tab { grid-template-columns:1fr; } .grid.phone { grid-template-columns:repeat(2, 1fr); } }
+ .grid[hidden] { display:none; }
+ .card-shot { margin:0; } .card-shot .frame { transition:transform .2s ease; } .card-shot .frame:hover { transform:translateY(-3px); }
+ figcaption { margin-top:12px; } figcaption .t { display:block; font-weight:650; } figcaption .d { display:block; color:var(--muted); font-size:14px; }
+ .video { position:relative; border-radius:16px; overflow:hidden; box-shadow:var(--shadow); background:#000; }
+ .video video { display:block; width:100%; height:auto; }
+ .note { border:1px solid var(--line); background:var(--bg2); border-radius:12px; padding:16px 18px; color:var(--muted); font-size:14px; }
+ .note b { color:var(--fg); }
+ .notes p { font-size:14px !important; border-left:3px solid var(--line); padding-left:14px; } .notes small { color:var(--soft); }
+ footer { border-top:1px solid var(--line); margin-top:48px; padding:22px 0 40px; color:var(--soft); font-size:13px; }
+ .lb { position:fixed; inset:0; background:rgba(8,11,15,.92); display:none; z-index:20; align-items:center; justify-content:center; flex-direction:column; padding:20px; }
+ .lb.open { display:flex; }
+ .lb img { max-width:min(1400px, 100%); max-height:calc(100vh - 120px); border-radius:10px; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+ .lb .cap { color:#DDE3EA; margin-top:14px; text-align:center; font-size:15px; max-width:900px; } .lb .cap b { color:#fff; }
+ .lb button { position:absolute; background:rgba(255,255,255,.1); color:#fff; border:0; width:46px; height:46px; border-radius:50%; font-size:22px; cursor:pointer; }
+ .lb button:hover { background:rgba(255,255,255,.2); }
+ .lb .x { top:16px; right:16px; } .lb .prev { left:16px; top:calc(50% - 23px); } .lb .next { right:16px; top:calc(50% - 23px); }
+</style></head>
+<body>
+<nav class="nav"><div class="wrap">
+  <a class="brand" href="#"><img src="logo.png" alt="">MobileCAD</a>
+  <div class="links"><a href="#video">Video</a><a href="#gallery">Gallery</a><a href="#source">Source</a><a href="#notes">Release notes</a><a class="cta" href="#download">Download</a></div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <div>
+    <p class="eyebrow">Parametric CAD for Android</p>
+    <h1>Real CAD, made for touch.</h1>
+    <p class="lede">Sketch, model, assemble and simulate on your phone or tablet. MobileCAD runs the open-source FreeCAD engine on the device and opens your <code>.FCStd</code> projects.</p>
+    <div class="btns" id="download">
+      <a class="btn" href="__APK_ARM__">Download for Android</a>
+      <a class="btn ghost" href="#video">Watch the video</a>
+    </div>
+    <p class="fine">Android 8 or newer · about 1 GB free space · free and open source (GPL-3.0) ·
+      <a href="__APK_X86__">x86_64 build for emulators</a><br>
+      Installed an earlier test build? This version installs as a separate app; uninstall the old one.</p>
+  </div>
+  <div class="stage">
+    <button class="frame tablet" data-open="tab:0" aria-label="View the part design screenshot"><img src="screens/tablet-partdesign.jpg" alt="MobileCAD on a tablet"></button>
+    <button class="frame phone" data-open="phone:3" aria-label="View the sketcher screenshot"><img src="screens/phone-sketcher.jpg" alt="MobileCAD on a phone"></button>
+  </div>
+</div></header>
+
+<div class="wrap">
+  <div class="features">
+    <div class="feat"><b>Full feature history</b><span>Pads, pockets, fillets and patterns stay editable.</span></div>
+    <div class="feat"><b>Constraint sketcher</b><span>Dimensions, snapping and constraint checking.</span></div>
+    <div class="feat"><b>Assemblies &amp; FEM</b><span>Joints, analyses and coloured results on the device.</span></div>
+    <div class="feat"><b>Phones to tablets</b><span>Layouts for phones, tablets and foldables.</span></div>
+  </div>
+
+  <section id="video">
+    <h2>See it in one minute</h2>
+    <p class="sub">FreeCAD's example projects on a tablet and a phone, recorded in the app.</p>
+    <div class="video"><video controls preload="metadata" playsinline poster="mobilecad-launch-poster.jpg">
+      <source src="mobilecad-launch.mp4" type="video/mp4"></video></div>
+  </section>
+
+  <section id="gallery">
+    <h2>Gallery</h2>
+    <p class="sub">FreeCAD's example projects, opened in MobileCAD. Select a picture to see it full size.</p>
+    <div class="seg" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="tab">Tablet</button>
+      <button role="tab" aria-selected="false" data-tab="phone">Phone</button>
+    </div>
+    <div class="grid tab" data-grid="tab">
+__TAB__
+    </div>
+    <div class="grid phone" data-grid="phone" hidden>
+__PHONE__
+    </div>
+  </section>
+
+  <section>
+    <div class="note"><b>Not affiliated with FreeCAD.</b> MobileCAD is an independent project built on the open-source
+      <a href="https://www.freecad.org">FreeCAD</a> engine. It is not affiliated with, sponsored or endorsed by the FreeCAD project
+      or the FreeCAD Project Association. FreeCAD is a trademark of the FreeCAD Project Association. The models shown are
+      FreeCAD's own example projects.</div>
+  </section>
+
+  <section id="source">
+    <h2>Source code &amp; licenses</h2>
+    <p class="sub">MobileCAD is free software under the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPL v3 or later</a>.</p>
+    <ul>
+      <li><a href="__SRC__">MobileCAD source</a>: app, engine build scripts and patches, Python bridge</li>
+      <li><a href="__SRC_DIR__">FreeCAD, Open CASCADE, Qt, Gmsh, CalculiX, MED, IfcOpenShell</a>: the exact sources built, with our FreeCAD patch (<a href="__SUMS__">checksums</a>)</li>
+    </ul>
+    <p class="sub">Every included component and its license is listed in the app under ☰ ▸ About ▸ Open-source licenses.</p>
+  </section>
+
+  <section id="notes" class="notes">
+    <h2>Release notes</h2>
+__NOTES__
+  </section>
+
+  <footer>MobileCAD · GPL-3.0-or-later · Built on FreeCAD, Open CASCADE and Qt</footer>
+</div>
+
+<div class="lb" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
+  <button class="x" aria-label="Close">✕</button><button class="prev" aria-label="Previous">‹</button><button class="next" aria-label="Next">›</button>
+  <img alt=""><div class="cap"></div>
+</div>
+<script>
+const SHOTS = __SHOTS__;
+const lb = document.querySelector('.lb'), lbImg = lb.querySelector('img'), lbCap = lb.querySelector('.cap');
+let cur = null, lastFocus = null;
+function show(kind, i) {
+  const list = SHOTS[kind]; i = (i + list.length) % list.length; cur = [kind, i];
+  const [f, t, d] = list[i]; lbImg.src = 'screens/' + f; lbImg.alt = t;
+  lbCap.innerHTML = '<b>' + t + '</b> · ' + d + ' <span style="opacity:.6">(' + (i + 1) + ' / ' + list.length + ')</span>';
+  if (!lb.classList.contains('open')) { lastFocus = document.activeElement; lb.classList.add('open'); document.body.style.overflow = 'hidden'; lb.querySelector('.x').focus(); }
+}
+function close() { lb.classList.remove('open'); document.body.style.overflow = ''; cur = null; if (lastFocus) lastFocus.focus(); }
+document.querySelectorAll('[data-grid]').forEach(g => g.querySelectorAll('.card-shot').forEach(c =>
+  c.querySelector('.frame').addEventListener('click', () => show(g.dataset.grid, +c.dataset.i))));
+document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { const [k, i] = b.dataset.open.split(':'); show(k, +i); }));
+lb.querySelector('.x').onclick = close;
+lb.querySelector('.prev').onclick = () => show(cur[0], cur[1] - 1);
+lb.querySelector('.next').onclick = () => show(cur[0], cur[1] + 1);
+lb.addEventListener('click', e => { if (e.target === lb) close(); });
+document.addEventListener('keydown', e => { if (!cur) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowLeft') show(cur[0], cur[1] - 1); if (e.key === 'ArrowRight') show(cur[0], cur[1] + 1); });
+let sx = null; lb.addEventListener('touchstart', e => sx = e.touches[0].clientX, {passive: true});
+lb.addEventListener('touchend', e => { if (sx === null || !cur) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 50) show(cur[0], cur[1] + (dx < 0 ? 1 : -1)); sx = null; });
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('[data-grid]').forEach(g => g.hidden = g.dataset.grid !== b.dataset.tab);
+}));
+</script>
+</body></html>

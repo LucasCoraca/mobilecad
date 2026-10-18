@@ -1,0 +1,471 @@
+[
+ {
+  "name": "MobileCAD",
+  "license": "GPL-3.0-or-later",
+  "source": "the MobileCAD source archive on the download page",
+  "texts": [
+   {
+    "title": "GPL-3.0",
+    "file": "gpl-3-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "FreeCAD",
+  "license": "LGPL-2.1-or-later",
+  "source": "https://github.com/FreeCAD/FreeCAD",
+  "texts": [
+   {
+    "title": "LGPL-2.1",
+    "file": "lgpl-2-1.txt"
+   }
+  ]
+ },
+ {
+  "name": "Open CASCADE Technology",
+  "license": "LGPL-2.1 with Open CASCADE exception",
+  "source": "https://github.com/Open-Cascade-SAS/OCCT",
+  "texts": [
+   {
+    "title": "LGPL-2.1",
+    "file": "open-cascade-technology-lgpl-2-1.txt"
+   },
+   {
+    "title": "Open CASCADE exception",
+    "file": "open-cascade-exception.txt"
+   }
+  ]
+ },
+ {
+  "name": "Qt 6 (Core, Gui, Widgets, Xml, Network, OpenGL, PrintSupport, Concurrent)",
+  "license": "LGPL-3.0-only",
+  "source": "https://download.qt.io/archive/qt/6.8/6.8.3/submodules/",
+  "texts": [
+   {
+    "title": "LGPL-3.0",
+    "file": "lgpl-3-0.txt"
+   },
+   {
+    "title": "GPL-3.0 (referenced by LGPL-3.0)",
+    "file": "gpl-3-0-referenced-by-lgpl-3-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "Python 3.14",
+  "license": "PSF-2.0",
+  "source": "https://www.python.org/downloads/source/",
+  "texts": [
+   {
+    "title": "Python license",
+    "file": "python-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "NumPy 2.3.5",
+  "license": "BSD-3-Clause (+ bundled)",
+  "source": "https://github.com/numpy/numpy",
+  "texts": [
+   {
+    "title": "NumPy license",
+    "file": "numpy-license.txt"
+   },
+   {
+    "title": "NumPy bundled",
+    "file": "numpy-bundled.txt"
+   }
+  ]
+ },
+ {
+  "name": "Gmsh 4.13.1",
+  "license": "GPL-2.0-or-later with linking exception",
+  "source": "https://gmsh.info",
+  "texts": [
+   {
+    "title": "Gmsh license",
+    "file": "gmsh-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "CalculiX CrunchiX 2.22",
+  "license": "GPL-2.0",
+  "source": "http://www.calculix.de",
+  "texts": [
+   {
+    "title": "GPL-2.0",
+    "file": "gpl-2-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "SPOOLES 2.2",
+  "license": "Public domain",
+  "source": "https://netlib.org/linalg/spooles/",
+  "texts": []
+ },
+ {
+  "name": "SALOME SMESH (FreeCAD 3rdParty)",
+  "license": "LGPL-2.1-or-later",
+  "source": "https://github.com/FreeCAD/FreeCAD/tree/main/src/3rdParty/salomesmesh",
+  "texts": [
+   {
+    "title": "LGPL-2.1",
+    "file": "salome-smesh-freecad-3rdparty-lgpl-2-1.txt"
+   }
+  ]
+ },
+ {
+  "name": "OndselSolver",
+  "license": "LGPL-2.1-or-later",
+  "source": "https://github.com/Ondsel-Development/OndselSolver",
+  "texts": [
+   {
+    "title": "OndselSolver license",
+    "file": "ondselsolver-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "MED-fichier 4.1.0",
+  "license": "LGPL-3.0-or-later",
+  "source": "https://www.salome-platform.org",
+  "texts": [
+   {
+    "title": "MED license",
+    "file": "med-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "HDF5 1.10.11",
+  "license": "BSD-3-Clause-style",
+  "source": "https://github.com/HDFGroup/hdf5",
+  "texts": [
+   {
+    "title": "HDF5 license",
+    "file": "hdf5-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "Boost 1.87",
+  "license": "BSL-1.0",
+  "source": "https://www.boost.org",
+  "texts": [
+   {
+    "title": "Boost Software License",
+    "file": "boost-software-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "{fmt} 11.1.4",
+  "license": "MIT",
+  "source": "https://github.com/fmtlib/fmt",
+  "texts": [
+   {
+    "title": "fmt license",
+    "file": "fmt-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "FreeType 2.13.3",
+  "license": "FTL",
+  "source": "https://freetype.org",
+  "texts": [
+   {
+    "title": "FreeType License",
+    "file": "freetype-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "HarfBuzz 10.4.0",
+  "license": "MIT-style",
+  "source": "https://github.com/harfbuzz/harfbuzz",
+  "texts": [
+   {
+    "title": "HarfBuzz license",
+    "file": "harfbuzz-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "ICU 76",
+  "license": "Unicode-3.0",
+  "source": "https://icu.unicode.org",
+  "texts": [
+   {
+    "title": "ICU license",
+    "file": "icu-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "Xerces-C 3.2.5",
+  "license": "Apache-2.0",
+  "source": "https://xerces.apache.org",
+  "texts": [
+   {
+    "title": "Apache-2.0",
+    "file": "apache-2-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "yaml-cpp 0.8.0",
+  "license": "MIT",
+  "source": "https://github.com/jbeder/yaml-cpp",
+  "texts": [
+   {
+    "title": "yaml-cpp license",
+    "file": "yaml-cpp-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "Eigen 3.4.0",
+  "license": "MPL-2.0",
+  "source": "https://eigen.tuxfamily.org",
+  "texts": [
+   {
+    "title": "MPL-2.0",
+    "file": "mpl-2-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "OpenBLAS",
+  "license": "BSD-3-Clause",
+  "source": "https://github.com/OpenMathLib/OpenBLAS",
+  "texts": [
+   {
+    "title": "OpenBLAS license",
+    "file": "openblas-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "arpack-ng",
+  "license": "BSD-3-Clause",
+  "source": "https://github.com/opencollab/arpack-ng",
+  "texts": [
+   {
+    "title": "arpack-ng license",
+    "file": "arpack-ng-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "LLVM libc++ / OpenMP runtime (Android NDK)",
+  "license": "Apache-2.0 WITH LLVM-exception",
+  "source": "https://android.googlesource.com/toolchain/llvm-project",
+  "texts": [
+   {
+    "title": "NDK toolchain notices",
+    "file": "ndk-toolchain-notices.txt"
+   }
+  ]
+ },
+ {
+  "name": "IfcOpenShell 0.8.4",
+  "license": "LGPL-3.0-or-later",
+  "source": "https://github.com/IfcOpenShell/IfcOpenShell (source archive on the download page)",
+  "texts": [
+   {
+    "title": "IfcOpenShell license",
+    "file": "ifcopenshell-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "Pivy (FreeCAD 3rdParty)",
+  "license": "ISC",
+  "source": "https://github.com/coin3d/pivy",
+  "texts": [
+   {
+    "title": "Pivy license",
+    "file": "pivy-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "requests",
+  "license": "Apache-2.0",
+  "source": "https://github.com/psf/requests",
+  "texts": [
+   {
+    "title": "requests license",
+    "file": "requests-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "urllib3",
+  "license": "MIT",
+  "source": "https://github.com/urllib3/urllib3",
+  "texts": [
+   {
+    "title": "urllib3 license",
+    "file": "urllib3-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "certifi",
+  "license": "MPL-2.0",
+  "source": "https://github.com/certifi/python-certifi",
+  "texts": [
+   {
+    "title": "certifi license",
+    "file": "certifi-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "charset-normalizer",
+  "license": "MIT",
+  "source": "https://github.com/jawah/charset_normalizer",
+  "texts": [
+   {
+    "title": "charset-normalizer license",
+    "file": "charset-normalizer-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "idna",
+  "license": "BSD-3-Clause",
+  "source": "https://github.com/kjd/idna",
+  "texts": [
+   {
+    "title": "idna license",
+    "file": "idna-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "python-dateutil",
+  "license": "Apache-2.0 AND BSD-3-Clause",
+  "source": "https://github.com/dateutil/dateutil",
+  "texts": [
+   {
+    "title": "python-dateutil license",
+    "file": "python-dateutil-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "isodate",
+  "license": "BSD-3-Clause",
+  "source": "https://github.com/gweis/isodate",
+  "texts": [
+   {
+    "title": "isodate license",
+    "file": "isodate-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "Lark",
+  "license": "MIT",
+  "source": "https://github.com/lark-parser/lark",
+  "texts": [
+   {
+    "title": "Lark license",
+    "file": "lark-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "packaging",
+  "license": "Apache-2.0 OR BSD-2-Clause",
+  "source": "https://github.com/pypa/packaging",
+  "texts": [
+   {
+    "title": "packaging license",
+    "file": "packaging-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "PLY",
+  "license": "BSD-3-Clause",
+  "source": "https://github.com/dabeaz/ply",
+  "texts": [
+   {
+    "title": "PLY license",
+    "file": "ply-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "PyYAML",
+  "license": "MIT",
+  "source": "https://github.com/yaml/pyyaml",
+  "texts": [
+   {
+    "title": "PyYAML license",
+    "file": "pyyaml-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "six",
+  "license": "MIT",
+  "source": "https://github.com/benjaminp/six",
+  "texts": [
+   {
+    "title": "six license",
+    "file": "six-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "typing_extensions",
+  "license": "PSF-2.0",
+  "source": "https://github.com/python/typing_extensions",
+  "texts": [
+   {
+    "title": "typing_extensions license",
+    "file": "typing-extensions-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "AndroidX, Jetpack Compose, Kotlin, kotlinx.coroutines",
+  "license": "Apache-2.0",
+  "source": "https://source.android.com",
+  "texts": [
+   {
+    "title": "Apache-2.0",
+    "file": "apache-2-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "AndroidSVG 1.4",
+  "license": "Apache-2.0",
+  "source": "https://github.com/BigBadaboom/androidsvg",
+  "texts": [
+   {
+    "title": "Apache-2.0",
+    "file": "apache-2-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "FreeCAD icons",
+  "license": "LGPL-2.1-or-later; some CC-BY / CC-BY-SA / public domain",
+  "source": "https://github.com/FreeCAD/FreeCAD",
+  "texts": [
+   {
+    "title": "Icon credits",
+    "file": "freecad-icons.txt"
+   }
+  ]
+ }
+]

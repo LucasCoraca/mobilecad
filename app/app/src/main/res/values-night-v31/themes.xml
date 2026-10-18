@@ -1,0 +1,11 @@
+<resources>
+    <!-- Android 12+ system splash: the FreeCAD logo on the theme background -->
+    <style name="Theme.FC" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">#1C2026</item>
+        <item name="android:navigationBarColor">#181B1F</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">#181B1F</item>
+        <item name="android:windowSplashScreenBackground">#181B1F</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+    </style>
+</resources>
