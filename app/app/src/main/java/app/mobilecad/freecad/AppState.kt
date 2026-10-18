@@ -657,7 +657,7 @@ class AppState(private val ctx: Context) {
     fun insertPart(name: String) { partPicker = null
         eng({ begin("Insert"); val r = call("asm_insert", mapOf("part" to name)); commit(); r }) { refresh() } }
 
-    /** Free-drag a component: move, then OndselSolver satisfies the mates (FreeCAD dragger). */
+    /** Free-drag a component: move, then OndselSolver satisfies the joints (FreeCAD dragger). */
     fun dragComponent(link: String, d: FloatArray) = eng({ call("asm_drag", mapOf("link" to link, "dx" to d[0].toDouble(), "dy" to d[1].toDouble(), "dz" to d[2].toDouble())) }) { refresh() }
 
     // ------------------------------------------------------------------ commands
