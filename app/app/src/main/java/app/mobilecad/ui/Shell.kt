@@ -69,7 +69,15 @@ import app.mobilecad.techdraw.PageView
 @Composable
 fun Shell(app: AppState) {
     val ctx = LocalContext.current
-    LaunchedEffect(app.message) { app.message?.let { Toast.makeText(ctx, it, Toast.LENGTH_LONG).show(); app.message = null } }
+    // Messages are toasts, except on a secondary display (MobileCAD XR draws this UI on a private virtual display, where the
+    // system cannot show toasts): there they appear in the UI itself, at the bottom.
+    val onSecondary = androidx.compose.ui.platform.LocalView.current.display?.displayId.let { it != null && it != android.view.Display.DEFAULT_DISPLAY }
+    var inUiMessage by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(app.message) { app.message?.let {
+        app.message = null
+        if (onSecondary) { inUiMessage = it; kotlinx.coroutines.delay(3500); if (inUiMessage == it) inUiMessage = null }
+        else Toast.makeText(ctx, it, Toast.LENGTH_LONG).show()
+    } }
     if (!app.ready) { Splash(app.status); return }
 
     var view by remember { mutableStateOf<ViewportView?>(null) }
@@ -286,6 +294,10 @@ fun Shell(app: AppState) {
     // the numpad sits above everything (like a keyboard): it fits short screens, e.g. phones in landscape
     app.numpad?.let { n -> key(n) { Numpad(n.title, n.initial, n.units, n.onAccept, { app.numpad = null },
         if (compact) Modifier.align(Alignment.BottomCenter).navigationBarsPadding() else Modifier.align(Alignment.CenterEnd).padding(16.dp).statusBarsPadding()) } }   // fresh state per request
+    inUiMessage?.let { m ->
+        Text(m, color = Color.White, fontSize = 14.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 72.dp)
+            .shadow(6.dp, RoundedCornerShape(20.dp)).background(Color(0xE6202428), RoundedCornerShape(20.dp)).padding(horizontal = 18.dp, vertical = 10.dp))
+    }
     }
 }
 
