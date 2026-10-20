@@ -280,13 +280,14 @@ fun Shell(app: AppState) {
 
     if (app.xr) {
         // MobileCAD XR: the same interface, laid out to be cut into surfaces around the user (XrLayout): the feature list
-        // on the left, the view area ahead with the bars under it, the docked panels on the right; nothing is drawn where
+        // on the left, the view area ahead with the bars (shown under it, like a keyboard), the docked panels on the right; nothing is drawn where
         // the model in the room should show through.
         Row(Modifier.fillMaxSize()) {
             Box(Modifier.width(XrLayout.TREE.dp).fillMaxHeight()) { if (app.treeOpen) FeatureTree(app, Modifier.fillMaxSize()) { app.treeOpen = false } else treeTab() }
             Column(Modifier.width(XrLayout.STAGE.dp).fillMaxHeight()) {
-                Box(Modifier.weight(1f).fillMaxWidth()) { viewArea(true, false); message(Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)) }
+                // the bars first: their menus drop down into the view area, which is shown in one piece
                 Column(Modifier.height(XrLayout.BARS.dp).fillMaxWidth()) { topBar(); if (sk != null) SketchStrip(app) else ToolStrip(app); ElementTabs(app) }
+                Box(Modifier.weight(1f).fillMaxWidth()) { viewArea(true, false); message(Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)) }
             }
             Box(Modifier.width(XrLayout.SIDE.dp).fillMaxHeight()) { viewArea(false, true); numpad(Modifier.align(Alignment.BottomCenter).padding(6.dp)) }
         }
@@ -326,9 +327,9 @@ fun Shell(app: AppState) {
     }
 }
 
-/** MobileCAD XR's layout (dp): the parts the headset cuts the interface into, left to right: feature list, view area with
- *  [BARS] (top bar, tool strip, element tabs) under it, docked panels; [HEIGHT] tall. */
-object XrLayout { const val TREE = 320; const val STAGE = 800; const val SIDE = 360; const val HEIGHT = 800; const val BARS = 153 }
+/** MobileCAD XR's layout (dp): the parts the headset cuts the interface into, left to right: feature list, [BARS] (top
+ *  bar, tool strip, element tabs) over the view area, docked panels; [HEIGHT] tall. */
+object XrLayout { const val TREE = 320; const val STAGE = 800; const val SIDE = 360; const val HEIGHT = 800; const val BARS = 154 }   // (whole pixels at 1.5 px per dp)
 
 /** Draft tool prompt (desktop: the Draft task panel with its coordinate fields, Finish, Close, Undo, Copy). */
 @Composable
