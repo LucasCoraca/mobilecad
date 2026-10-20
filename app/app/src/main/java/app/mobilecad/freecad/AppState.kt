@@ -139,6 +139,10 @@ class AppState(private val ctx: Context) {
     val unselectable = androidx.compose.runtime.mutableStateListOf<String>()
     /** The 3D view, for view commands (set by the Shell). */
     var viewport: ViewportView? = null
+    /** MobileCAD XR: the model is shown in the room around the user; the viewport only turns controller rays into its touch
+     *  handling, and [xrChanged] reports when what it would draw changed. */
+    var xr = false
+    var xrChanged: (() -> Unit)? = null
     /** Std_SelBack / Std_SelForward history. */
     private val selHistory = ArrayList<List<SelRef>>(); private var selPos = -1
     fun recordSelection() { val cur = selection.toList(); if (selHistory.getOrNull(selPos) == cur) return
