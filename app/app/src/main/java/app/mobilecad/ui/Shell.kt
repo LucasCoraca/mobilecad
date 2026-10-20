@@ -75,9 +75,10 @@ fun Shell(app: AppState) {
     var inUiMessage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(app.message) { app.message?.let {
         app.message = null
-        if (onSecondary) { inUiMessage = it; kotlinx.coroutines.delay(3500); if (inUiMessage == it) inUiMessage = null }
-        else Toast.makeText(ctx, it, Toast.LENGTH_LONG).show()
+        if (onSecondary) inUiMessage = it else Toast.makeText(ctx, it, Toast.LENGTH_LONG).show()
     } }
+    // (its own effect: clearing app.message above restarts that one)
+    LaunchedEffect(inUiMessage) { if (inUiMessage != null) { kotlinx.coroutines.delay(3500); inUiMessage = null } }
     if (!app.ready) { Splash(app.status); return }
 
     var view by remember { mutableStateOf<ViewportView?>(null) }
@@ -183,8 +184,116 @@ fun Shell(app: AppState) {
     // panels: floating at the top left on tablets, bottom sheets on phones (the model stays visible above)
     val panelAlign = if (compact) Alignment.BottomCenter else Alignment.TopStart
     val panelPad = if (compact) Modifier.padding(0.dp) else Modifier.padding(6.dp)
+    // the feature list's collapsed tab: tapping it opens the list
+    val treeTab: @Composable () -> Unit = {
+        Column(Modifier.width(40.dp).fillMaxHeight().background(OS.Surface).clickable { app.treeOpen = true }, horizontalAlignment = Alignment.CenterHorizontally) {
+            Spacer(Modifier.height(8.dp)); Icon(Icons.Default.ChevronRight, "Show features", tint = OS.Primary, modifier = Modifier.size(28.dp))
+            Icon(Icons.Default.AccountTree, null, tint = OS.Steel, modifier = Modifier.padding(top = 8.dp).size(20.dp))
+        }
+    }
+    val topBar: @Composable () -> Unit = { TopBar(app, onOpen = { app.fileRequest = AppState.FileRequest("open") }, onSave = { app.fileRequest = AppState.FileRequest("save", suggested = "${app.docName}.FCStd") }, onFit = { view?.fitAll() }) }
+    val message: @Composable (Modifier) -> Unit = { mod -> inUiMessage?.let { m ->
+        Text(m, color = Color.White, fontSize = 14.sp, modifier = mod.shadow(6.dp, RoundedCornerShape(20.dp)).background(Color(0xE6202428), RoundedCornerShape(20.dp)).padding(horizontal = 18.dp, vertical = 10.dp))
+    } }
+    val numpad: @Composable (Modifier) -> Unit = { mod -> app.numpad?.let { n -> key(n) { Numpad(n.title, n.initial, n.units, n.onAccept, { app.numpad = null }, mod) } } }   // fresh state per request
+    // What the 3D view area holds: the view itself and what floats over it (`stage`: banners, chips, menus, dialogs, the
+    // drawing / spreadsheet that replace the view), and the panels docked in it (`side`: tool panels, feature dialogs,
+    // task panels, the constraint list). One area on phones and tablets; MobileCAD XR shows them as two surfaces.
+    val viewArea: @Composable BoxScope.(Boolean, Boolean) -> Unit = { stage, side ->
+        if (stage) AndroidView(modifier = Modifier.fillMaxSize(), factory = { c ->
+            ViewportView(c, app).also { it.layoutParams = ViewGroup.LayoutParams(-1, -1); it.onContextMenu = { x, y -> menu = x to y }; view = it; app.viewport = it; it.sync() }
+        })
+        // Variables tab: the spreadsheet grid replaces the 3D view
+        if (stage) if (app.inSheet) SheetView(app, Modifier.fillMaxSize())
+        // Drawing tab: the TechDraw page replaces the 3D view
+        if (stage) if (app.inDrawing) {
+            LaunchedEffect(Unit) { app.refreshPage() }
+            AndroidView(modifier = Modifier.fillMaxSize().clipToBounds(), factory = { c ->
+                PageView(c, app).also { it.layoutParams = ViewGroup.LayoutParams(-1, -1); app.pageView = it } },
+                update = { it.invalidate() })
+            DisposableEffect(Unit) { onDispose { app.pageView = null } }
+        }
+        // empty element tabs: the first step as a button (empty-state call to action)
+        if (stage) if (app.inDrawing && app.page == null && app.objects.none { it.type == "TechDraw::DrawPage" })
+            EmptyState("No drawing yet", "New drawing page", Modifier.align(Alignment.Center)) { app.run("TechDraw_PageDefault") }
+        if (stage) if (app.inAssembly && app.objects.none { it.type == "Assembly::AssemblyObject" })
+            EmptyState("No assembly yet", "Create assembly", Modifier.align(Alignment.Center)) { app.run("Assembly_CreateAssembly") }
+        if (side) app.openToolset?.let { ts ->
+            ToolPanel(app.catalog, ts, { MobileCommands.available(it) }, { app.run(it.id) }, panelPad.align(panelAlign),
+                extras = remember(ts, sk != null) { Workspaces.extras(app.catalog, app.workspace, ts, sketchMode = sk != null) })
+        }
+        if (side) app.edit?.let { e ->
+            FeatureDialog(e.title, e.type, e.props, e.error, e.activeQuery,
+                onQueryFocus = { q -> e.activeQuery = if (e.activeQuery == q) null else q },
+                onSet = { p, v -> app.setProp(e, p, v) },
+                onNumpad = { p -> app.numpad = NumpadRequest(p.name, p.expression?.let { "=$it" } ?: (p.value?.toString() ?: ""), DialogSpec.units(p.type, p.value)) { v -> app.numpad = null; app.setExpr(e, p, v.removePrefix("=")) } },
+                onOk = { app.commitEdit() }, onCancel = { app.cancelEdit() }, modifier = panelPad.align(panelAlign),
+                editors = DialogEditors(
+                    number = { t, init, units, ok -> app.numpad = NumpadRequest(t, init, units) { v -> app.numpad = null; ok(v) } },
+                    text = { t, init, multi, ok -> app.textPrompt = TextPrompt(t, init, multi, ok) },
+                    file = { p -> app.fileRequest = AppState.FileRequest("propfile", listOf(e.obj, p.name)) },
+                    choose = { t, opts, ok -> app.choose(t, opts, ok) }),
+                onSetPart = { path, v -> app.setPart(e, path, v.removePrefix("=")) })
+        }
+        if (side) app.taskPanel?.let { p -> TaskPanelView(app, p, panelPad.align(panelAlign)) }
+        if (stage) if (app.inDrawing) Text("Fit", Modifier.align(Alignment.TopEnd).padding(8.dp).background(OS.Surface.copy(alpha = .92f), RoundedCornerShape(6.dp))
+            .clickable { app.pageView?.fit() }.padding(horizontal = 16.dp, vertical = 10.dp), color = OS.Primary, fontSize = 12.sp)
+        if (stage) if (sk == null && app.openToolset == null && app.selection.isNotEmpty() && (app.xr || !((compact || Screen.height < 560.dp) && (app.edit != null || app.taskPanel != null)))) SelectionChips(app, Modifier.align(Alignment.BottomStart).padding(8.dp))
+        if (stage) app.draft?.let { t -> DraftBanner(app, t, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
+        if (stage) app.mate?.let { m -> MateBanner(app, m.jointType, m.picks.size, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
+        if (stage) app.partPicker?.let { parts -> PartPicker(app, parts) }
+        if (stage) app.textPrompt?.let { tp -> var txt by remember(tp) { mutableStateOf(tp.initial) }
+            AlertDialog(onDismissRequest = { app.textPrompt = null }, title = { Text(tp.title) },
+                text = { OutlinedTextField(txt, { txt = it }, singleLine = !tp.multiline, minLines = if (tp.multiline) 4 else 1, maxLines = if (tp.multiline) 10 else 1) },
+                confirmButton = { TextButton({ app.textPrompt = null; tp.onAccept(txt) }) { Text("OK") } },
+                dismissButton = { TextButton({ app.textPrompt = null }) { Text("Cancel") } }) }
+        if (stage) app.imageView?.let { bmp -> AlertDialog(onDismissRequest = { app.imageView = null }, confirmButton = { TextButton({ app.imageView = null }) { Text("Close") } },
+            title = { Text("Image ${bmp.width}×${bmp.height}") },
+            text = { var sc by remember(bmp) { mutableStateOf(1f) }; var off by remember(bmp) { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+                androidx.compose.foundation.Image(bmp.asImageBitmap(), null, Modifier.fillMaxWidth().heightIn(max = 480.dp).clipToBounds()
+                    .pointerInput(bmp) { detectTransformGestures { _, pan, zoom, _ -> sc = (sc * zoom).coerceIn(1f, 12f); off += pan } }
+                    .graphicsLayer { scaleX = sc; scaleY = sc; translationX = off.x; translationY = off.y }) }) }
+        if (stage) app.info?.let { (t, body) -> AlertDialog(onDismissRequest = { app.info = null }, title = { Text(t) },
+            text = { Text(body, fontSize = 13.sp, modifier = Modifier.verticalScroll(rememberScrollState())) },
+            confirmButton = { TextButton({ app.info = null }) { Text("Close") } }) }
+        if (stage) if (sk == null && (app.selFilter != null || app.boxSelect != null)) FilterBanner(app, Modifier.align(Alignment.BottomEnd).padding(10.dp))
+        if (stage) app.multiChoice?.let { mc -> val picked = remember(mc) { mutableStateListOf<String>().apply { addAll(mc.initial) } }
+            AlertDialog(onDismissRequest = { app.multiChoice = null }, title = { Text(mc.title) },
+                text = { LazyColumn(Modifier.heightIn(max = 420.dp)) { items(mc.options) { (id, l) ->
+                    Row(Modifier.fillMaxWidth().clickable { if (id in picked) picked.remove(id) else picked.add(id) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(id in picked, { if (it) picked.add(id) else picked.remove(id) }); Text(l, color = OS.Navy) } } } },
+                confirmButton = { TextButton({ mc.onDone(picked.toList()) }) { Text("OK") } },
+                dismissButton = { TextButton({ app.multiChoice = null }) { Text("Cancel") } }) }
+        if (stage) app.choice?.let { ch -> AlertDialog(onDismissRequest = { app.choice = null }, confirmButton = {}, dismissButton = { TextButton({ app.choice = null }) { Text("Cancel") } },
+            title = { Text(ch.title) }, text = { Column { ch.options.forEach { (id, l) ->
+                Text(l, Modifier.fillMaxWidth().clickable { ch.onPick(id) }.padding(vertical = 12.dp), color = OS.Navy) } } }) }
+        if (stage) sk?.let { s -> SketchStatus(s.status, s.fully, s.conflicting.isNotEmpty(),
+            if (compact) Modifier.align(Alignment.TopStart).padding(8.dp).widthIn(max = Screen.width - 140.dp) else Modifier.align(Alignment.BottomStart).padding(10.dp)) {
+            // the solver message opens the constraint list on the problems (desktop: the message links select them)
+            s.consList = if (s.conflicting.isNotEmpty() || s.redundant.isNotEmpty() || s.malformed.isNotEmpty()) "problems" else "all" } }
+        if (side) sk?.takeIf { it.consList != null }?.let { s -> ConstraintList(app, s, panelPad.align(panelAlign)) }
+        if (stage) sk?.let { s -> s.drawStep.let { _ -> SketchInputs(s, Modifier.align(if (compact) Alignment.BottomStart else Alignment.BottomCenter).padding(10.dp)) } }
+        if (stage) ToolExit(app, Modifier.align(Alignment.BottomEnd).padding(12.dp))
+        if (stage) sk?.let { SketchSelectionBar(it, Modifier.align(Alignment.BottomCenter).padding(bottom = if (compact) 72.dp else 64.dp)) }
+        if (stage) menu?.let { (x, y) -> Box(Modifier.offset { IntOffset(x.toInt(), y.toInt()) }) { ContextMenu(app, view) { menu = null } } }
+    }
+
+    if (app.xr) {
+        // MobileCAD XR: the same interface, laid out to be cut into surfaces around the user (XrLayout): the feature list
+        // on the left, the view area ahead with the bars under it, the docked panels on the right; nothing is drawn where
+        // the model in the room should show through.
+        Row(Modifier.fillMaxSize()) {
+            Box(Modifier.width(XrLayout.TREE.dp).fillMaxHeight()) { if (app.treeOpen) FeatureTree(app, Modifier.fillMaxSize()) { app.treeOpen = false } else treeTab() }
+            Column(Modifier.width(XrLayout.STAGE.dp).fillMaxHeight()) {
+                Box(Modifier.weight(1f).fillMaxWidth()) { viewArea(true, false); message(Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)) }
+                Column(Modifier.height(XrLayout.BARS.dp).fillMaxWidth()) { topBar(); if (sk != null) SketchStrip(app) else ToolStrip(app); ElementTabs(app) }
+            }
+            Box(Modifier.width(XrLayout.SIDE.dp).fillMaxHeight()) { viewArea(false, true); numpad(Modifier.align(Alignment.BottomCenter).padding(6.dp)) }
+        }
+        return@BoxWithConstraints
+    }
     Column(Modifier.fillMaxSize().background(OS.Metal6).statusBarsPadding()) {
-        TopBar(app, onOpen = { app.fileRequest = AppState.FileRequest("open") }, onSave = { app.fileRequest = AppState.FileRequest("save", suggested = "${app.docName}.FCStd") }, onFit = { view?.fitAll() })
+        topBar()
         Row(Modifier.weight(1f)) {
             if (compact) { /* the feature list is a drawer over the view (below) */ }
             else if (app.treeOpen) {
@@ -196,91 +305,11 @@ fun Shell(app: AppState) {
                     contentAlignment = Alignment.Center) {
                     Box(Modifier.width(4.dp).height(36.dp).background(OS.Aluminum, RoundedCornerShape(2.dp)))
                 }
-            } else {
-                Column(Modifier.width(40.dp).fillMaxHeight().background(OS.Surface).clickable { app.treeOpen = true }, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Spacer(Modifier.height(8.dp)); Icon(Icons.Default.ChevronRight, "Show features", tint = OS.Primary, modifier = Modifier.size(28.dp))
-                    Icon(Icons.Default.AccountTree, null, tint = OS.Steel, modifier = Modifier.padding(top = 8.dp).size(20.dp))
-                }
-            }
+            } else treeTab()
             Column(Modifier.weight(1f)) {
                 if (sk != null) SketchStrip(app) else ToolStrip(app)
                 Box(Modifier.weight(1f).fillMaxWidth().background(OS.Surface)) {
-                    AndroidView(modifier = Modifier.fillMaxSize(), factory = { c ->
-                        ViewportView(c, app).also { it.layoutParams = ViewGroup.LayoutParams(-1, -1); it.onContextMenu = { x, y -> menu = x to y }; view = it; app.viewport = it; it.sync() }
-                    })
-                    // Variables tab: the spreadsheet grid replaces the 3D view
-                    if (app.inSheet) SheetView(app, Modifier.fillMaxSize())
-                    // Drawing tab: the TechDraw page replaces the 3D view
-                    if (app.inDrawing) {
-                        LaunchedEffect(Unit) { app.refreshPage() }
-                        AndroidView(modifier = Modifier.fillMaxSize().clipToBounds(), factory = { c ->
-                            PageView(c, app).also { it.layoutParams = ViewGroup.LayoutParams(-1, -1); app.pageView = it } },
-                            update = { it.invalidate() })
-                        DisposableEffect(Unit) { onDispose { app.pageView = null } }
-                    }
-                    // empty element tabs: the first step as a button (empty-state call to action)
-                    if (app.inDrawing && app.page == null && app.objects.none { it.type == "TechDraw::DrawPage" })
-                        EmptyState("No drawing yet", "New drawing page", Modifier.align(Alignment.Center)) { app.run("TechDraw_PageDefault") }
-                    if (app.inAssembly && app.objects.none { it.type == "Assembly::AssemblyObject" })
-                        EmptyState("No assembly yet", "Create assembly", Modifier.align(Alignment.Center)) { app.run("Assembly_CreateAssembly") }
-                    app.openToolset?.let { ts ->
-                        ToolPanel(app.catalog, ts, { MobileCommands.available(it) }, { app.run(it.id) }, panelPad.align(panelAlign),
-                            extras = remember(ts, sk != null) { Workspaces.extras(app.catalog, app.workspace, ts, sketchMode = sk != null) })
-                    }
-                    app.edit?.let { e ->
-                        FeatureDialog(e.title, e.type, e.props, e.error, e.activeQuery,
-                            onQueryFocus = { q -> e.activeQuery = if (e.activeQuery == q) null else q },
-                            onSet = { p, v -> app.setProp(e, p, v) },
-                            onNumpad = { p -> app.numpad = NumpadRequest(p.name, p.expression?.let { "=$it" } ?: (p.value?.toString() ?: ""), DialogSpec.units(p.type, p.value)) { v -> app.numpad = null; app.setExpr(e, p, v.removePrefix("=")) } },
-                            onOk = { app.commitEdit() }, onCancel = { app.cancelEdit() }, modifier = panelPad.align(panelAlign),
-                            editors = DialogEditors(
-                                number = { t, init, units, ok -> app.numpad = NumpadRequest(t, init, units) { v -> app.numpad = null; ok(v) } },
-                                text = { t, init, multi, ok -> app.textPrompt = TextPrompt(t, init, multi, ok) },
-                                file = { p -> app.fileRequest = AppState.FileRequest("propfile", listOf(e.obj, p.name)) },
-                                choose = { t, opts, ok -> app.choose(t, opts, ok) }),
-                            onSetPart = { path, v -> app.setPart(e, path, v.removePrefix("=")) })
-                    }
-                    app.taskPanel?.let { p -> TaskPanelView(app, p, panelPad.align(panelAlign)) }
-                    if (app.inDrawing) Text("Fit", Modifier.align(Alignment.TopEnd).padding(8.dp).background(OS.Surface.copy(alpha = .92f), RoundedCornerShape(6.dp))
-                        .clickable { app.pageView?.fit() }.padding(horizontal = 16.dp, vertical = 10.dp), color = OS.Primary, fontSize = 12.sp)
-                    if (sk == null && app.openToolset == null && app.selection.isNotEmpty() && !((compact || Screen.height < 560.dp) && (app.edit != null || app.taskPanel != null))) SelectionChips(app, Modifier.align(Alignment.BottomStart).padding(8.dp))
-                    app.draft?.let { t -> DraftBanner(app, t, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
-                    app.mate?.let { m -> MateBanner(app, m.jointType, m.picks.size, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
-                    app.partPicker?.let { parts -> PartPicker(app, parts) }
-                    app.textPrompt?.let { tp -> var txt by remember(tp) { mutableStateOf(tp.initial) }
-                        AlertDialog(onDismissRequest = { app.textPrompt = null }, title = { Text(tp.title) },
-                            text = { OutlinedTextField(txt, { txt = it }, singleLine = !tp.multiline, minLines = if (tp.multiline) 4 else 1, maxLines = if (tp.multiline) 10 else 1) },
-                            confirmButton = { TextButton({ app.textPrompt = null; tp.onAccept(txt) }) { Text("OK") } },
-                            dismissButton = { TextButton({ app.textPrompt = null }) { Text("Cancel") } }) }
-                    app.imageView?.let { bmp -> AlertDialog(onDismissRequest = { app.imageView = null }, confirmButton = { TextButton({ app.imageView = null }) { Text("Close") } },
-                        title = { Text("Image ${bmp.width}×${bmp.height}") },
-                        text = { var sc by remember(bmp) { mutableStateOf(1f) }; var off by remember(bmp) { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
-                            androidx.compose.foundation.Image(bmp.asImageBitmap(), null, Modifier.fillMaxWidth().heightIn(max = 480.dp).clipToBounds()
-                                .pointerInput(bmp) { detectTransformGestures { _, pan, zoom, _ -> sc = (sc * zoom).coerceIn(1f, 12f); off += pan } }
-                                .graphicsLayer { scaleX = sc; scaleY = sc; translationX = off.x; translationY = off.y }) }) }
-                    app.info?.let { (t, body) -> AlertDialog(onDismissRequest = { app.info = null }, title = { Text(t) },
-                        text = { Text(body, fontSize = 13.sp, modifier = Modifier.verticalScroll(rememberScrollState())) },
-                        confirmButton = { TextButton({ app.info = null }) { Text("Close") } }) }
-                    if (sk == null && (app.selFilter != null || app.boxSelect != null)) FilterBanner(app, Modifier.align(Alignment.BottomEnd).padding(10.dp))
-                    app.multiChoice?.let { mc -> val picked = remember(mc) { mutableStateListOf<String>().apply { addAll(mc.initial) } }
-                        AlertDialog(onDismissRequest = { app.multiChoice = null }, title = { Text(mc.title) },
-                            text = { LazyColumn(Modifier.heightIn(max = 420.dp)) { items(mc.options) { (id, l) ->
-                                Row(Modifier.fillMaxWidth().clickable { if (id in picked) picked.remove(id) else picked.add(id) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Checkbox(id in picked, { if (it) picked.add(id) else picked.remove(id) }); Text(l, color = OS.Navy) } } } },
-                            confirmButton = { TextButton({ mc.onDone(picked.toList()) }) { Text("OK") } },
-                            dismissButton = { TextButton({ app.multiChoice = null }) { Text("Cancel") } }) }
-                    app.choice?.let { ch -> AlertDialog(onDismissRequest = { app.choice = null }, confirmButton = {}, dismissButton = { TextButton({ app.choice = null }) { Text("Cancel") } },
-                        title = { Text(ch.title) }, text = { Column { ch.options.forEach { (id, l) ->
-                            Text(l, Modifier.fillMaxWidth().clickable { ch.onPick(id) }.padding(vertical = 12.dp), color = OS.Navy) } } }) }
-                    sk?.let { s -> SketchStatus(s.status, s.fully, s.conflicting.isNotEmpty(),
-                        if (compact) Modifier.align(Alignment.TopStart).padding(8.dp).widthIn(max = Screen.width - 140.dp) else Modifier.align(Alignment.BottomStart).padding(10.dp)) {
-                        // the solver message opens the constraint list on the problems (desktop: the message links select them)
-                        s.consList = if (s.conflicting.isNotEmpty() || s.redundant.isNotEmpty() || s.malformed.isNotEmpty()) "problems" else "all" } }
-                    sk?.takeIf { it.consList != null }?.let { s -> ConstraintList(app, s, panelPad.align(panelAlign)) }
-                    sk?.let { s -> s.drawStep.let { _ -> SketchInputs(s, Modifier.align(if (compact) Alignment.BottomStart else Alignment.BottomCenter).padding(10.dp)) } }
-                    ToolExit(app, Modifier.align(Alignment.BottomEnd).padding(12.dp))
-                    sk?.let { SketchSelectionBar(it, Modifier.align(Alignment.BottomCenter).padding(bottom = if (compact) 72.dp else 64.dp)) }
-                    menu?.let { (x, y) -> Box(Modifier.offset { IntOffset(x.toInt(), y.toInt()) }) { ContextMenu(app, view) { menu = null } } }
+                    viewArea(true, true)
                     // phones: the feature list slides over the view; tapping outside closes it
                     if (compact && app.treeOpen) {
                         Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .25f)).clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { app.treeOpen = false })
@@ -292,14 +321,14 @@ fun Shell(app: AppState) {
         ElementTabs(app)
     }
     // the numpad sits above everything (like a keyboard): it fits short screens, e.g. phones in landscape
-    app.numpad?.let { n -> key(n) { Numpad(n.title, n.initial, n.units, n.onAccept, { app.numpad = null },
-        if (compact) Modifier.align(Alignment.BottomCenter).navigationBarsPadding() else Modifier.align(Alignment.CenterEnd).padding(16.dp).statusBarsPadding()) } }   // fresh state per request
-    inUiMessage?.let { m ->
-        Text(m, color = Color.White, fontSize = 14.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 72.dp)
-            .shadow(6.dp, RoundedCornerShape(20.dp)).background(Color(0xE6202428), RoundedCornerShape(20.dp)).padding(horizontal = 18.dp, vertical = 10.dp))
-    }
+    numpad(if (compact) Modifier.align(Alignment.BottomCenter).navigationBarsPadding() else Modifier.align(Alignment.CenterEnd).padding(16.dp).statusBarsPadding())
+    message(Modifier.align(Alignment.BottomCenter).padding(bottom = 72.dp))
     }
 }
+
+/** MobileCAD XR's layout (dp): the parts the headset cuts the interface into, left to right: feature list, view area with
+ *  [BARS] (top bar, tool strip, element tabs) under it, docked panels; [HEIGHT] tall. */
+object XrLayout { const val TREE = 320; const val STAGE = 800; const val SIDE = 360; const val HEIGHT = 800; const val BARS = 153 }
 
 /** Draft tool prompt (desktop: the Draft task panel with its coordinate fields, Finish, Close, Undo, Copy). */
 @Composable

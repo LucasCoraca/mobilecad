@@ -577,11 +577,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     /** MobileCAD XR shows the model in 3D around the user: this view then draws nothing, and controller rays come in through
      *  [xrPointer], running the same touch handling as a finger (picking, every sketch tool, Draft points, drag arrows). */
     var xr = false
-        set(v) { field = v; val vis = if (v) View.GONE else View.VISIBLE; gl.visibility = vis; overlay.visibility = vis; navi.visibility = vis
-            if (v && xrHint.parent == null) addView(xrHint, LayoutParams(-2, -2, android.view.Gravity.CENTER)) }
-    private val xrHint by lazy { android.widget.TextView(context).apply {
-        text = "The model is in the room:\npoint at it to pick, sketch and drag"; textSize = 15f; gravity = android.view.Gravity.CENTER
-        setTextColor(if (OS.dark) 0xFF8D99A5.toInt() else 0xFF7A8691.toInt()) } }
+        set(v) { field = v; val vis = if (v) View.GONE else View.VISIBLE; gl.visibility = vis; overlay.visibility = vis; navi.visibility = vis }
     override fun onAttachedToWindow() { super.onAttachedToWindow(); if (app.xr && !xr) xr = true }
     private val fingerOffset get() = if (xr) 0f else 50 * dp
     /** The virtual camera's image: 20 dp per degree (12 dp, the pick radius, is 0.6°: about what it is on a phone held at
