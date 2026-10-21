@@ -593,7 +593,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     }
 
     /** A controller ray (origin [o], unit direction [d], model mm; [depth]: distance to what it points at). action: 0 press,
-     *  1 drag, 2 release, 3 hover, 4 leave. A press is a touch at the centre of a camera looking down the ray; while
+     *  1 drag, 2 release, 3 hover, 4 leave, 5 cancel (the touch is called off: a second hand joined in). A press is a touch at the centre of a camera looking down the ray; while
      *  pressed, the ray is followed on that camera's image, so drags keep their meaning (slop, rubber bands, arrows). */
     fun xrPointer(action: Int, o: FloatArray, d: FloatArray, depth: Float) {
         val c = xrPx / 2f
@@ -610,6 +610,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                 if (action == 2) xrPressed = null }
             3 -> if (xrPressed == null) { icam = rayCam(o, d, depth); try { hoverAt(c, c) } finally { icam = cam } }
             4 -> if (xrPressed == null) hoverEnd()
+            5 -> { val cm = xrPressed ?: return; touch(MotionEvent.ACTION_CANCEL, c, c, cm); xrPressed = null }
         }
     }
     /** The context menu (a two-finger tap on a touch screen), centred on the view. */
