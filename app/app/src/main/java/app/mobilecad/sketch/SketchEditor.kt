@@ -738,8 +738,30 @@ class SketchEditor(private val app: AppState, val name: String) {
     private val pFill = Paint(Paint.ANTI_ALIAS_FLAG)
     private val pText = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER }
 
-    fun draw(c: Canvas, dp: Float, project: (DoubleArray) -> FloatArray?) {
+    /** A text label the editor draws at a sketch point (constraint glyphs, dimension values, sizes while drawing, snap
+     *  hints): its box around the point in pixels (left top right bottom) and how to paint it with the point at (x, y). */
+    class Label(val at: P2, val l: Float, val t: Float, val r: Float, val b: Float, val paint: (Canvas, Float, Float) -> Unit)
+
+    private fun pillLabel(at: P2, text: String, dp: Float, fg: Int, bg: Int, padX: Float, top: Float, bottom: Float, dy: Float = 0f): Label {
+        val tp = Paint(pText).apply { textSize = 12 * dp; color = fg; textAlign = Paint.Align.CENTER }
+        val fp = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = bg }
+        val w = tp.measureText(text) / 2 + padX
+        return Label(at, -w, dy - top, w, dy + bottom) { c, x, y ->
+            c.drawRoundRect(x - w, y + dy - top, x + w, y + dy + bottom, 4 * dp, 4 * dp, fp); c.drawText(text, x, y + dy, tp) }
+    }
+
+    private fun textLabel(at: P2, text: String, dp: Float, size: Float, color: Int, dx: Float, dy: Float, left: Boolean = false): Label {
+        val tp = Paint(pText).apply { textSize = size * dp; this.color = color; textAlign = if (left) Paint.Align.LEFT else Paint.Align.CENTER }
+        val tw = tp.measureText(text); val l = if (left) dx else dx - tw / 2
+        return Label(at, l, dy - size * dp, l + tw, dy + 3 * dp) { c, x, y -> c.drawText(text, x + dx, y + dy, tp) }
+    }
+
+    /** Draws the sketch with [project] (world -> canvas pixels; null = not visible). With [labels], the text labels are
+     *  collected there (sized for [labelDp]) instead of drawn: MobileCAD XR shows them facing the user. */
+    fun draw(c: Canvas, dp: Float, project: (DoubleArray) -> FloatArray?, labels: MutableList<Label>? = null, labelDp: Float = dp) {
         fun scr(p: P2) = project(toWorld(p))
+        val ldp = if (labels != null) labelDp else dp
+        fun emit(l: Label) { if (labels != null) labels.add(l) else scr(l.at)?.let { s -> l.paint(c, s[0], s[1]) } }
         val dk = OS.dark
         val defined = if (dk) 0xFFE8ECEF.toInt() else 0xFF1A1A1A.toInt(); val free = if (dk) 0xFF6FA8FF.toInt() else 0xFF2A6FC9.toInt(); val cons = 0xFF66C7C9.toInt(); val sel = 0xFF418FDE.toInt()
         // axes
@@ -759,9 +781,8 @@ class SketchEditor(private val app: AppState, val name: String) {
             }
         }
         pLine.pathEffect = null
-        drawHelpers(c, dp, ::scr)
+        drawHelpers(c, dp, ::scr, ldp, ::emit)
         // constraint glyphs and dimension labels
-        pText.textSize = 12 * dp
         for (k in this.cons) {
             val lay = dimLayout(k)
             val anchor = labelPoint(k) ?: continue
@@ -773,10 +794,8 @@ class SketchEditor(private val app: AppState, val name: String) {
             val text = when (k.type) { "Horizontal" -> "H"; "Vertical" -> "V"; "Parallel" -> "∥"; "Perpendicular" -> "⊥"; "Tangent" -> "T"; "Equal" -> "="
                 "Symmetric" -> "⇋"; "Block" -> "⊠"; "Distance", "DistanceX", "DistanceY", "Radius", "Diameter", "Angle" -> (if (k.type == "Diameter") "⌀" else if (k.type == "Radius") "R" else "") + k.label
                 else -> continue }
-            pText.color = if (k.i in selectedCons) 0xFF418FDE.toInt() else if (bad) 0xFFE0403F.toInt() else if (k.driving) (if (dk) 0xFFE3E9EF.toInt() else 0xFF1B2733.toInt()) else 0xFF9AA5AF.toInt()
-            val w = pText.measureText(text) / 2 + 4 * dp
-            pFill.color = if (dk) 0xE622272D.toInt() else 0xE6FFFFFF.toInt(); c.drawRoundRect(s[0] - w, s[1] - 14 * dp, s[0] + w, s[1] + 4 * dp, 4 * dp, 4 * dp, pFill)
-            c.drawText(text, s[0], s[1], pText)
+            val fg = if (k.i in selectedCons) 0xFF418FDE.toInt() else if (bad) 0xFFE0403F.toInt() else if (k.driving) (if (dk) 0xFFE3E9EF.toInt() else 0xFF1B2733.toInt()) else 0xFF9AA5AF.toInt()
+            emit(pillLabel(anchor, text, ldp, fg, if (dk) 0xE622272D.toInt() else 0xE6FFFFFF.toInt(), 4 * ldp, 14 * ldp, 4 * ldp))
         }
         // in-progress shape + snap feedback
         val pp = pendingPoints(); val pv = preview
@@ -792,7 +811,7 @@ class SketchEditor(private val app: AppState, val name: String) {
             }
             pLine.pathEffect = null
             pFill.color = 0xFF418FDE.toInt(); pp.forEach { p -> scr(p)?.let { q -> c.drawCircle(q[0], q[1], 5 * dp, pFill) } }
-            liveDims(c, dp, all, ::scr)
+            liveDims(all, ldp, ::emit)
             pv?.let { s -> scr(s.p)?.let { q ->
                 // inference guide lines (FreeCAD alignment): from the reference point to the cursor
                 pLine.color = 0xFF47AB72.toInt(); pLine.strokeWidth = 1 * dp; pLine.pathEffect = DashPathEffect(floatArrayOf(4 * dp, 4 * dp), 0f)
@@ -804,21 +823,17 @@ class SketchEditor(private val app: AppState, val name: String) {
                 val tag = when (s.kind) { "point" -> "coincident"; "origin" -> "origin"; "center" -> "center"; "midpoint" -> "midpoint"; "on curve" -> "on curve"
                     "on axis" -> "on axis"; "horizontal" -> "horizontal"; "vertical" -> "vertical"; "aligned" -> "aligned"
                     "model point" -> "part vertex"; "model center" -> "part center"; "model midpoint" -> "part midpoint"; "on model edge" -> "on part edge"; else -> null }
-                tag?.let { t -> pText.textSize = 11 * dp; pText.color = pFill.color; pText.textAlign = Paint.Align.LEFT
-                    c.drawText(t, q[0] + 12 * dp, q[1] - 12 * dp, pText); pText.textAlign = Paint.Align.CENTER }
+                tag?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }
             } }
         }
     }
 
     /** The shape's size while it is being drawn (FreeCAD's on-view parameters). */
-    private fun liveDims(c: Canvas, dp: Float, all: List<P2>, scr: (P2) -> FloatArray?) {
+    private fun liveDims(all: List<P2>, dp: Float, emit: (Label) -> Unit) {
         if (all.size < 2) return
         val a = all[all.size - 2]; val b = all.last()
         fun mm(v: Double) = "%.2f mm".format(v)
-        fun label(p: P2, text: String, dy: Float = 0f) = scr(p)?.let { s ->
-            pText.textSize = 12 * dp; val w = pText.measureText(text) / 2 + 5 * dp
-            pFill.color = 0xF22A6FC9.toInt(); c.drawRoundRect(s[0] - w, s[1] + dy - 15 * dp, s[0] + w, s[1] + dy + 5 * dp, 4 * dp, 4 * dp, pFill)
-            pText.color = 0xFFFFFFFF.toInt(); c.drawText(text, s[0], s[1] + dy, pText) }
+        fun label(p: P2, text: String, dy: Float = 0f) = emit(pillLabel(p, text, dp, 0xFFFFFFFF.toInt(), 0xF22A6FC9.toInt(), 5 * dp, 15 * dp, 5 * dp, dy))
         fun mid(p: P2, q: P2) = P2((p.x + q.x) / 2, (p.y + q.y) / 2)
         when (tool) {
             SketchTool.LINE, SketchTool.POLYLINE -> {
@@ -840,8 +855,8 @@ class SketchEditor(private val app: AppState, val name: String) {
         }
     }
 
-    private fun drawHelpers(c: Canvas, dp: Float, scr: (P2) -> FloatArray?) {
-        pLine.strokeWidth = 1 * dp; pText.textSize = 11 * dp; pText.color = if (OS.dark) 0xFFA3AEB8.toInt() else 0xFF606A73.toInt()
+    private fun drawHelpers(c: Canvas, dp: Float, scr: (P2) -> FloatArray?, ldp: Float, emit: (Label) -> Unit) {
+        pLine.strokeWidth = 1 * dp; val tc = if (OS.dark) 0xFFA3AEB8.toInt() else 0xFF606A73.toInt()
         for (g in geos) {
             if (showArcOverlay && g.isArc) { pLine.color = 0x55418FDE; pLine.pathEffect = DashPathEffect(floatArrayOf(4 * dp, 4 * dp), 0f)
                 poly(c, (0..72).map { P2(g.c!!.x + g.r * cos(it * Math.PI / 36), g.c.y + g.r * sin(it * Math.PI / 36)) }, scr); pLine.pathEffect = null }
@@ -849,9 +864,9 @@ class SketchEditor(private val app: AppState, val name: String) {
             if (showBsPolygon) { pLine.color = 0x88606A73.toInt(); poly(c, b.poles, scr) }
             if (showBsComb) { pLine.color = 0x88E0403F.toInt(); b.comb.forEach { (p0, p1) -> poly(c, listOf(p0, p1), scr) }
                 poly(c, b.comb.map { it.second }, scr) }
-            if (showBsDegree) b.poles.firstOrNull()?.let { scr(it)?.let { s -> c.drawText("degree ${b.degree}", s[0], s[1] - 10 * dp, pText) } }
-            if (showBsWeight) b.poles.zip(b.weights).forEach { (p, w) -> scr(p)?.let { s -> c.drawText("%.2f".format(w), s[0], s[1] + 14 * dp, pText) } }
-            if (showBsKnotMult) b.knots.forEach { (p, m) -> scr(p)?.let { s -> c.drawText("($m)", s[0], s[1] - 8 * dp, pText) } }
+            if (showBsDegree) b.poles.firstOrNull()?.let { emit(textLabel(it, "degree ${b.degree}", ldp, 11f, tc, 0f, -10 * ldp)) }
+            if (showBsWeight) b.poles.zip(b.weights).forEach { (p, w) -> emit(textLabel(p, "%.2f".format(w), ldp, 11f, tc, 0f, 14 * ldp)) }
+            if (showBsKnotMult) b.knots.forEach { (p, m) -> emit(textLabel(p, "($m)", ldp, 11f, tc, 0f, -8 * ldp)) }
         }
     }
 

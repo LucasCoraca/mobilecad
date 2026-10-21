@@ -190,18 +190,31 @@ def info():
     return {'version': App.Version(), 'modules': sorted(App.listImportModules() and []) }
 
 # ------------------------------------------------------------------ objects / tree
+def _failed_dependency(o):
+    """A feature left uncomputed (Touched, no shape) because something it depends on failed: that object, else None."""
+    if 'Touched' not in o.State or 'Invalid' in o.State or 'Error' in o.State or not _has_shape_prop(o): return None
+    try:
+        if not _shape(o).isNull(): return None
+    except Exception: pass
+    return next((d for d in o.OutListRecursive if 'Invalid' in d.State or 'Error' in d.State), None)
+
+def _has_shape_prop(o):
+    return 'Shape' in o.PropertiesList
+
 def _obj_info(o):
+    blocked = _failed_dependency(o)   # shown and reported as failed, like desktop's error overlay on the chain
     return {'name': o.Name, 'label': o.Label, 'type': o.TypeId,
             # an App::Origin hides its axes / planes when it is hidden (ViewProviderCoordinateSystem), whatever their own flag
             'visible': bool(getattr(o, 'Visibility', True)) and not any(p.TypeId == 'App::Origin' and not p.Visibility for p in o.InList),
-            'state': list(o.State), 'invalid': 'Invalid' in o.State or 'Error' in o.State,
+            'state': list(o.State), 'invalid': 'Invalid' in o.State or 'Error' in o.State or blocked is not None,
             'parents': [p.Name for p in o.InList],
             'group': [c.Name for c in getattr(o, 'Group', [])] if hasattr(o, 'Group') else [],
             'tip': o.Tip.Name if getattr(o, 'Tip', None) is not None and o.TypeId == 'PartDesign::Body' else None,
             'hasShape': _has_shape(o),
             'assembly': next((p.Name for p in o.InListRecursive if p.TypeId == 'Assembly::AssemblyObject'), None),
             'linked': o.LinkedObject.Name if o.TypeId == 'App::Link' and o.LinkedObject is not None else None,
-            'error': o.getStatusString() if ('Invalid' in o.State or 'Error' in o.State) else None,
+            'error': o.getStatusString() if ('Invalid' in o.State or 'Error' in o.State) else
+                     ('%s failed: %s' % (blocked.Label, blocked.getStatusString()) if blocked is not None else None),
             'subtype': ('Joint:' + o.JointType) if hasattr(o, 'JointType') else ('Grounded' if hasattr(o, 'ObjectToGround') else None),
             'claims': _claims(o)}
 

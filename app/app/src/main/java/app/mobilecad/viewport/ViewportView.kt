@@ -646,21 +646,26 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     /** The sketch's extent on its plane (sketch mm: x0 y0 x1 y1): geometry, the shape being drawn, the origin. */
     fun xrSketchBounds(): DoubleArray? {
         val sk = sketch ?: return null
-        val pts = sk.geos.flatMap { g -> g.polyline() + g.points().map { it.second } } + sk.pendingPoints() + listOfNotNull(sk.preview?.p, P2(0.0, 0.0))
+        // what is drawn, not the hover preview (pointing at the plane at a low angle puts it far away); an empty sketch: its origin
+        val pts = (sk.geos.filter { !it.external }.flatMap { g -> g.polyline() + g.points().map { it.second } } + sk.pendingPoints()).ifEmpty { listOf(P2(0.0, 0.0)) }
         return doubleArrayOf(pts.minOf { it.x }, pts.minOf { it.y }, pts.maxOf { it.x }, pts.maxOf { it.y })
     }
 
-    /** Draws the sketch being edited with its own editor (geometry, constraints, dimensions, the shape in progress, snap
-     *  feedback) into [bmp]: a view straight onto the sketch plane covering sketch coordinates [x0, y0] .. + [size].
-     *  [dpPx] is the size of a dp in bitmap pixels. Returns the bitmap's corners in model coordinates (top left, top right,
-     *  bottom right, bottom left), or null when no sketch is open. */
-    fun xrDrawSketch(bmp: android.graphics.Bitmap, x0: Double, y0: Double, size: Double, dpPx: Float): FloatArray? {
+    /** Draws the sketch being edited with its own editor (geometry, the shape in progress, snap feedback) into [bmp]: a view
+     *  straight onto the sketch plane covering sketch coordinates [x0, y0] .. + [size]. [dpPx] is the size of a dp in bitmap
+     *  pixels. Its text labels (constraint glyphs, dimensions, sizes while drawing, snap hints) go to [labels] sized for
+     *  [labelDp], with their points in model coordinates, to be shown facing the user. Returns the bitmap's corners in model
+     *  coordinates (top left, top right, bottom right, bottom left), or null when no sketch is open. */
+    fun xrDrawSketch(bmp: android.graphics.Bitmap, x0: Double, y0: Double, size: Double, dpPx: Float,
+                     labels: MutableList<Pair<DoubleArray, app.mobilecad.sketch.SketchEditor.Label>>, labelDp: Float): FloatArray? {
         val sk = sketch ?: return null
         val m = sk.m; val n = bmp.width
         val c = Canvas(bmp); c.drawColor(Color.TRANSPARENT, android.graphics.PorterDuff.Mode.CLEAR)
-        sk.draw(c, dpPx) { w -> val dx = w[0] - m[3]; val dy = w[1] - m[7]; val dz = w[2] - m[11]
+        val ls = ArrayList<app.mobilecad.sketch.SketchEditor.Label>()
+        sk.draw(c, dpPx, { w -> val dx = w[0] - m[3]; val dy = w[1] - m[7]; val dz = w[2] - m[11]
             val u = dx * m[0] + dy * m[4] + dz * m[8]; val v = dx * m[1] + dy * m[5] + dz * m[9]
-            floatArrayOf(((u - x0) / size * n).toFloat(), ((y0 + size - v) / size * n).toFloat()) }
+            floatArrayOf(((u - x0) / size * n).toFloat(), ((y0 + size - v) / size * n).toFloat()) }, ls, labelDp)
+        ls.forEach { labels.add(sk.toWorld(it.at) to it) }
         return listOf(P2(x0, y0 + size), P2(x0 + size, y0 + size), P2(x0 + size, y0), P2(x0, y0)).flatMap { p -> sk.toWorld(p).map { it.toFloat() } }.toFloatArray()
     }
 
@@ -681,7 +686,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
             val dk = OS.dark
             labelBg.color = if (dk) 0xEE22272D.toInt() else 0xEEFFFFFF.toInt(); labelText.color = if (dk) 0xFFE3E9EF.toInt() else 0xFF1B2733.toInt()
             annLine.color = if (dk) 0xFFC8D0D8.toInt() else 0xFF2B3640.toInt(); annText.color = annLine.color
-            sketch?.draw(c, dp) { w -> cam.project(w[0].toFloat(), w[1].toFloat(), w[2].toFloat()) }
+            sketch?.draw(c, dp, { w -> cam.project(w[0].toFloat(), w[1].toFloat(), w[2].toFloat()) })
             pointer?.let { p ->
                 c.drawLine(p[0], p[1], p[2], p[3], ring); c.drawCircle(p[2], p[3], 12 * dp, fill); c.drawCircle(p[2], p[3], 12 * dp, ring)
                 c.drawLine(p[2] - 18 * dp, p[3], p[2] + 18 * dp, p[3], ring); c.drawLine(p[2], p[3] - 18 * dp, p[2], p[3] + 18 * dp, ring)

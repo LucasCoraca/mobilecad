@@ -243,28 +243,28 @@ fun Shell(app: AppState) {
         if (stage) app.mate?.let { m -> MateBanner(app, m.jointType, m.picks.size, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
         if (stage) app.partPicker?.let { parts -> PartPicker(app, parts) }
         if (stage) app.textPrompt?.let { tp -> var txt by remember(tp) { mutableStateOf(tp.initial) }
-            AlertDialog(onDismissRequest = { app.textPrompt = null }, title = { Text(tp.title) },
+            AppDialog(onDismissRequest = { app.textPrompt = null }, title = { Text(tp.title) },
                 text = { OutlinedTextField(txt, { txt = it }, singleLine = !tp.multiline, minLines = if (tp.multiline) 4 else 1, maxLines = if (tp.multiline) 10 else 1) },
                 confirmButton = { TextButton({ app.textPrompt = null; tp.onAccept(txt) }) { Text("OK") } },
                 dismissButton = { TextButton({ app.textPrompt = null }) { Text("Cancel") } }) }
-        if (stage) app.imageView?.let { bmp -> AlertDialog(onDismissRequest = { app.imageView = null }, confirmButton = { TextButton({ app.imageView = null }) { Text("Close") } },
+        if (stage) app.imageView?.let { bmp -> AppDialog(onDismissRequest = { app.imageView = null }, confirmButton = { TextButton({ app.imageView = null }) { Text("Close") } },
             title = { Text("Image ${bmp.width}×${bmp.height}") },
             text = { var sc by remember(bmp) { mutableStateOf(1f) }; var off by remember(bmp) { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
                 androidx.compose.foundation.Image(bmp.asImageBitmap(), null, Modifier.fillMaxWidth().heightIn(max = 480.dp).clipToBounds()
                     .pointerInput(bmp) { detectTransformGestures { _, pan, zoom, _ -> sc = (sc * zoom).coerceIn(1f, 12f); off += pan } }
                     .graphicsLayer { scaleX = sc; scaleY = sc; translationX = off.x; translationY = off.y }) }) }
-        if (stage) app.info?.let { (t, body) -> AlertDialog(onDismissRequest = { app.info = null }, title = { Text(t) },
+        if (stage) app.info?.let { (t, body) -> AppDialog(onDismissRequest = { app.info = null }, title = { Text(t) },
             text = { Text(body, fontSize = 13.sp, modifier = Modifier.verticalScroll(rememberScrollState())) },
             confirmButton = { TextButton({ app.info = null }) { Text("Close") } }) }
         if (stage) if (sk == null && (app.selFilter != null || app.boxSelect != null)) FilterBanner(app, Modifier.align(Alignment.BottomEnd).padding(10.dp))
         if (stage) app.multiChoice?.let { mc -> val picked = remember(mc) { mutableStateListOf<String>().apply { addAll(mc.initial) } }
-            AlertDialog(onDismissRequest = { app.multiChoice = null }, title = { Text(mc.title) },
+            AppDialog(onDismissRequest = { app.multiChoice = null }, title = { Text(mc.title) },
                 text = { LazyColumn(Modifier.heightIn(max = 420.dp)) { items(mc.options) { (id, l) ->
                     Row(Modifier.fillMaxWidth().clickable { if (id in picked) picked.remove(id) else picked.add(id) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(id in picked, { if (it) picked.add(id) else picked.remove(id) }); Text(l, color = OS.Navy) } } } },
                 confirmButton = { TextButton({ mc.onDone(picked.toList()) }) { Text("OK") } },
                 dismissButton = { TextButton({ app.multiChoice = null }) { Text("Cancel") } }) }
-        if (stage) app.choice?.let { ch -> AlertDialog(onDismissRequest = { app.choice = null }, confirmButton = {}, dismissButton = { TextButton({ app.choice = null }) { Text("Cancel") } },
+        if (stage) app.choice?.let { ch -> AppDialog(onDismissRequest = { app.choice = null }, confirmButton = {}, dismissButton = { TextButton({ app.choice = null }) { Text("Cancel") } },
             title = { Text(ch.title) }, text = { Column { ch.options.forEach { (id, l) ->
                 Text(l, Modifier.fillMaxWidth().clickable { ch.onPick(id) }.padding(vertical = 12.dp), color = OS.Navy) } } }) }
         if (stage) sk?.let { s -> SketchStatus(s.status, s.fully, s.conflicting.isNotEmpty(),
@@ -281,8 +281,8 @@ fun Shell(app: AppState) {
     if (app.xr) {
         // MobileCAD XR: the same interface, laid out to be cut into surfaces around the user (XrLayout): the feature list
         // on the left, the view area ahead with the bars (shown under it, like a keyboard), the docked panels on the right; nothing is drawn where
-        // the model in the room should show through.
-        Row(Modifier.fillMaxSize()) {
+        // the model in the room should show through. Its dialogs are drawn in the view area (LocalInlineDialogs).
+        CompositionLocalProvider(LocalInlineDialogs provides true) { Row(Modifier.fillMaxSize()) {
             Box(Modifier.width(XrLayout.TREE.dp).fillMaxHeight()) { if (app.treeOpen) FeatureTree(app, Modifier.fillMaxSize()) { app.treeOpen = false } else treeTab() }
             Column(Modifier.width(XrLayout.STAGE.dp).fillMaxHeight()) {
                 // the bars first: their menus drop down into the view area, which is shown in one piece
@@ -290,7 +290,7 @@ fun Shell(app: AppState) {
                 Box(Modifier.weight(1f).fillMaxWidth()) { viewArea(true, false); message(Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)) }
             }
             Box(Modifier.width(XrLayout.SIDE.dp).fillMaxHeight()) { viewArea(false, true); numpad(Modifier.align(Alignment.BottomCenter).padding(6.dp)) }
-        }
+        } }
         return@BoxWithConstraints
     }
     Column(Modifier.fillMaxSize().background(OS.Metal6).statusBarsPadding()) {
@@ -324,6 +324,29 @@ fun Shell(app: AppState) {
     // the numpad sits above everything (like a keyboard): it fits short screens, e.g. phones in landscape
     numpad(if (compact) Modifier.align(Alignment.BottomCenter).navigationBarsPadding() else Modifier.align(Alignment.CenterEnd).padding(16.dp).statusBarsPadding())
     message(Modifier.align(Alignment.BottomCenter).padding(bottom = 72.dp))
+    }
+}
+
+/** Dialogs drawn in the layout instead of in windows of their own (MobileCAD XR: its private display takes no dialog
+ *  windows). */
+val LocalInlineDialogs = androidx.compose.runtime.staticCompositionLocalOf { false }
+
+/** Material's AlertDialog; with [LocalInlineDialogs] the same dialog over a scrim filling the enclosing box. */
+@Composable
+fun AppDialog(onDismissRequest: () -> Unit, confirmButton: @Composable () -> Unit, modifier: Modifier = Modifier, dismissButton: (@Composable () -> Unit)? = null,
+              title: (@Composable () -> Unit)? = null, text: (@Composable () -> Unit)? = null) {
+    if (!LocalInlineDialogs.current) { AlertDialog(onDismissRequest, confirmButton, modifier, dismissButton, title = title, text = text); return }
+    Box(Modifier.fillMaxSize().background(Color.Black.copy(alpha = .32f))
+        .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onDismissRequest), contentAlignment = Alignment.Center) {
+        Surface(modifier.widthIn(min = 280.dp, max = 560.dp).padding(24.dp)
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) {},   // taps inside stay inside
+            shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.surfaceContainerHigh, tonalElevation = 6.dp, shadowElevation = 8.dp) {
+            Column(Modifier.padding(24.dp)) {
+                title?.let { ProvideTextStyle(MaterialTheme.typography.headlineSmall) { it() }; Spacer(Modifier.height(16.dp)) }
+                text?.let { ProvideTextStyle(MaterialTheme.typography.bodyMedium) { Box(Modifier.weight(1f, fill = false)) { it() } }; Spacer(Modifier.height(24.dp)) }
+                Row(Modifier.align(Alignment.End), horizontalArrangement = Arrangement.spacedBy(8.dp)) { dismissButton?.invoke(); confirmButton() }
+            }
+        }
     }
 }
 
@@ -499,7 +522,7 @@ private fun MateBanner(app: AppState, type: String, picked: Int, modifier: Modif
 /** Assembly_InsertLink part list. */
 @Composable
 private fun PartPicker(app: AppState, parts: List<Pair<String, String>>) {
-    AlertDialog(onDismissRequest = { app.partPicker = null }, confirmButton = {}, dismissButton = { TextButton({ app.partPicker = null }) { Text("Cancel") } },
+    AppDialog(onDismissRequest = { app.partPicker = null }, confirmButton = {}, dismissButton = { TextButton({ app.partPicker = null }) { Text("Cancel") } },
         title = { Text("Insert part") },
         text = {
             if (parts.isEmpty()) Text("No parts yet. Model a Body in the Part tab first.")

@@ -94,6 +94,13 @@ def pd_body():
     """PartDesign_Body."""
     return _doc().addObject('PartDesign::Body', 'Body').Name
 
+def _planar(o, sub):
+    try:
+        f = o.Shape.getElement(sub)
+        try: return f.isPlanar(1e-7)                   # Attacher::AttachEnginePlane::planarPrecision()
+        except Exception: return f.Surface.__class__.__name__ == 'Plane'
+    except Exception: return False
+
 @op
 def pd_new_sketch(sel=None, plane=None):
     """PartDesign_NewSketch / Sketcher_NewSketch: attach to a selected planar face / datum plane / origin plane (FlatFace)."""
@@ -102,7 +109,10 @@ def pd_new_sketch(sel=None, plane=None):
     support = None
     for o, subs in s:
         if o.TypeId == 'PartDesign::Body': continue
-        if subs and subs[0].startswith('Face'): support = (o, [subs[0]]); break
+        if subs and subs[0].startswith('Face'):
+            # desktop (SketchWorkflow): only a planar face can carry a sketch; a curved one falls through to the planes
+            if _planar(o, subs[0]): support = (o, [subs[0]]); break
+            continue
         if getattr(o, 'Role', None) in ('XY_Plane', 'XZ_Plane', 'YZ_Plane') or o.TypeId in ('PartDesign::Plane', 'App::Plane'):
             support = (o, ['']); break
     if support is None:
