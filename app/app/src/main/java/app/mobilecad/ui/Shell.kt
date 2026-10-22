@@ -783,33 +783,46 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
 }
 
 // ---------------------------------------------------------------------------------------------- context menu (selection-aware)
-@Composable
-private fun ContextMenu(app: AppState, view: ViewportView?, dismiss: () -> Unit) {
+/** One entry of the 3D view's context menu: [group] changes where a divider goes, [danger] is drawn in red. */
+class ContextEntry(val label: String, val group: Int, val danger: Boolean = false, val action: () -> Unit)
+
+/** The 3D view's context menu for the current selection, in order: the touch screen's dropdown and MobileCAD XR's
+ *  marking menu show the same entries. */
+fun viewContextEntries(app: AppState, view: ViewportView?): List<ContextEntry> {
     val faces = app.selection.filter { it.sub.startsWith("Face") }; val edges = app.selection.filter { it.sub.startsWith("Edge") }
     val sketches = app.selection.filter { app.obj(it.obj)?.type == "Sketcher::SketchObject" }
+    val out = ArrayList<ContextEntry>()
+    fun item(label: String, id: String, group: Int) = out.add(ContextEntry(label, group) { app.run(id) })
+    if (app.inAssembly) {
+        item("Fixed joint", "Assembly_CreateJointFixed", 0); item("Revolute joint", "Assembly_CreateJointRevolute", 0)
+        item("Slider joint", "Assembly_CreateJointSlider", 0); item("Insert part…", "Assembly_InsertLink", 0)
+        if (app.selection.isNotEmpty()) item("Toggle grounded", "Assembly_ToggleGrounded", 0)
+        item("Solve assembly", "Assembly_SolveAssembly", 0)
+    }
+    if (faces.size == 1 && !app.inAssembly) { item("Sketch", "PartDesign_NewSketch", 1); item("Extrude (Pad)", "PartDesign_Pad", 1); item("Plane", "PartDesign_Plane", 1) }
+    if (sketches.isNotEmpty()) { item("Extrude (Pad)", "PartDesign_Pad", 1); item("Revolve", "PartDesign_Revolution", 1); item("Pocket", "PartDesign_Pocket", 1); item("Edit sketch", "Sketcher_EditSketch", 1) }
+    if (edges.isNotEmpty()) { item("Fillet", "PartDesign_Fillet", 1); item("Chamfer", "PartDesign_Chamfer", 1) }
+    if (app.selection.isNotEmpty()) {
+        item("Hide / show", "Std_ToggleVisibility", 2)
+        out.add(ContextEntry("Delete ${app.selection.map { it.obj }.distinct().size}", 2, danger = true) { app.run("Std_Delete") })
+        out.add(ContextEntry("Clear selection", 2) { app.clearSelection(); app.refresh() })
+    }
+    out.add(ContextEntry("Zoom to fit", 3) { view?.fitAll() })
+    out.add(ContextEntry("Isometric", 3) { view?.setView(-0.785f, 0.6155f) })
+    out.add(ContextEntry("Top", 3) { view?.setView(-1.5708f, 1.5f) })
+    out.add(ContextEntry("Front", 3) { view?.setView(-1.5708f, 0f) })
+    out.add(ContextEntry("Right", 3) { view?.setView(0f, 0f) })
+    return out
+}
+
+@Composable
+private fun ContextMenu(app: AppState, view: ViewportView?, dismiss: () -> Unit) {
+    val entries = viewContextEntries(app, view)
     DropdownMenu(true, dismiss) {
-        @Composable fun item(label: String, id: String) = DropdownMenuItem({ Text(label) }, { dismiss(); app.run(id) })
-        if (app.inAssembly) {
-            item("Fixed joint", "Assembly_CreateJointFixed"); item("Revolute joint", "Assembly_CreateJointRevolute")
-            item("Slider joint", "Assembly_CreateJointSlider"); item("Insert part…", "Assembly_InsertLink")
-            if (app.selection.isNotEmpty()) item("Toggle grounded", "Assembly_ToggleGrounded")
-            item("Solve assembly", "Assembly_SolveAssembly"); HorizontalDivider()
+        entries.forEachIndexed { i, e ->
+            if (i > 0 && entries[i - 1].group != e.group) HorizontalDivider()
+            DropdownMenuItem({ Text(e.label, color = if (e.danger) OS.Red else Color.Unspecified) }, { dismiss(); e.action() })
         }
-        if (faces.size == 1 && !app.inAssembly) { item("Sketch", "PartDesign_NewSketch"); item("Extrude (Pad)", "PartDesign_Pad"); item("Plane", "PartDesign_Plane") }
-        if (sketches.isNotEmpty()) { item("Extrude (Pad)", "PartDesign_Pad"); item("Revolve", "PartDesign_Revolution"); item("Pocket", "PartDesign_Pocket"); item("Edit sketch", "Sketcher_EditSketch") }
-        if (edges.isNotEmpty()) { item("Fillet", "PartDesign_Fillet"); item("Chamfer", "PartDesign_Chamfer") }
-        if (app.selection.isNotEmpty()) {
-            HorizontalDivider()
-            item("Hide / show", "Std_ToggleVisibility")
-            DropdownMenuItem({ Text("Delete ${app.selection.map { it.obj }.distinct().size}", color = OS.Red) }, { dismiss(); app.run("Std_Delete") })
-            DropdownMenuItem({ Text("Clear selection") }, { dismiss(); app.clearSelection(); app.refresh() })
-        }
-        HorizontalDivider()
-        DropdownMenuItem({ Text("Zoom to fit") }, { dismiss(); view?.fitAll() })
-        DropdownMenuItem({ Text("Isometric") }, { dismiss(); view?.setView(-0.785f, 0.6155f) })
-        DropdownMenuItem({ Text("Top") }, { dismiss(); view?.setView(-1.5708f, 1.5f) })
-        DropdownMenuItem({ Text("Front") }, { dismiss(); view?.setView(-1.5708f, 0f) })
-        DropdownMenuItem({ Text("Right") }, { dismiss(); view?.setView(0f, 0f) })
     }
 }
 

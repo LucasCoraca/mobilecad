@@ -14,6 +14,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.widget.FrameLayout
 import app.mobilecad.freecad.AppState
+import app.mobilecad.freecad.Manipulator
 import app.mobilecad.freecad.SelRef
 import app.mobilecad.sketch.P2
 import app.mobilecad.sketch.SketchEditor
@@ -603,15 +604,31 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
             icam = cm; try { onTouchEvent(e) } finally { icam = cam; e.recycle() }
         }
         when (action) {
-            0 -> { hoverEnd(); val cm = rayCam(o, d, depth); xrPressed = cm; touch(MotionEvent.ACTION_DOWN, c, c, cm) }
-            1, 2 -> { val cm = xrPressed ?: return
+            0 -> { hoverEnd(); val cm = rayCam(o, d, depth); xrPressed = cm; touch(MotionEvent.ACTION_DOWN, c, c, cm)
+                xrArrowOff = if (mode == Mode.MANIPULATOR) app.manipulator?.let { m -> rayOnArrow(m, o, d)?.minus(manipStartValue) } ?: Double.NaN else Double.NaN }
+            1 -> if (mode == Mode.MANIPULATOR && !xrArrowOff.isNaN()) {
+                // a drag arrow held by the ray: its tip goes where the ray passes the arrow's line, as if held in the hand
+                val m = app.manipulator ?: return; val s = rayOnArrow(m, o, d) ?: return
+                app.manipDrag(m, maxOf(0.01, s - xrArrowOff)); overlayChanged()
+            } else xrPointer(-1, o, d, depth)
+            -1, 2 -> { val cm = xrPressed ?: return
                 val q = cm.project(o[0] + d[0] * cm.dist, o[1] + d[1] * cm.dist, o[2] + d[2] * cm.dist) ?: floatArrayOf(c, c)
-                touch(if (action == 1) MotionEvent.ACTION_MOVE else MotionEvent.ACTION_UP, q[0], q[1], cm)
+                touch(if (action == -1) MotionEvent.ACTION_MOVE else MotionEvent.ACTION_UP, q[0], q[1], cm)
                 if (action == 2) xrPressed = null }
             3 -> if (xrPressed == null) { icam = rayCam(o, d, depth); try { hoverAt(c, c) } finally { icam = cam } }
             4 -> if (xrPressed == null) hoverEnd()
             5 -> { val cm = xrPressed ?: return; touch(MotionEvent.ACTION_CANCEL, c, c, cm); xrPressed = null }
         }
+    }
+    private var xrArrowOff = Double.NaN
+    /** Where the ray (model mm) passes closest to the arrow's line, as the arrow's value there (along `dir` from `base`);
+     *  null when the ray runs along the line. */
+    private fun rayOnArrow(m: Manipulator, o: FloatArray, d: FloatArray): Double? {
+        val u = m.dir; val w = FloatArray(3) { m.base[it] - o[it] }
+        fun dot(a: FloatArray, b: FloatArray) = (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]).toDouble()
+        val a = dot(u, u); val b = dot(u, d); val c = dot(d, d); val den = a * c - b * b
+        if (den < 1e-6 * a * c) return null
+        return (b * dot(d, w) - c * dot(u, w)) / den
     }
     /** The context menu (a two-finger tap on a touch screen), centred on the view. */
     fun xrContextMenu() = onContextMenu(width / 2f, height / 2f)
