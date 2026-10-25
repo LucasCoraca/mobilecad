@@ -16,7 +16,7 @@ Repo: https://github.com/LucasCoraca/mobilecad.git
 Builds:
   - versionName: '0.5'
     versionCode: 1005001
-    commit: v0.5
+    commit: 5eb64537f8e0ffbe173f035ebe3cb1a57b7be1ae
     timeout: 43200
     subdir: app/app
     sudo:
