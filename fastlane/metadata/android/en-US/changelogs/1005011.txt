@@ -1,0 +1,3 @@
+• Sketcher: undo / redo stay inside the open sketch; undoing past your first step no longer deletes the sketch.
+• Polyline: horizontal and vertical segments are created again (they failed with an error).
+• OK and Cancel are further apart in sketches and feature dialogs; a cancelled sketch can be brought back with redo.
