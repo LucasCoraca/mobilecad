@@ -1,0 +1,54 @@
+# Source archives of everything the native runtime is built from (engine/fetch_sources.sh downloads + verifies them)
+# <file in $FCDEPS/src> <sha256> <url>
+# C/C++ libraries (engine/build_deps.sh)
+qtbase.tar.xz 56001b905601bb9023d399f3ba780d7fa940f3e4861e496a7c490331f49e0b80 https://download.qt.io/archive/qt/6.8/6.8.3/submodules/qtbase-everywhere-src-6.8.3.tar.xz
+boost.tar.gz 78fbf579e3caf0f47517d3fb4d9301852c3154bfecdc5eeebd9b2b0292366f5b https://github.com/boostorg/boost/releases/download/boost-1.87.0/boost-1.87.0-cmake.tar.gz
+xerces.tar.gz 545cfcce6c4e755207bd1f27e319241e50e37c0c27250f11cda116018f1ef0f5 https://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.5.tar.gz
+fmt.tar.gz ac366b7b4c2e9f0dde63a59b3feb5ee59b67974b14ee5dc9ea8ad78aa2c1ee1e https://github.com/fmtlib/fmt/archive/refs/tags/11.1.4.tar.gz
+yaml.tar.gz fbe74bbdcee21d656715688706da3c8becfd946d92cd44705cc6098bb23b3a16 https://github.com/jbeder/yaml-cpp/archive/refs/tags/0.8.0.tar.gz
+eigen.tar.gz 8586084f71f9bde545ee7fa6d00288b264a2b7ac3607b974e54d13e7162c1c72 https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz
+icu.tgz dfacb46bfe4747410472ce3e1144bf28a102feeaa4e3875bac9b4c6cf30f4f3e https://github.com/unicode-org/icu/releases/download/release-76-1/icu4c-76_1-src.tgz
+freetype.tar.xz 0550350666d427c74daeb85d5ac7bb353acba5f76956395995311a9c6f063289 https://download.savannah.gnu.org/releases/freetype/freetype-2.13.3.tar.xz
+harfbuzz.tar.xz 480b6d25014169300669aa1fc39fb356c142d5028324ea52b3a27648b9beaad8 https://github.com/harfbuzz/harfbuzz/releases/download/10.4.0/harfbuzz-10.4.0.tar.xz
+vtk.tar.gz cee64b98d270ff7302daf1ef13458dff5d5ac1ecb45d47723835f7f7d562c989 https://www.vtk.org/files/release/9.5/VTK-9.5.2.tar.gz
+occt-7.8.1.tar.gz 7321af48c34dc253bf8aae3f0430e8cb10976961d534d8509e72516978aa82f5 https://github.com/Open-Cascade-SAS/OCCT/archive/refs/tags/V7_8_1.tar.gz
+# HDF5 + MED (engine/build_med.sh)
+hdf5/hdf5-1.10.11.tar.gz 341684c5c0976b8c7e6951735a400275a90693604464cac73e9f323c696fc79c https://support.hdfgroup.org/archive/support/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.11/src/hdf5-1.10.11.tar.gz
+med/med-fichier_4.1.0+repack.orig.tar.gz ef5420a8b9aa2db4477661814ce355939fbdbe5f540f943508defc292f0c3b1b https://deb.debian.org/debian/pool/main/m/med-fichier/med-fichier_4.1.0+repack.orig.tar.gz
+# FreeCAD at the commit built (+ engine/patches/freecad-android.patch) and the submodules a headless build needs (engine/build_freecad.sh)
+freecad-e95a31c3119f09a5b185c0b9c901a91384961cc0.tar.gz 1a3eb48bde4daf4c7792cab05bea443e72361a2a085dff20ffa6de12ee2d4141 https://github.com/FreeCAD/FreeCAD/archive/e95a31c3119f09a5b185c0b9c901a91384961cc0.tar.gz
+ondselsolver-4be80eef02a3486cda0d78f3ccbb308d207a9639.tar.gz 701a5b6814114d3bd358700b4308e0c75c8fe86d24400d5accde0f3c11e3580a https://github.com/FreeCAD/OndselSolver/archive/4be80eef02a3486cda0d78f3ccbb308d207a9639.tar.gz
+gsl-543d0dd3fe966ddf20e884b44e5fdbf12cb43784.tar.gz dd06a9190c02f6c04d008366faabc8947c817f33cbc6a838c5bfc9ad79652410 https://github.com/microsoft/GSL/archive/543d0dd3fe966ddf20e884b44e5fdbf12cb43784.tar.gz
+# NumPy (engine/build_numpy.sh), Gmsh (engine/build_gmsh.sh)
+numpy/numpy-2.3.5.tar.gz 784db1dcdab56bf0517743e746dfb0f885fc68d948aba86eeec2cba234bdf1c0 https://files.pythonhosted.org/packages/source/n/numpy/numpy-2.3.5.tar.gz
+gmsh/gmsh.tgz 77972145f431726026d50596a6a44fb3c1c95c21255218d66955806b86edbe8d https://gmsh.info/src/gmsh-4.13.1-source.tgz
+# IfcOpenShell (engine/build_ifcopenshell.sh): the commit built, its svgfill submodule, nlohmann/json, SWIG 4.1 (host tool)
+ifc/ifcopenshell-158fe92644cfe2bc37be513d9838c95d9f2233cf.tar.gz cf2f8f5e2d70611ae03f4610fc47be0e97c4f68ff9e1495953f638408f35e7a1 https://github.com/IfcOpenShell/IfcOpenShell/archive/158fe92644cfe2bc37be513d9838c95d9f2233cf.tar.gz
+ifc/svgfill-ba09c29b81325c27d77cd41be84d7e84c9c06f5b.tar.gz 1506421f47eb365aea8bd7738583b94607b6732166609dc4b34423efd0c22a5e https://github.com/IfcOpenShell/svgfill/archive/ba09c29b81325c27d77cd41be84d7e84c9c06f5b.tar.gz
+ifc/json-3.11.3.hpp 9bea4c8066ef4a1c206b2be5a36302f8926f7fdc6087af5d20b417d0cf103ea6 https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp
+swig-4.1.1.tar.gz 2af08aced8fcd65cdb5cc62426768914bedc735b1c250325203716f78e39ac9b https://downloads.sourceforge.net/project/swig/swig/swig-4.1.1/swig-4.1.1.tar.gz
+# --- CPython 3.14.4 for Android + its dependencies (engine/build_python.sh); versions as in CPython's Android/android.py
+Python-3.14.4.tar.xz d923c51303e38e249136fc1bdf3568d56ecb03214efdef48516176d3d7faaef8 https://www.python.org/ftp/python/3.14.4/Python-3.14.4.tar.xz
+openssl-3.0.19.tar.gz fa5a4143b8aae18be53ef2f3caf29a2e0747430b8bc74d32d88335b94ab63072 https://github.com/openssl/openssl/releases/download/openssl-3.0.19/openssl-3.0.19.tar.gz
+sqlite-autoconf-3500400.tar.gz a3db587a1b92ee5ddac2f66b3edb41b26f9c867275782d46c3a088977d6a5b18 https://www.sqlite.org/2025/sqlite-autoconf-3500400.tar.gz
+bzip2-1.0.8.tar.gz ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269 https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz
+libffi-3.4.4.tar.gz d66c56ad259a82cf2a9dfc408b32bf5da52371500b84745f7fb8b645712df676 https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz
+xz-5.4.6.tar.gz aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz
+zstd-1.5.7.tar.gz eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3 https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz
+# --- host build-tool venv (engine/host-requirements.txt): pure-Python wheels, PyYAML from sdist
+pypi/cython-3.3.0-py3-none-any.whl 9b24b5c8cd536946b62086fcafee6d5509d3f549f72d553d2336af87ffbe0da1 https://files.pythonhosted.org/packages/bf/77/67b0b24e45073a699610e50f00c18474ff9b09ea29ecc95083bdf5e60acd/cython-3.3.0-py3-none-any.whl
+pypi/lark-1.3.1-py3-none-any.whl c629b661023a014c37da873b4ff58a817398d12635d3bbb2c5a03be7fe5d1e12 https://files.pythonhosted.org/packages/82/3d/14ce75ef66813643812f3093ab17e46d3a206942ce7376d31ec2d36229e7/lark-1.3.1-py3-none-any.whl
+pypi/meson-1.12.1-py3-none-any.whl 930bc7542cbd9f57009e182fd014eba48cf1a0180a7b9006d2d32d8f168d8b02 https://files.pythonhosted.org/packages/57/99/36cd25f9598eef70db97577440a70a360af505f6f01c2338a18d1556079c/meson-1.12.1-py3-none-any.whl
+pypi/meson_python-0.22.1-py3-none-any.whl 258fde948cf45aab5df23fcc9e17a9050ee73d4e1002fe6cf86519f61c414778 https://files.pythonhosted.org/packages/96/62/0c1cf20fe158b0e623e78acbf5fb6de5f1410a408f65f727e4090497627b/meson_python-0.22.1-py3-none-any.whl
+pypi/packaging-26.3-py3-none-any.whl d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl
+pypi/ply-3.11-py2.py3-none-any.whl 096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce https://files.pythonhosted.org/packages/a3/58/35da89ee790598a0700ea49b2a66594140f44dec458c07e8e3d4979137fc/ply-3.11-py2.py3-none-any.whl
+pypi/pybind11-3.1.0-py3-none-any.whl b8488090f8acffbcb6b5d6a85571a6827a0a2981ffb75e5a0b27b87c4a6b7dd0 https://files.pythonhosted.org/packages/33/fd/8762f7ee3e4e4be6d1d846cffb4916dd9bb02b2f800d3603718a0efe494c/pybind11-3.1.0-py3-none-any.whl
+pypi/pyproject_metadata-0.12.1-py3-none-any.whl f7162d580a96386a8eb096da06215f981f547d1490f03055ef99e323bc2da427 https://files.pythonhosted.org/packages/b9/8e/d883718e872abc214ba053f60f7e6edc2abd5ffbd1544beb01a9c92ddd3c/pyproject_metadata-0.12.1-py3-none-any.whl
+pypi/pyyaml-6.0.3.tar.gz d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f https://files.pythonhosted.org/packages/05/8e/961c0007c59b8dd7729d542c61a4d537767a59645b82a0b521206e1e25c2/pyyaml-6.0.3.tar.gz
+pypi/setuptools-84.2.1-py3-none-any.whl ca140b45d5325a9478f880e351484f62fef15f336462e449ca0c03c873d589c2 https://files.pythonhosted.org/packages/ef/55/6dc6d6bb953bdfc52519a0059592c52b6e3b8ad51cf8256dffceb55b0610/setuptools-84.2.1-py3-none-any.whl
+# CalculiX ccx 2.22 + SPOOLES 2.2, LLVM flang-rt (Fortran runtime, = flang 21.1.8), OpenBLAS, arpack-ng (engine/build_ccx.sh)
+ccx/ccx.tar.bz2 3a94dcc775a31f570229734b341d6b06301ebdc759863df901c8b9bf1854c0bc https://www.dhondt.de/ccx_2.22.src.tar.bz2
+ccx/spooles.tgz a84559a0e987a1e423055ef4fdf3035d55b65bbe4bf915efaa1a35bef7f8c5dd https://www.netlib.org/linalg/spooles/spooles.2.2.tgz
+llvm/llvm-project-21.1.8.src.tar.xz 4633a23617fa31a3ea51242586ea7fb1da7140e426bd62fc164261fe036aa142 https://github.com/llvm/llvm-project/releases/download/llvmorg-21.1.8/llvm-project-21.1.8.src.tar.xz
+openblas/OpenBLAS-0.3.34.tar.gz cd7e129868320cc2d033afa920e31202dfe0b8066a5b66661900ccc0f197dfed https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.34/OpenBLAS-0.3.34.tar.gz
+arpack/arpack-ng-3.9.1.tar.gz f6641deb07fa69165b7815de9008af3ea47eb39b2bb97521fbf74c97aba6e844 https://github.com/opencollab/arpack-ng/archive/refs/tags/3.9.1.tar.gz

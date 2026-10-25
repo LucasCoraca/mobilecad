@@ -1,0 +1,15 @@
+--- a/flang-rt/lib/runtime/time-intrinsic.cpp
++++ b/flang-rt/lib/runtime/time-intrinsic.cpp
+@@ -193,7 +193,12 @@
+ count_t GetSystemClockCount(int kind, fallback_implementation) {
+   struct timespec tspec;
+ 
++#if defined(__ANDROID__) && __ANDROID_API__ < 29
++  // Android's bionic has timespec_get only from API 29
++  if (clock_gettime(CLOCK_REALTIME, &tspec) < 0) {
++#else
+   if (timespec_get(&tspec, TIME_UTC) < 0) {
++#endif
+     // Return -HUGE(COUNT) to represent failure.
+     return -static_cast<count_t>(GetHUGE(kind));
+   }

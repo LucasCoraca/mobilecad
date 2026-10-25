@@ -31,3 +31,6 @@ avm/
 *.jks
 *.keystore
 keystore.properties
+
+# Qt's Java side, copied from the Qt Android build by engine/package_runtime.py
+app/app/libs/Qt6Android.jar

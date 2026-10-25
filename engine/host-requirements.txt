@@ -1,0 +1,12 @@
+# Build tools for the host venv $FCDEPS/hostpy (engine/build_python.sh installs these offline, hash-checked, from
+# $FCDEPS/src/pypi; the files are listed in engine/sources.lock). CMake, Ninja and SWIG come from Debian packages.
+# setuptools (also in sources.lock) is only the build backend of the PyYAML sdist, not installed into the venv.
+cython==3.3.0 --hash=sha256:9b24b5c8cd536946b62086fcafee6d5509d3f549f72d553d2336af87ffbe0da1
+lark==1.3.1 --hash=sha256:c629b661023a014c37da873b4ff58a817398d12635d3bbb2c5a03be7fe5d1e12
+meson==1.12.1 --hash=sha256:930bc7542cbd9f57009e182fd014eba48cf1a0180a7b9006d2d32d8f168d8b02
+meson-python==0.22.1 --hash=sha256:258fde948cf45aab5df23fcc9e17a9050ee73d4e1002fe6cf86519f61c414778
+packaging==26.3 --hash=sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c
+ply==3.11 --hash=sha256:096f9b8350b65ebd2fd1346b12452efe5b9607f7482813ffca50c22722a807ce
+pybind11==3.1.0 --hash=sha256:b8488090f8acffbcb6b5d6a85571a6827a0a2981ffb75e5a0b27b87c4a6b7dd0
+pyproject-metadata==0.12.1 --hash=sha256:f7162d580a96386a8eb096da06215f981f547d1490f03055ef99e323bc2da427
+pyyaml==6.0.3 --hash=sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f

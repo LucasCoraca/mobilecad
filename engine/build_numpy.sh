@@ -4,8 +4,9 @@
 # pkg-config resolves the Android python-3.14.pc.  Usage: build_numpy.sh <abi>
 set -euo pipefail
 ABI=${1:-x86_64}
-D=$HOME/Android/fcdeps; P=$D/$ABI; PY=$P/python/prefix; SRC=$D/src/numpy/numpy-2.3.5
-NDK=$HOME/Android/sdk/ndk/29.0.14206865; TB=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin
+. "$(dirname "$(readlink -f "$0")")/env.sh"
+P=$D/$ABI; PY=$P/python/prefix
+unpack numpy/numpy-2.3.5.tar.gz numpy/numpy-2.3.5; NSRC=$SRC/numpy/numpy-2.3.5
 case $ABI in x86_64) T=x86_64-linux-android; CPU=x86_64;; arm64-v8a) T=aarch64-linux-android; CPU=aarch64;; esac
 B=$D/build-numpy-$ABI; rm -rf $B; mkdir -p $B/tools $B/sysconf
 cp $PY/lib/python3.14/_sysconfigdata__android_$T.py $B/sysconf/
@@ -45,10 +46,10 @@ cpp_link_args = ['-L$PY/lib', '-lpython3.14']
 INI
 export PATH=$D/hostpy/bin:$PATH
 cd $B
-$D/hostpy/bin/python $SRC/vendored-meson/meson/meson.py setup build $SRC --cross-file cross.ini --prefix=/usr/local --buildtype=release -Dblas=none -Dlapack=none -Dallow-noblas=true \
+$D/hostpy/bin/python $NSRC/vendored-meson/meson/meson.py setup build $NSRC --cross-file cross.ini --prefix=/usr/local --buildtype=release -Dblas=none -Dlapack=none -Dallow-noblas=true \
   -Ddisable-optimization=false -Dcpu-baseline=min -Dcpu-dispatch=none > setup.log 2>&1 || { tail -40 setup.log; exit 1; }
-ninja -C build -j24 > build.log 2>&1 || { grep -E "error|FAILED" build.log | head -30; exit 1; }
-DESTDIR=$B/stage $D/hostpy/bin/python $SRC/vendored-meson/meson/meson.py install -C build > install.log 2>&1 || { tail -20 install.log; exit 1; }
+$NINJA -C build -j$J > build.log 2>&1 || { grep -E "error|FAILED" build.log | head -30; exit 1; }
+DESTDIR=$B/stage $D/hostpy/bin/python $NSRC/vendored-meson/meson/meson.py install -C build > install.log 2>&1 || { tail -20 install.log; exit 1; }
 SP=$(find $B/stage -type d -name numpy -path "*-packages*" | head -1)
 rm -rf $PY/lib/python3.14/site-packages/numpy; mkdir -p $PY/lib/python3.14/site-packages; cp -r $SP $PY/lib/python3.14/site-packages/
 find $PY/lib/python3.14/site-packages/numpy -depth -type d \( -name tests -o -name _examples \) -exec rm -rf {} +

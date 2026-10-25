@@ -1,0 +1,4 @@
+First release on F-Droid.
+• Built entirely from source: FreeCAD engine, CPython, Qt, Open CASCADE, Gmsh, CalculiX and the other libraries.
+• New Sketch skips non-planar faces; features blocked by a failed dependency show as failed.
+• Hidden edges and vertices are no longer picked; hover highlight with a pointer.

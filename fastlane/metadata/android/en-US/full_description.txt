@@ -1,0 +1,17 @@
+MobileCAD is parametric 3D CAD made for touch. It runs the open-source FreeCAD modelling engine on the device, works offline and opens and saves FreeCAD's .FCStd projects, so a model started on a desktop can be continued on a phone or tablet and back.
+
+<b>What you can do</b>
+<ul>
+<li><b>Part Design with a full feature history</b>: pads, pockets, revolutions, lofts, sweeps, holes, fillets, chamfers and patterns stay editable in the model tree.</li>
+<li><b>Constraint sketcher</b>: lines, arcs, circles, splines, dimensions and geometric constraints, with snapping and constraint checking.</li>
+<li><b>Part workbench</b>: primitives, booleans, extrusions, offsets and the other solid tools.</li>
+<li><b>Assemblies</b>: joints between parts and their solver.</li>
+<li><b>FEM</b>: meshing with Gmsh, analysis with CalculiX and coloured results on the model.</li>
+<li><b>TechDraw, Draft, BIM (with IFC through IfcOpenShell), Mesh, Spreadsheet, CAM, Surface</b> and more of FreeCAD's tools.</li>
+<li>Import and export STEP, IGES, STL, OBJ, DXF, IFC and other formats.</li>
+<li>Layouts for phones, tablets and foldables, light and dark themes.</li>
+</ul>
+
+The engine is the real FreeCAD, built for Android, with Open CASCADE, Qt, Gmsh, CalculiX, MED and IfcOpenShell; About ▸ Open-source licenses lists every component and its license. The app needs about 1 GB of free space: the engine is unpacked on first start.
+
+MobileCAD is an independent project. It is not affiliated with, sponsored or endorsed by the FreeCAD project or the FreeCAD Project Association; FreeCAD is their trademark and is used here only to say what MobileCAD is built on.

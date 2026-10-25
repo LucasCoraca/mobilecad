@@ -1,0 +1,48 @@
+Categories:
+  - Graphics
+  - Science & Education
+License: GPL-3.0-or-later
+AuthorName: Lucas Coraça
+WebSite: https://lucascoraca.github.io/mobilecad/
+SourceCode: https://github.com/LucasCoraca/mobilecad
+IssueTracker: https://github.com/LucasCoraca/mobilecad/issues
+Changelog: https://github.com/LucasCoraca/mobilecad/releases
+
+AutoName: MobileCAD
+
+RepoType: git
+Repo: https://github.com/LucasCoraca/mobilecad.git
+
+Builds:
+  - versionName: '0.5'
+    versionCode: 1005001
+    commit: v0.5
+    timeout: 43200
+    subdir: app/app
+    sudo:
+      - apt-get update
+      - apt-get install -y build-essential cmake ninja-build pkg-config perl patch
+        xz-utils bzip2 file python3-venv swig libpcre2-dev bison libssl-dev zlib1g-dev
+        libffi-dev libsqlite3-dev libbz2-dev liblzma-dev libzstd-dev libreadline-dev
+        uuid-dev
+      - apt-get install -y -t trixie-backports flang-21
+    gradle:
+      - arm64
+    output: build/outputs/apk/arm64/release/app-arm64-release-unsigned.apk
+    scanignore:
+      - engine/python/vendor/dateutil/zoneinfo/dateutil-zoneinfo.tar.gz
+    build:
+      - export ANDROID_NDK=$$NDK$$
+      - sdkmanager 'platforms;android-34' 'build-tools;34.0.0' 'cmake;3.22.1'
+      - ../../engine/build_all.sh arm64-v8a
+      - rm -rf $HOME/Android/fcdeps/build-*
+    ndk: 29.0.14206865
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags ^v[0-9.]+$
+VercodeOperation:
+  - '%c + 1'
+UpdateCheckData: app/app/build.gradle.kts|val baseVersionCode = (\d+)|.|val appVersion
+  = "(.*)"
+CurrentVersion: '0.5'
+CurrentVersionCode: 1005001

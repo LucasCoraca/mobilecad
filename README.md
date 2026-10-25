@@ -34,12 +34,14 @@ The corresponding source of every release is this repository plus the archives a
 
 ## Building
 
-Build the native runtime with `engine/build_deps.sh` and `engine/build_freecad.sh` (Android NDK 29, per ABI), stage
-it with `engine/package_runtime.py <abi> app`, then build the APK with Gradle:
+Everything is built from upstream source (pinned with SHA-256 in `engine/sources.lock`), on Debian 13 with Android NDK 29;
+`fdroid/README.md` lists the Debian packages and has a container recipe. Build and stage the native runtime for one ABI,
+then build the APK with Gradle:
 
 ```sh
-cd app && ./gradlew :app:assembleArm64Release     # or :app:assembleX86Debug for the emulator
+engine/build_all.sh arm64-v8a                      # or x86_64 for the emulator; FCDEPS = build root (default ~/Android/fcdeps)
+cd app && ./gradlew :app:assembleArm64Release      # or :app:assembleX86Debug
 ```
 
 Release builds are signed when `~/Android/keys/mobilecad-release.properties` exists (`storeFile`, `storePassword`,
-`keyAlias`, `keyPassword`); otherwise they come out unsigned.
+`keyAlias`, `keyPassword`); otherwise they come out unsigned. F-Droid builds the same way (`fdroid/app.mobilecad.yml`).

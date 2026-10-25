@@ -1,4 +1,9 @@
 import java.util.Properties
+// One release = one versionName and one base versionCode (raise both per release; F-Droid's update check reads them):
+// 1000000 + major*100000 + minor*1000 + patch*10, plus the ABI digit per APK (arm64 1, x86_64 2). The codes stay above
+// the time-based ones of 0.4, and a tag builds to the same versionCode on GitHub and on F-Droid.
+val appVersion = "0.5"
+val baseVersionCode = 1005000
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -13,9 +18,7 @@ android {
         applicationId = "app.mobilecad"
         minSdk = 26
         targetSdk = 34
-        // rises with every build (minutes since 2026-01-01), so each published APK installs as an update
-        versionCode = ((System.currentTimeMillis() / 60000L) - 29454720L).toInt()
-        versionName = "0.4"
+        versionName = appVersion
     }
     signingConfigs {
         if (keyProps.containsKey("storeFile")) create("release") {
@@ -35,8 +38,8 @@ android {
     // The FreeCAD/CPython runtime is ABI-specific: one flavor (and APK) per ABI, staged by engine/package_runtime.py
     flavorDimensions += "abi"
     productFlavors {
-        create("arm64") { dimension = "abi"; ndk { abiFilters += "arm64-v8a" } }
-        create("x86") { dimension = "abi"; ndk { abiFilters += "x86_64" } }
+        create("arm64") { dimension = "abi"; ndk { abiFilters += "arm64-v8a" }; versionCode = baseVersionCode + 1 }
+        create("x86") { dimension = "abi"; ndk { abiFilters += "x86_64" }; versionCode = baseVersionCode + 2 }
     }
     buildFeatures { compose = true }
     packaging { jniLibs { pickFirsts += "**/libc++_shared.so"; useLegacyPackaging = true } }

@@ -2,10 +2,15 @@
 FreeCAD icons that carry their own Creative Commons / public-domain notice. Run before building a release
 (publish.sh does). Texts come from the sources the runtime was built from."""
 import io, json, os, re, tarfile, shutil
-H = os.path.expanduser('~/Android'); SRC = H + '/fcdeps/src'; FC = H + '/freecad-src'
+# same build root / source trees as engine/env.sh (FCDEPS, FREECAD_SRC, OCCT_SRC, ANDROID_NDK overrides)
+H = os.path.expanduser('~/Android'); SRC = (os.environ.get('FCDEPS') or H + '/fcdeps') + '/src'
+FC = os.environ.get('FREECAD_SRC') or H + '/freecad-src'
+if not os.path.isdir(FC): FC = SRC + '/freecad'
+OCC = os.environ.get('OCCT_SRC') or H + '/occt-src'
+if not os.path.isdir(OCC): OCC = SRC + '/occt'
+NDK = os.environ.get('ANDROID_NDK') or (os.environ.get('ANDROID_HOME') or H + '/sdk') + '/ndk/29.0.14206865'
 R = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(R, '..', 'app', 'app', 'src', 'main', 'assets', 'licenses')
 TP = os.path.join(R, 'third_party')   # license texts of vendored Python packages (from their wheels)
-TERMUX = SRC + '/termux/%s/data/data/com.termux/files/usr/share/doc/%s/copyright'
 
 def tar(path, member):
     with tarfile.open(path) as t:
@@ -19,11 +24,11 @@ C = [
  ('MobileCAD', 'GPL-3.0-or-later', 'the MobileCAD source archive on the download page', [('GPL-3.0', lambda: file(os.path.join(R, '..', 'LICENSE')))]),
  ('FreeCAD', 'LGPL-2.1-or-later', 'https://github.com/FreeCAD/FreeCAD', [('LGPL-2.1', lambda: file(FC + '/LICENSE'))]),
  ('Open CASCADE Technology', 'LGPL-2.1 with Open CASCADE exception', 'https://github.com/Open-Cascade-SAS/OCCT',
-  [('LGPL-2.1', lambda: file(H + '/occt-src/LICENSE_LGPL_21.txt')), ('Open CASCADE exception', lambda: file(H + '/occt-src/OCCT_LGPL_EXCEPTION.txt'))]),
+  [('LGPL-2.1', lambda: file(OCC + '/LICENSE_LGPL_21.txt')), ('Open CASCADE exception', lambda: file(OCC + '/OCCT_LGPL_EXCEPTION.txt'))]),
  ('Qt 6 (Core, Gui, Widgets, Xml, Network, OpenGL, PrintSupport, Concurrent)', 'LGPL-3.0-only', 'https://download.qt.io/archive/qt/6.8/6.8.3/submodules/',
   [('LGPL-3.0', lambda: tar(SRC + '/qtbase.tar.xz', 'qtbase-everywhere-src-6.8.3/LICENSES/LGPL-3.0-only.txt')),
    ('GPL-3.0 (referenced by LGPL-3.0)', lambda: tar(SRC + '/qtbase.tar.xz', 'qtbase-everywhere-src-6.8.3/LICENSES/GPL-3.0-only.txt'))]),
- ('Python 3.14', 'PSF-2.0', 'https://www.python.org/downloads/source/', [('Python license', lambda: tar(SRC + '/py-aarch64.tar.gz', './prefix/lib/python3.14/LICENSE.txt'))]),
+ ('Python 3.14', 'PSF-2.0', 'https://www.python.org/downloads/source/', [('Python license', lambda: tar(SRC + '/Python-3.14.4.tar.xz', 'Python-3.14.4/LICENSE'))]),
  ('NumPy 2.3.5', 'BSD-3-Clause (+ bundled)', 'https://github.com/numpy/numpy', [('NumPy license', lambda: file(SRC + '/numpy/numpy-2.3.5/LICENSE.txt')),
    ('NumPy bundled', lambda: file(SRC + '/numpy/numpy-2.3.5/LICENSES_bundled.txt'))]),
  ('Gmsh 4.13.1', 'GPL-2.0-or-later with linking exception', 'https://gmsh.info', [('Gmsh license', lambda: file(SRC + '/gmsh/gmsh-4.13.1-source/LICENSE.txt'))]),
@@ -42,10 +47,18 @@ C = [
  ('Xerces-C 3.2.5', 'Apache-2.0', 'https://xerces.apache.org', [('Apache-2.0', lambda: tar(SRC + '/xerces.tar.gz', 'xerces-c-3.2.5/LICENSE'))]),
  ('yaml-cpp 0.8.0', 'MIT', 'https://github.com/jbeder/yaml-cpp', [('yaml-cpp license', lambda: tar(SRC + '/yaml.tar.gz', 'yaml-cpp-0.8.0/LICENSE'))]),
  ('Eigen 3.4.0', 'MPL-2.0', 'https://eigen.tuxfamily.org', [('MPL-2.0', lambda: tar(SRC + '/eigen.tar.gz', 'eigen-3.4.0/COPYING.MPL2'))]),
- ('OpenBLAS', 'BSD-3-Clause', 'https://github.com/OpenMathLib/OpenBLAS', [('OpenBLAS license', lambda: file(TERMUX % ('openblas_aarch64', 'libopenblas')))]),
- ('arpack-ng', 'BSD-3-Clause', 'https://github.com/opencollab/arpack-ng', [('arpack-ng license', lambda: file(TERMUX % ('arpack_aarch64', 'arpack-ng')))]),
+ ('OpenBLAS 0.3.34', 'BSD-3-Clause', 'https://github.com/OpenMathLib/OpenBLAS', [('OpenBLAS license', lambda: tar(SRC + '/openblas/OpenBLAS-0.3.34.tar.gz', 'OpenBLAS-0.3.34/LICENSE'))]),
+ ('arpack-ng 3.9.1', 'BSD-3-Clause', 'https://github.com/opencollab/arpack-ng', [('arpack-ng license', lambda: tar(SRC + '/arpack/arpack-ng-3.9.1.tar.gz', 'arpack-ng-3.9.1/COPYING'))]),
+ ('LLVM Flang runtime 21.1.8 (in CalculiX)', 'Apache-2.0 WITH LLVM-exception', 'https://github.com/llvm/llvm-project',
+  [('flang-rt license', lambda: tar(SRC + '/llvm/llvm-project-21.1.8.src.tar.xz', 'llvm-project-21.1.8.src/flang-rt/LICENSE.TXT'))]),
+ ('OpenSSL 3.0.19 (Python ssl / hashlib)', 'Apache-2.0', 'https://www.openssl.org', [('OpenSSL license', lambda: tar(SRC + '/openssl-3.0.19.tar.gz', 'openssl-3.0.19/LICENSE.txt'))]),
+ ('SQLite 3.50.4 (Python sqlite3)', 'Public domain', 'https://sqlite.org', []),
+ ('libffi 3.4.4 (Python ctypes)', 'MIT', 'https://github.com/libffi/libffi', [('libffi license', lambda: tar(SRC + '/libffi-3.4.4.tar.gz', 'libffi-3.4.4/LICENSE'))]),
+ ('XZ Utils liblzma 5.4.6 (Python lzma)', 'Public domain', 'https://tukaani.org/xz/', [('XZ Utils copying', lambda: tar(SRC + '/xz-5.4.6.tar.gz', 'xz-5.4.6/COPYING'))]),
+ ('Zstandard 1.5.7 (Python compression.zstd)', 'BSD-3-Clause', 'https://github.com/facebook/zstd', [('zstd license', lambda: tar(SRC + '/zstd-1.5.7.tar.gz', 'zstd-1.5.7/LICENSE'))]),
+ ('bzip2 1.0.8 (Python bz2)', 'bzip2-1.0.6', 'https://sourceware.org/bzip2/', [('bzip2 license', lambda: tar(SRC + '/bzip2-1.0.8.tar.gz', 'bzip2-1.0.8/LICENSE'))]),
  ('LLVM libc++ / OpenMP runtime (Android NDK)', 'Apache-2.0 WITH LLVM-exception', 'https://android.googlesource.com/toolchain/llvm-project',
-  [('NDK toolchain notices', lambda: file(H + '/sdk/ndk/29.0.14206865/NOTICE.toolchain'))]),
+  [('NDK toolchain notices', lambda: file(NDK + '/NOTICE.toolchain'))]),
  ('IfcOpenShell 0.8.4', 'LGPL-3.0-or-later', 'https://github.com/IfcOpenShell/IfcOpenShell (source archive on the download page)',
   [('IfcOpenShell license', lambda: file(SRC + '/ifc/ios/COPYING.LESSER'))]),
  ('Pivy (FreeCAD 3rdParty)', 'ISC', 'https://github.com/coin3d/pivy', [('Pivy license', lambda: file(FC + '/src/3rdParty/pivy/LICENSE'))]),

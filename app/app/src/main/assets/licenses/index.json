@@ -238,7 +238,7 @@
   ]
  },
  {
-  "name": "OpenBLAS",
+  "name": "OpenBLAS 0.3.34",
   "license": "BSD-3-Clause",
   "source": "https://github.com/OpenMathLib/OpenBLAS",
   "texts": [
@@ -249,13 +249,85 @@
   ]
  },
  {
-  "name": "arpack-ng",
+  "name": "arpack-ng 3.9.1",
   "license": "BSD-3-Clause",
   "source": "https://github.com/opencollab/arpack-ng",
   "texts": [
    {
     "title": "arpack-ng license",
     "file": "arpack-ng-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "LLVM Flang runtime 21.1.8 (in CalculiX)",
+  "license": "Apache-2.0 WITH LLVM-exception",
+  "source": "https://github.com/llvm/llvm-project",
+  "texts": [
+   {
+    "title": "flang-rt license",
+    "file": "flang-rt-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "OpenSSL 3.0.19 (Python ssl / hashlib)",
+  "license": "Apache-2.0",
+  "source": "https://www.openssl.org",
+  "texts": [
+   {
+    "title": "OpenSSL license",
+    "file": "openssl-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "SQLite 3.50.4 (Python sqlite3)",
+  "license": "Public domain",
+  "source": "https://sqlite.org",
+  "texts": []
+ },
+ {
+  "name": "libffi 3.4.4 (Python ctypes)",
+  "license": "MIT",
+  "source": "https://github.com/libffi/libffi",
+  "texts": [
+   {
+    "title": "libffi license",
+    "file": "libffi-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "XZ Utils liblzma 5.4.6 (Python lzma)",
+  "license": "Public domain",
+  "source": "https://tukaani.org/xz/",
+  "texts": [
+   {
+    "title": "XZ Utils copying",
+    "file": "xz-utils-copying.txt"
+   }
+  ]
+ },
+ {
+  "name": "Zstandard 1.5.7 (Python compression.zstd)",
+  "license": "BSD-3-Clause",
+  "source": "https://github.com/facebook/zstd",
+  "texts": [
+   {
+    "title": "zstd license",
+    "file": "zstd-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "bzip2 1.0.8 (Python bz2)",
+  "license": "bzip2-1.0.6",
+  "source": "https://sourceware.org/bzip2/",
+  "texts": [
+   {
+    "title": "bzip2 license",
+    "file": "bzip2-license.txt"
    }
   ]
  },

@@ -1,0 +1,36 @@
+--- a/Makefile.in	2025-02-18 14:09:51
++++ b/Makefile.in	2025-03-11 17:21:35
+@@ -125,7 +125,16 @@
+ #
+ OPT_FEATURE_FLAGS = @OPT_FEATURE_FLAGS@
+ 
+-LDFLAGS.libsqlite3.soname = @LDFLAGS_LIBSQLITE3_SONAME@
++# CPython: We add a _python suffix to avoid conflict with libraries of the
++# same name that are provided by Android itself, or other components of an
++# app.
++#
++# We used to do this with patchelf, but patching a library before stripping
++# it may corrupt it (https://github.com/NixOS/patchelf/issues/507). And the
++# Android Gradle plugin will strip all libraries in an app, if its preferred
++# NDK version is installed.
++LDFLAGS.libsqlite3.soname = -Wl,-soname,libsqlite3_python.so
++
+ # soname: see https://sqlite.org/src/forumpost/5a3b44f510df8ded
+ LDFLAGS.libsqlite3.os-specific = \
+   @LDFLAGS_MAC_CVERSION@ @LDFLAGS_MAC_INSTALL_NAME@ @LDFLAGS_OUT_IMPLIB@
+@@ -173,10 +183,11 @@
+ 	$(INSTALL) $(libsqlite3.DLL) "$(install-dir.lib)"
+ 	@echo "Setting up $(libsqlite3.DLL) version symlinks..."; \
+ 	cd "$(install-dir.lib)" || exit $$?; \
+-	rm -f $(libsqlite3.DLL).0 $(libsqlite3.DLL).$(PACKAGE_VERSION) || exit $$?; \
+-	mv $(libsqlite3.DLL) $(libsqlite3.DLL).$(PACKAGE_VERSION) || exit $$?; \
+-	ln -s $(libsqlite3.DLL).$(PACKAGE_VERSION) $(libsqlite3.DLL) || exit $$?; \
+-	ln -s $(libsqlite3.DLL).$(PACKAGE_VERSION) $(libsqlite3.DLL).0 || exit $$?; \
++	: CPython: see comment above about the _python suffix. \
++ 	rm -f $(libsqlite3.DLL).0 libsqlite3_python.so || exit $$?; \
++ 	mv $(libsqlite3.DLL) libsqlite3_python.so || exit $$?; \
++ 	ln -s libsqlite3_python.so $(libsqlite3.DLL) || exit $$?; \
++ 	ln -s libsqlite3_python.so $(libsqlite3.DLL).0 || exit $$?; \
+ 	ls -la $(libsqlite3.DLL) $(libsqlite3.DLL).[a03]*; \
+ 	if [ -e $(libsqlite3.DLL).0.8.6 ]; then \
+ 		echo "ACHTUNG: legacy libtool-compatible install found. Re-linking it..."; \

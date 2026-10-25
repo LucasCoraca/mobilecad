@@ -12,9 +12,13 @@ Usage: python3 -I package_runtime.py <abi> <app_dir>   (writes the per-ABI flavo
 import os, re, shutil, subprocess, sys
 
 abi, app = sys.argv[1], sys.argv[2]
+# same defaults / environment overrides as engine/env.sh
 home = os.path.expanduser('~/Android')
-P = os.path.join(home, 'fcdeps', abi)
-NDK = os.path.join(home, 'sdk/ndk/29.0.14206865')
+FCDEPS = os.environ.get('FCDEPS') or os.path.join(home, 'fcdeps')
+P = os.path.join(FCDEPS, abi)
+NDK = os.environ.get('ANDROID_NDK') or os.path.join(os.environ.get('ANDROID_HOME') or os.path.join(home, 'sdk'), 'ndk/29.0.14206865')
+FREECAD_SRC = os.environ.get('FREECAD_SRC') or os.path.join(home, 'freecad-src')
+if not os.path.isdir(FREECAD_SRC): FREECAD_SRC = os.path.join(FCDEPS, 'src', 'freecad')
 READELF = os.path.join(NDK, 'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf')
 TRIPLE = {'x86_64': 'x86_64-linux-android', 'arm64-v8a': 'aarch64-linux-android'}[abi]
 FLAVOR = {'x86_64': 'x86', 'arm64-v8a': 'arm64'}[abi]          # one Gradle product flavor per ABI
@@ -59,10 +63,10 @@ for sub in ('Mod', 'Ext', 'share', 'data'):
         shutil.copytree(s, os.path.join(rt, sub), ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'icons', 'translations', '*.qm', '*.ts', 'doc', '*tests', 'Test*', 'es-AR'), dirs_exist_ok=True)
 # the `freecad` namespace package (freecad.deprecation, freecad.utils ...): CMake installs it into the *host* Python's
 # site-packages when INSTALL_TO_SITEPACKAGES is on, so take it from the build tree
-shutil.copytree(os.path.join(home, 'fcdeps', 'build-freecad-' + abi, 'Ext', 'freecad'), os.path.join(rt, 'Ext', 'freecad'),
+shutil.copytree(os.path.join(FCDEPS, 'build-freecad-' + abi, 'Ext', 'freecad'), os.path.join(rt, 'Ext', 'freecad'),
                 ignore=shutil.ignore_patterns('__pycache__'), dirs_exist_ok=True)
 # App-level Python feature modules that CMake only installs with BUILD_GUI (their Gui imports are guarded by GuiUp)
-FCSRC = os.path.join(home, 'freecad-src', 'src', 'Mod')
+FCSRC = os.path.join(FREECAD_SRC, 'src', 'Mod')
 for m, fs in {'PartDesign': ('InvoluteGearFeature.py', 'SprocketFeature.py')}.items():
     for f in fs: shutil.copy(os.path.join(FCSRC, m, f), os.path.join(rt, 'Mod', m, f))
 # every Python command module the app runs (mobilecad/command_modules.py) that CMake installs only with BUILD_GUI
@@ -150,13 +154,11 @@ for dp, _, fs in os.walk(FCSRC):
 
 # Gmsh (engine/build_gmsh.sh) as a native library: the only place Android lets an app execute a program from
 jni = os.path.join(app, 'app', 'src', {'x86_64': 'x86', 'arm64-v8a': 'arm64'}[abi], 'jniLibs', abi)
-# CalculiX (engine/build_ccx.sh): ccx as libccx.so; its ARPACK / OpenBLAS go to the runtime lib dir (LD_LIBRARY_PATH)
+# CalculiX (engine/build_ccx.sh): ccx as libccx.so (ARPACK, OpenBLAS and the Fortran runtime are linked in statically)
 for exe, src_ in (('libgmsh.so', os.path.join(P, 'gmsh', 'gmsh')), ('libccx.so', os.path.join(P, 'ccx', 'ccx'))):
     if os.path.exists(src_):
         os.makedirs(jni, exist_ok=True); shutil.copy(src_, os.path.join(jni, exe))
         subprocess.run([os.path.join(NDK, 'toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-strip'), '--strip-unneeded', os.path.join(jni, exe)], check=True)
-for f in ('libarpack.so.2', 'libopenblas.so'):
-    if os.path.exists(os.path.join(P, 'ccx', f)): shutil.copy(os.path.join(P, 'ccx', f), os.path.join(rt, 'lib', f))
 # Qt's Java side (QtNative) — QtCore's Android backend needs it
 os.makedirs(os.path.join(app, 'app/libs'), exist_ok=True)
 shutil.copy(os.path.join(P, 'jar', 'Qt6Android.jar'), os.path.join(app, 'app/libs', 'Qt6Android.jar'))
