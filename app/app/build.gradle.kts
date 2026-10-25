@@ -2,8 +2,8 @@ import java.util.Properties
 // One release = one versionName and one base versionCode (raise both per release; F-Droid's update check reads them):
 // 1000000 + major*100000 + minor*1000 + patch*10, plus the ABI digit per APK (arm64 1, x86_64 2). The codes stay above
 // the time-based ones of 0.4, and a tag builds to the same versionCode on GitHub and on F-Droid.
-val appVersion = "0.5.1"
-val baseVersionCode = 1005010
+val appVersion = "0.5.2"
+val baseVersionCode = 1005020
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -28,7 +28,8 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false          // the Python/FreeCAD runtime and Qt reach Java by name
+            isMinifyEnabled = true; isShrinkResources = true     // R8; Qt reaches its Java classes by name: proguard-rules.pro
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfigs.findByName("release")?.let { signingConfig = it }
         }
     }

@@ -1,0 +1,1 @@
+• Smaller download: the app's code is now optimized and shrunk (R8).
