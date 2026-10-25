@@ -28,6 +28,10 @@ class FcProperty(val name: String, val type: String, val group: String, val doc:
 /** colors: optional r g b per tri vertex (or per point of a cloud) — Inspection deviation maps. */
 class FcMesh(val tris: FloatArray, val edges: FloatArray, val verts: FloatArray = FloatArray(0), val colors: FloatArray = FloatArray(0))
 
+/** The document's undo / redo names (newest first) and its position in the history (bridge.undo_state: +1 per committed
+ *  step, -1 per undo; unlike the list lengths it keeps counting when FreeCAD's 20-step limit drops old steps). */
+data class History(val undo: List<String>, val redo: List<String>, val pos: Int)
+
 class EngineException(msg: String) : Exception(msg)
 
 /**
@@ -103,9 +107,9 @@ class Engine private constructor(private val ctx: Context) {
     fun abort() = call("abort")
     fun undo() = call("undo")
     fun redo() = call("redo")
-    fun undoState(): Pair<List<String>, List<String>> = (call("undo_state") as JSONObject).let { o ->
+    fun undoState(): History = (call("undo_state") as JSONObject).let { o ->
         fun l(k: String) = o.getJSONArray(k).let { a -> List(a.length()) { a.getString(it) } }
-        l("undo") to l("redo")
+        History(l("undo"), l("redo"), o.optInt("pos"))
     }
     fun run(script: String, args: Map<String, Any?> = emptyMap()) = call("run", mapOf("script" to script, "args" to args))
 

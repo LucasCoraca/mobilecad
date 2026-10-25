@@ -175,7 +175,7 @@ def _auto(sk, auto, first):
     for a in auto:
         if len(a) > 3 and isinstance(a[3], str) and ':' in a[3]: a[3] = _ext_id(sk, a[3])
     for a in auto:
-        t = a[0]; g = a[1] + first; pos = a[2]
+        t = a[0]; g = a[1] + first; pos = a[2] if len(a) > 2 else None     # Horizontal / Vertical: [type, localGeo]
         if t == 'Coincident': cs.append(Sketcher.Constraint('Coincident', g, pos, a[3], a[4]))
         elif t == 'PointOnObject': cs.append(Sketcher.Constraint('PointOnObject', g, pos, a[3]))
         elif t in ('Horizontal', 'Vertical'): cs.append(Sketcher.Constraint(t, g))

@@ -398,9 +398,9 @@ class AppState(private val ctx: Context) {
         // a failed feature keeps the model on screen: its last good predecessor, drawn as a red ghost
         val gh = shown.filter { it.invalid }.mapNotNull { o -> (call("last_good", mapOf("name" to o.name)) as? String)?.let { o.name to it } }.toMap()
         val m = shown.associate { it.name to tessellate(gh[it.name] ?: it.name) }
-        val (u, r) = undoState()
+        val hist = undoState()
         val ann = if (objs.any { it.type == "App::FeaturePython" || it.type == "App::AnnotationLabel" }) call("annotations") as? org.json.JSONObject else null
-        Triple(objs, m to gh, u to r) to ann
+        Triple(objs, m to gh, hist) to ann
     }) { (t, ann) -> val (objs, mg, ur) = t; val (m, gh) = mg
         objects.clear(); objects.addAll(objs); ghosts = gh; meshes = m
         annotations = ann?.let { j -> j.keys().asSequence().associateWith { k -> val o = j.getJSONObject(k)
@@ -408,7 +408,7 @@ class AppState(private val ctx: Context) {
             val ts = o.getJSONArray("texts"); seg to List(ts.length()) { i -> ts.getJSONArray(i).let { tx -> val p = tx.getJSONArray(0)
                 floatArrayOf(p.getDouble(0).toFloat(), p.getDouble(1).toFloat(), p.getDouble(2).toFloat()) to tx.getString(1) } } } } ?: emptyMap()
         annotationSize = ann?.let { j -> j.keys().asSequence().associateWith { k -> j.getJSONObject(k).optDouble("size", 3.5).toFloat() } } ?: emptyMap()
-        undoNames = ur.first; redoNames = ur.second
+        setHistory(ur)
         selection.removeAll { s -> objs.none { it.name == s.obj } }
         sceneVersion.intValue++
         if (inDrawing) refreshPage()
@@ -449,15 +449,26 @@ class AppState(private val ctx: Context) {
     // ------------------------------------------------------------------ undo / redo (FreeCAD transactions, global like desktop)
     // Every user action is its own transaction (a sketch line, a constraint, a property change, a new feature), so the top-bar
     // undo/redo works everywhere — in the sketcher, in a feature dialog and in the model. Cancel (✗) in a sketch or dialog undoes
-    // back to the depth recorded on entry, which is what FreeCAD's abortTransaction gives on desktop.
+    // back to the position recorded on entry, which is what FreeCAD's abortTransaction gives on desktop.
+    // While a sketch or dialog is open, undo / redo stay within the steps made there: one more undo would remove the sketch
+    // or feature being edited (its creation step) and close the editor with everything in it.
     private var undoMark = 0
+    var undoPos by mutableIntStateOf(0); private set
+    private var editFloor = 0          // history position the open sketch / dialog started from (after its creation step)
+    private var editRedo = 0           // redo steps that were already there on entry (they belong to the model, not the editor)
+    private val editing get() = sketch != null || edit != null
+    val canUndo get() = undoNames.isNotEmpty() && (!editing || undoPos > editFloor)
+    val canRedo get() = redoNames.isNotEmpty() && (!editing || redoNames.size > editRedo)
+    /** Bounds undo / redo to the editor being opened: [mark] = position before its creation step (null: an existing object). */
+    private fun enterEditHistory(mark: Int?) { editFloor = if (mark != null) mark + 1 else undoPos; editRedo = if (mark != null) 0 else redoNames.size }
 
-    fun undo() = eng({ undo(); undoState() }) { h -> setHistory(h); afterHistory() }
-    fun redo() = eng({ redo(); undoState() }) { h -> setHistory(h); afterHistory() }
-    fun setHistory(h: Pair<List<String>, List<String>>) { undoNames = h.first; redoNames = h.second }
+    fun undo() { if (canUndo) eng({ undo(); undoState() }) { h -> setHistory(h); afterHistory() } }
+    fun redo() { if (canRedo) eng({ redo(); undoState() }) { h -> setHistory(h); afterHistory() } }
+    fun setHistory(h: History) { undoNames = h.undo; redoNames = h.redo; undoPos = h.pos }
 
     private fun afterHistory() = refresh {
-        sketch?.let { s -> if (objects.none { it.name == s.name }) sketch = null else s.reload(keepView = true) }
+        // a drawing tool's placed points refer to geometry the undo may have removed: start the tool over
+        sketch?.let { s -> if (objects.none { it.name == s.name }) sketch = null else { s.finishChain(); s.reload(keepView = true) } }
         edit?.let { e -> if (objects.none { it.name == e.obj }) edit = null else reloadProps(e) }
     }
 
@@ -468,9 +479,9 @@ class AppState(private val ctx: Context) {
     }) { refresh(after) }
 
     private fun rollbackTo(mark: Int) = eng({
-        var n = undoState().first.size
-        while (n > mark) { undo(); n-- }
-        recompute(); undoState()
+        var h = undoState()
+        while (h.pos > mark && h.undo.isNotEmpty()) { undo(); h = undoState() }
+        recompute(); h
     }) { h -> setHistory(h); refresh() }
 
     fun save(path: String) = eng({ saveDocument(path) }) { message = "Saved $it" }
@@ -497,7 +508,7 @@ class AppState(private val ctx: Context) {
     // ------------------------------------------------------------------ feature dialog
     /** Creates a feature as one undoable step and opens its dialog (desktop: command + task panel). */
     fun createFeature(label: String, script: Engine.() -> String) = eng({
-        val mark = undoState().first.size
+        val mark = undoState().pos
         begin(label)
         try { val n = script(); recompute(); commit(); n to mark } catch (e: Throwable) { abort(); throw e }
     }) { (name, mark) -> selection.clear(); refresh { openEditor(name, mark) } }
@@ -506,7 +517,8 @@ class AppState(private val ctx: Context) {
         val o = obj(name) ?: return
         if (o.type == "Sketcher::SketchObject") { editSketch(name, mark); return }
         val e = EditState(name, o.type, o.label, mark != null)
-        e.undoMark = mark ?: undoNames.size
+        e.undoMark = mark ?: undoPos
+        enterEditHistory(mark)
         edit = e
         reloadProps(e)
     }
@@ -618,7 +630,8 @@ class AppState(private val ctx: Context) {
         preSketchCamera = viewport?.cameraState()
         val ed = SketchEditor(this, name)
         sketch = ed; selection.clear(); openToolset = null
-        undoMark = mark ?: undoNames.size
+        undoMark = mark ?: undoPos
+        enterEditHistory(mark)
         ed.reload(); ed.loadModelRefs()
     }
 

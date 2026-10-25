@@ -544,7 +544,20 @@ def redo():
     d = _doc(); d.redo(); d.recompute(); return d.RedoNames
 @op
 def undo_state():
-    d = _doc(); return {'undo': d.UndoNames, 'redo': d.RedoNames}
+    d = _doc(); return {'undo': d.UndoNames, 'redo': d.RedoNames, 'pos': _history.pos.get(d.Name, 0)}
+
+class _History:
+    """Position in each document's undo history: +1 per committed transaction (only those that changed something:
+    FreeCAD signals no commit for an empty one), -1 per undo, +1 per redo, whichever code path did it.  The editors
+    bound undo by it ("undo stops where the sketch was opened"); the undo list's length cannot tell, because FreeCAD
+    keeps at most 20 steps and then drops the oldest."""
+    def __init__(self): self.pos = {}
+    def _add(self, doc, n): self.pos[doc.Name] = self.pos.get(doc.Name, 0) + n
+    def slotCommitTransaction(self, doc): self._add(doc, 1)
+    def slotUndoDocument(self, doc): self._add(doc, -1)
+    def slotRedoDocument(self, doc): self._add(doc, 1)
+_history = _History()
+App.addDocumentObserver(_history)
 
 # ------------------------------------------------------------------ generic scripting (mobile command implementations)
 @op

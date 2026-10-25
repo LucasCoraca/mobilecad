@@ -427,9 +427,17 @@ private fun TopBar(app: AppState, onOpen: () -> Unit, onSave: () -> Unit, onFit:
             Text(app.docName, color = OS.Navy, fontSize = 18.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text("${app.workspace.label} · based on FreeCAD ${app.catalog.source.removePrefix("FreeCAD ")}", color = OS.Steel, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        IconBtn(Icons.Default.Undo, app.undoNames.firstOrNull()?.let { "Undo $it" } ?: "Undo", OS.Primary, app.undoNames.isNotEmpty()) { app.undo() }
-        IconBtn(Icons.Default.Redo, "Redo", OS.Primary, app.redoNames.isNotEmpty()) { app.redo() }
+        IconBtn(Icons.Default.Undo, app.undoNames.firstOrNull()?.let { "Undo $it" } ?: "Undo", OS.Primary, app.canUndo) { app.undo() }
+        IconBtn(Icons.Default.Redo, app.redoNames.firstOrNull()?.let { "Redo $it" } ?: "Redo", OS.Primary, app.canRedo) { app.redo() }
     }
+}
+
+/** ✓ and ✗ of a sketch or dialog, kept apart so a slip of the thumb does not discard the work instead of keeping it. */
+@Composable
+fun OkCancel(okDesc: String, cancelDesc: String, onOk: () -> Unit, onCancel: () -> Unit) {
+    IconBtn(Icons.Default.Check, okDesc, OS.Green, onClick = onOk)
+    Spacer(Modifier.width(20.dp))
+    IconBtn(Icons.Default.Close, cancelDesc, OS.Red, onClick = onCancel)
 }
 
 @Composable
@@ -497,8 +505,7 @@ private fun SketchStrip(app: AppState) {
             StripTool(app, null, "Finish", fallback = Icons.Default.Done) { sk.finishShape() }
         }
         Box(Modifier.width(1.dp).height(34.dp).background(OS.ToolbarDiv))
-        IconBtn(Icons.Default.Check, "Leave sketch", OS.Green) { app.leaveSketch(true) }
-        IconBtn(Icons.Default.Close, "Cancel sketch", OS.Red) { app.leaveSketch(false) }
+        OkCancel("Leave sketch", "Cancel sketch", { app.leaveSketch(true) }) { app.leaveSketch(false) }
     }
     Box(Modifier.fillMaxWidth().height(1.dp).background(OS.ToolbarDiv))
 }

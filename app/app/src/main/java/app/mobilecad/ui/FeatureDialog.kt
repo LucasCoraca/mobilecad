@@ -193,8 +193,7 @@ fun FeatureDialog(
             Icon(if (collapsed) Icons.Default.ExpandMore else Icons.Default.ExpandLess, if (collapsed) "Expand" else "Collapse", tint = OS.Steel, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(6.dp))
             Text(title, Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy, fontSize = 15.sp, maxLines = 1)
-            IconBtn(Icons.Default.Check, "OK", OS.Green, onClick = onOk)
-            IconBtn(Icons.Default.Close, "Cancel", OS.Red, onClick = onCancel)
+            OkCancel("OK", "Cancel", onOk, onCancel)
         }
         if (error != null) Text(error, Modifier.fillMaxWidth().background(OS.ErrBg).padding(horizontal = 10.dp, vertical = 6.dp), color = OS.Red, fontSize = 12.sp)
         if (!collapsed) Column(Modifier.heightIn(max = Screen.panelHeight(420.dp)).verticalScroll(rememberScrollState()).padding(horizontal = 10.dp, vertical = 4.dp)) {
