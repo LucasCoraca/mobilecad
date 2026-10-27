@@ -54,9 +54,8 @@ class SkGeo(val i: Int, val type: String, val construction: Boolean, val a: P2?,
         else -> poly
     }
     fun points(): List<Pair<Int, P2>> = buildList {
-        if (isLine || isArc) { add(1 to a!!); add(2 to b!!) }
-        if (isCircle || isArc) add(3 to c!!)
-        if (isPoint) add(1 to a!!)
+        if (isPoint) { add(1 to a!!); return@buildList }
+        a?.let { add(1 to it) }; b?.let { add(2 to it) }; c?.let { add(3 to it) }
     }
 }
 
@@ -562,7 +561,8 @@ class SketchEditor(private val app: AppState, val name: String) {
 
     fun deleteSelected() {
         val g = selected.filter { it.pos == 0 && (it.geo >= 0 || it.geo <= -3) }.map { it.geo }.distinct()
-        selected.clear(); if (g.isNotEmpty()) exec("sketch_delete", mapOf("geometry" to g))
+        val pts = selected.filter { it.pos != 0 && (it.geo >= 0 || it.geo <= -3) }.map { listOf(it.geo, it.pos) }
+        selected.clear(); if (g.isNotEmpty() || pts.isNotEmpty()) exec("sketch_delete", mapOf("geometry" to g, "points" to pts))
     }
     fun toggleConstruction() {
         val g = selected.map { it.geo }.filter { it >= 0 }.distinct()
@@ -766,8 +766,8 @@ class SketchEditor(private val app: AppState, val name: String) {
         val defined = if (dk) 0xFFE8ECEF.toInt() else 0xFF1A1A1A.toInt(); val free = if (dk) 0xFF6FA8FF.toInt() else 0xFF2A6FC9.toInt(); val cons = 0xFF66C7C9.toInt(); val sel = 0xFF418FDE.toInt()
         // axes
         pLine.strokeWidth = 1 * dp; pLine.pathEffect = DashPathEffect(floatArrayOf(6 * dp, 4 * dp), 0f)
-        pLine.color = 0x66E0403F; poly(c, listOf(P2(-1e4, 0.0), P2(1e4, 0.0)), ::scr)
-        pLine.color = 0x6647AB72; poly(c, listOf(P2(0.0, -1e4), P2(0.0, 1e4)), ::scr)
+        pLine.color = 0x66E0403F; axis(c, scr(P2(-1e7, 0.0)), scr(P2(1e7, 0.0)))
+        pLine.color = 0x6647AB72; axis(c, scr(P2(0.0, -1e7)), scr(P2(0.0, 1e7)))
         for (g in geos) {
             val isSel = selected.any { it.geo == g.i && it.pos == 0 }
             pLine.pathEffect = if (g.construction) DashPathEffect(floatArrayOf(8 * dp, 5 * dp), 0f) else null
@@ -870,6 +870,17 @@ class SketchEditor(private val app: AppState, val name: String) {
         }
     }
 
+    /** A sketch axis: the line through two far points, cut to the canvas (a dashed line kilometres long is slow to draw). */
+    private fun axis(c: Canvas, s0: FloatArray?, s1: FloatArray?) {
+        if (s0 == null || s1 == null) return
+        val dx = s1[0] - s0[0]; val dy = s1[1] - s0[1]; var t0 = 0f; var t1 = 1f
+        val w = c.width.toFloat(); val h = c.height.toFloat()
+        for ((p, q) in listOf(-dx to s0[0], dx to w - s0[0], -dy to s0[1], dy to h - s0[1])) {   // Liang-Barsky
+            if (p == 0f) { if (q < 0) return; continue }
+            val r = q / p; if (p < 0) t0 = maxOf(t0, r) else t1 = minOf(t1, r)
+        }
+        if (t0 < t1) c.drawLine(s0[0] + t0 * dx, s0[1] + t0 * dy, s0[0] + t1 * dx, s0[1] + t1 * dy, pLine)
+    }
     private fun poly(c: Canvas, pts: List<P2>, scr: (P2) -> FloatArray?) {
         val path = Path(); var started = false
         for (p in pts) { val s = scr(p); if (s == null) { started = false; continue }; if (!started) { path.moveTo(s[0], s[1]); started = true } else path.lineTo(s[0], s[1]) }

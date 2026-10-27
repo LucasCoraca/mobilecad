@@ -21,6 +21,19 @@ class Camera {
     @Volatile var orthographic = true
     /** Rotation about the view axis (Std_ViewRotateLeft/Right, FreeCAD's standard view quaternions). */
     @Volatile var roll = 0f
+    /** Bounding sphere of the scene (ViewportView sets it): the clip planes always take in the whole model, at any zoom. */
+    @Volatile var sceneC = floatArrayOf(0f, 0f, 0f); @Volatile var sceneR = 0f
+
+    companion object {
+        /** Zoom range: from a tenth of a millimetre to kilometres (buildings, sites), like FreeCAD's unlimited zoom. */
+        const val MIN_DIST = 0.1f; const val MAX_DIST = 1e7f
+        fun clampDist(d: Float) = d.coerceIn(MIN_DIST, MAX_DIST)
+    }
+    /** Distance from the eye beyond which nothing of the scene lies. */
+    private fun reach(): Float {
+        val e = eye(); val c = sceneC
+        return Math.sqrt(((e[0] - c[0]) * (e[0] - c[0]) + (e[1] - c[1]) * (e[1] - c[1]) + (e[2] - c[2]) * (e[2] - c[2])).toDouble()).toFloat() + sceneR
+    }
 
     fun eye(): FloatArray = floatArrayOf(
         tx + dist * cos(pitch) * cos(yaw), ty + dist * cos(pitch) * sin(yaw), tz + dist * sin(pitch))
@@ -35,8 +48,9 @@ class Camera {
         if (orthographic) {
             // same visible height at the target as the perspective view, so zoom/pan/pick scale stay consistent
             val hh = dist * tan(fov / 2); val hw = hh * w.toFloat() / h
-            Matrix.orthoM(m, 0, -hw, hw, -hh, hh, -dist * 50f, dist * 50f)
-        } else Matrix.perspectiveM(m, 0, Math.toDegrees(fov.toDouble()).toFloat(), w.toFloat() / h, max(1f, dist / 100f), dist * 20f)
+            val d = max(dist * 50f, reach() * 1.1f)
+            Matrix.orthoM(m, 0, -hw, hw, -hh, hh, -d, d)
+        } else Matrix.perspectiveM(m, 0, Math.toDegrees(fov.toDouble()).toFloat(), w.toFloat() / h, dist / 100f, max(dist * 20f, reach() * 1.1f))
         return m
     }
 
@@ -52,7 +66,7 @@ class Camera {
         val (r, u) = basis()
         val k = 2f * dist * tan(fov / 2) / h
         tx += (-dx * r[0] + dy * u[0]) * k; ty += (-dx * r[1] + dy * u[1]) * k; tz += (-dx * r[2] + dy * u[2]) * k
-        dist = min(5000f, max(20f, dist * ratio))
+        dist = clampDist(dist * ratio)
     }
 
     fun setView(yawV: Float, pitchV: Float) { yaw = yawV; pitch = pitchV; roll = 0f }
@@ -78,7 +92,7 @@ class Camera {
         if (min[0] > max[0]) return
         tx = (min[0] + max[0]) / 2; ty = (min[1] + max[1]) / 2; tz = (min[2] + max[2]) / 2
         val r = Math.sqrt(((max[0] - min[0]) * (max[0] - min[0]) + (max[1] - min[1]) * (max[1] - min[1]) + (max[2] - min[2]) * (max[2] - min[2])).toDouble()).toFloat() / 2
-        dist = maxOf(20f, r / tan(fov / 2) * 1.15f * maxOf(1f, h.toFloat() / w))
+        dist = clampDist(r / tan(fov / 2) * 1.15f * maxOf(1f, h.toFloat() / w))
     }
 
     /** View normal to a plane (Sketcher_ViewSketch); eye placed along [n] from [o]. */

@@ -241,18 +241,29 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         for (i in -n..n) l.addAll(listOf(i * s, -n * s, 0f, i * s, n * s, 0f, -n * s, i * s, 0f, n * s, i * s, 0f))
         ByteBuffer.allocateDirect(l.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(l.toFloatArray()); position(0) }
     }
+    /** Power of ten that follows the zoom (1 at the default view): grid cell and origin axes scale by it. */
+    private fun zoomStep() = Math.pow(10.0, Math.round(Math.log10(cam.dist / 320.0)).toDouble()).toFloat()
     private fun drawGrid() {
         GLES20.glDisableVertexAttribArray(aNrm); GLES20.glVertexAttrib3f(aNrm, 0f, 0f, 1f); GLES20.glUniform1f(uLit, 0f)
         GLES20.glUniform4fv(uColor, 1, col(if (dark) 0x2A3138 else 0xE4E8EB), 0); grid.position(0)
+        // the cell follows the zoom in powers of ten (10 mm at the default view, 1 m for a building) and the grid stays
+        // under the view target, so it never ends inside the view
+        val k = zoomStep(); val step = 100f * k
+        val mm = FloatArray(16); android.opengl.Matrix.setIdentityM(mm, 0)
+        android.opengl.Matrix.translateM(mm, 0, Math.round(cam.tx / step) * step, Math.round(cam.ty / step) * step, 0f)
+        android.opengl.Matrix.scaleM(mm, 0, k, k, k)
+        val mvp = FloatArray(16); android.opengl.Matrix.multiplyMM(mvp, 0, cam.viewProj(), 0, mm, 0)
+        GLES20.glUniformMatrix4fv(uMvp, 1, false, mvp, 0)
         // the grid never occludes geometry: draw it without writing depth
         GLES20.glDepthMask(false)
         GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, grid); GLES20.glDrawArrays(GLES20.GL_LINES, 0, grid.capacity() / 3)
         GLES20.glDepthMask(true)
+        GLES20.glUniformMatrix4fv(uMvp, 1, false, cam.viewProj(), 0)
     }
     private fun drawAxes() {
         val b = ByteBuffer.allocateDirect(18 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
         GLES20.glLineWidth(2.5f)
-        val l = if (axisCross) cam.dist * 2f else 30f; val s0 = if (axisCross) -l else 0f
+        val l = if (axisCross) cam.dist * 2f else 30f * zoomStep(); val s0 = if (axisCross) -l else 0f
         for ((v, c) in listOf(floatArrayOf(1f, 0f, 0f) to 0xE0403F, floatArrayOf(0f, 1f, 0f) to 0x47AB72, floatArrayOf(0f, 0f, 1f) to 0x418FDE)) {
             b.position(0); b.put(floatArrayOf(v[0] * s0, v[1] * s0, v[2] * s0, v[0] * l, v[1] * l, v[2] * l)); b.position(0)
             GLES20.glUniform4fv(uColor, 1, col(c), 0); GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, b); GLES20.glDrawArrays(GLES20.GL_LINES, 0, 2)

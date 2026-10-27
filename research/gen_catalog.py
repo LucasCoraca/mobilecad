@@ -39,6 +39,31 @@ def _cpp_resources():
                     if mm: r[key] = mm.group(1)
                 if r: out[m.group(1)] = r
     return out
+# C++ dropdown commands (Part_CompCompoundTools, Sketcher_CompConstrainRadDia, FEM_CompEmConstraints ...): an ActionGroup
+# whose activated(i) runs the i-th member (runCommandByName) or a GroupCommand built with addCommand(); the toolbar
+# button shows the first member's icon, as on the desktop
+def _cpp_dropdowns():
+    out = {}
+    for dp, _, fs in os.walk(os.path.join(root, 'src')):
+        for f in fs:
+            if not f.endswith('.cpp'): continue
+            t = open(os.path.join(dp, f), errors='ignore').read()
+            for m in re.finditer(r'(\w+)::\1\(\)\s*:\s*(?:Gui::)?(Group)?Command\(\s*"(\w+)"\s*\)\s*\{(.{0,3000}?)\n\}', t, re.S):
+                cls, grp, name, ctor = m.groups()
+                if grp: members = re.findall(r'addCommand\(\s*"(\w+)"', ctor)
+                else:
+                    a = re.search(r'\b%s::activated\(int[^)]*\)\s*\{(.{0,4000}?)\n\}' % cls, t, re.S)
+                    members = re.findall(r'runCommandByName\(\s*"(\w+)"', a.group(1)) if a else []
+                if members: out[name] = list(dict.fromkeys(members))
+    return out
+for n, members in _cpp_dropdowns().items():
+    c = cmds.setdefault(n, {})
+    if not c.get('group') and not c.get('sPixmap'): c['group'] = members   # commands with their own icon stay plain commands
+# Python dropdowns (GetCommands()) captured on the device (mobilecad.guicmd.gui_groups)
+_pg = os.path.join(research, 'gui_groups.json')
+if os.path.exists(_pg):
+    for n, members in json.load(open(_pg)).items():
+        if members and not cmds.setdefault(n, {}).get('group'): cmds[n]['group'] = members
 for n, r in _cpp_resources().items():
     c = cmds.setdefault(n, {})
     for k, v in r.items():

@@ -79,9 +79,14 @@ fun ToolTile(cat: Catalog, c: FcCommand, available: Boolean, onClick: () -> Unit
         horizontalAlignment = Alignment.CenterHorizontally) {
         // group commands without their own pixmap show their first member's icon, as FreeCAD's toolbar button does
         val img = cat.icon(c.icon) ?: (c.group.ifEmpty { GuiCommands.groups[c.id] ?: emptyList() }).firstNotNullOfOrNull { cat.icon(cat.cmd(it)?.icon) }
-        if (img != null) Image(img, c.label, Modifier.size(28.dp)) else Box(Modifier.size(28.dp).background(OS.ToolPanel, RoundedCornerShape(4.dp)))
-        Spacer(Modifier.height(4.dp))
-        Text(c.label, fontSize = 10.sp, lineHeight = 12.sp, color = OS.Navy, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (img != null) {
+            Image(img, c.label, Modifier.size(28.dp))
+            Spacer(Modifier.height(4.dp))
+            Text(c.label, fontSize = 10.sp, lineHeight = 12.sp, color = OS.Navy, textAlign = TextAlign.Center, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        } else Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            // a command without a pixmap is a text button, as in FreeCAD's toolbars
+            Text(c.label, fontSize = 11.sp, lineHeight = 13.sp, color = OS.Navy, textAlign = TextAlign.Center, maxLines = 4, overflow = TextOverflow.Ellipsis)
+        }
     }
 }
 

@@ -111,8 +111,12 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
 
     /** Rebuild GPU objects from the engine's tessellation + current selection. */
     fun sync() {
-        val objs = app.meshes.map { (n, m) -> RenderObj(n, m, app.obj(n)?.type == "Sketcher::SketchObject", app.ghosts[n]) }
+        // the sketch in edit is drawn by its editor (live geometry); its last computed shape is hidden, as on the desktop
+        val objs = app.meshes.filter { (n, _) -> n != sketch?.name }.map { (n, m) -> RenderObj(n, m, app.obj(n)?.type == "Sketcher::SketchObject", app.ghosts[n]) }
         renderer.objs = objs
+        sceneBounds(objs)?.let { (mn, mx) -> val c = FloatArray(3) { (mn[it] + mx[it]) / 2 }
+            val r = Math.sqrt((0..2).sumOf { ((mx[it] - mn[it]) / 2.0).let { d -> d * d } }).toFloat()
+            for (k in setOf(cam, icam)) { k.sceneC = c; k.sceneR = r } }
         renderer.selectedObjs = app.selection.filter { it.sub.isEmpty() }.map { it.obj }.toSet()
         renderer.selectedFaces = app.selection.filter { it.sub.startsWith("Face") }.map { it.obj to it.sub.removePrefix("Face").toInt() }.toSet()
         renderer.selectedEdges = app.selection.filter { it.sub.startsWith("Edge") }.map { it.obj to it.sub.removePrefix("Edge").toInt() }.toSet()
@@ -140,11 +144,14 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     /** A newly opened document is framed once its geometry arrives. */
     fun refitOnNextSync() { fitted = false }
 
-    fun fitAll() {
-        val os = renderer.objs; if (os.isEmpty()) return
+    /** Bounding box of the drawn objects (null when there is nothing with extent). */
+    private fun sceneBounds(os: List<RenderObj>): Pair<FloatArray, FloatArray>? {
         val mn = FloatArray(3) { Float.MAX_VALUE }; val mx = FloatArray(3) { -Float.MAX_VALUE }
         os.filter { o -> (0..2).all { o.min[it] <= o.max[it] } }.forEach { o -> for (k in 0..2) { mn[k] = minOf(mn[k], o.min[k]); mx[k] = maxOf(mx[k], o.max[k]) } }
-        if ((0..2).any { mn[it] > mx[it] }) return
+        return if ((0..2).any { mn[it] > mx[it] }) null else mn to mx
+    }
+    fun fitAll() {
+        val (mn, mx) = sceneBounds(renderer.objs) ?: return
         cam.fit(mn, mx); refresh()
     }
 
@@ -170,7 +177,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     /** Std_ViewRotateLeft / Right: 90° about the view axis. */
     fun rotateView(deg: Float) = animateTo(cam.yaw, cam.pitch, cam.roll + Math.toRadians(deg.toDouble()).toFloat())
     /** Std_ViewZoomIn / Out. */
-    fun zoom(factor: Float) { cam.dist = (cam.dist * factor).coerceIn(20f, 5000f); refresh() }
+    fun zoom(factor: Float) { cam.dist = Camera.clampDist(cam.dist * factor); refresh() }
     /** Std_ViewFitSelection. */
     fun fitSelection() {
         val names = app.selection.map { it.obj }.toSet(); val os = renderer.objs.filter { it.name in names }
@@ -536,7 +543,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
             val (rr, uu) = icam.basis(); val k = icam.unitsPerPixel()
             val dx = r.centerX() - width / 2f; val dy = r.centerY() - height / 2f
             for (i in 0..2) { val d = (rr[i] * dx - uu[i] * dy) * k; if (i == 0) icam.tx += d else if (i == 1) icam.ty += d else icam.tz += d }
-            icam.dist = (icam.dist * maxOf(r.width() / width, r.height() / height)).coerceIn(20f, 5000f)
+            icam.dist = Camera.clampDist(icam.dist * maxOf(r.width() / width, r.height() / height))
             overlay.box = null; mode = Mode.NONE; refresh(); return
         }
         if (armed == "faces") {

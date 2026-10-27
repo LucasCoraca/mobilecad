@@ -25,6 +25,15 @@ def _geo_json(g, i, sk):
         d.update(c=[g.Center.x, g.Center.y], r=g.Radius)
     elif isinstance(g, Part.Point):
         d.update(p=[g.X, g.Y])
+    else:
+        # any other curve: FreeCAD's vertices start (1) / end (2) when it is bounded, centre (3) for conics
+        try:
+            if not (isinstance(g, Part.BSplineCurve) and g.isPeriodic()) and hasattr(g, 'StartPoint'):
+                d.update(a=[g.StartPoint.x, g.StartPoint.y], b=[g.EndPoint.x, g.EndPoint.y])
+        except Exception:
+            pass
+        if hasattr(g, 'Center'):
+            d.update(c=[g.Center.x, g.Center.y])
     if isinstance(g, Part.BSplineCurve):
         # data for Sketcher_BSplineDegree / Polygon / KnotMultiplicity / PoleWeight / Comb overlays
         try:
@@ -42,9 +51,10 @@ def _geo_json(g, i, sk):
                             'knots': [[g.value(k).x, g.value(k).y, m] for k, m in zip(knots, mults)], 'comb': comb}
         except Exception:
             pass
-    else:
+    if not isinstance(g, (Part.LineSegment, Part.Circle, Part.Point)):
+        # the drawn / picked curve; a B-spline needs it too (its overlay data above is extra)
         try:
-            pts = g.discretize(64); d['poly'] = [[p.x, p.y] for p in pts]
+            pts = g.discretize(128 if isinstance(g, Part.BSplineCurve) else 64); d['poly'] = [[p.x, p.y] for p in pts]
         except Exception:
             d['poly'] = []
     return d
@@ -320,9 +330,16 @@ def sketch_rename_constraint(name, index, label):
     sk = _sk(name); sk.renameConstraint(int(index), label or ''); return _commit(sk)
 
 @op
-def sketch_delete(name, geometry=(), constraints=()):
+def sketch_delete(name, geometry=(), constraints=(), points=()):
+    """Delete like the desktop (ViewProviderSketch::onDelete): constraints, then selected vertices (a sketch Point is
+    deleted, any other vertex loses the constraints on it: delConstraintOnPoint), then edges."""
     sk = _sk(name)
     if constraints: sk.delConstraints(sorted(constraints, reverse=True))
+    geometry = set(geometry)
+    for g, pos in points:
+        if g >= 0 and isinstance(sk.Geometry[g], Part.Point): geometry.add(g)
+        elif g >= 0 or g <= -3:
+            sk.delConstraintOnPoint(g, pos)
     own = sorted(g for g in geometry if g >= 0); ext = sorted((g for g in geometry if g <= -3), reverse=True)
     if own: sk.delGeometries(own)
     for g in ext: sk.delExternal(-g - 3)          # external geometry -3, -4 ... is ExternalGeometry[0, 1 ...]
