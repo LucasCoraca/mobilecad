@@ -21,6 +21,7 @@ BIM_Project.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-s
 BIM_Report.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
 BIM_Trash.svg — [maxwxyz] — https://creativecommons.org/licenses/by-sa/4.0
 BIM_Windows.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
+CAM_Vcarve.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by/4.0
 Draft_AddToLayer.svg — FreeCAD LGPL2+ — https://creativecommons.org/licenses/by-sa/4.0
 Draft_Edit.svg — [wmayer] — https://creativecommons.org/licenses/by-sa/4.0
 Draft_Ellipse.svg — [Yorik van Havre] — https://creativecommons.org/licenses/by-sa/4.0

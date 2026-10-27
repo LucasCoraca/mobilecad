@@ -1,0 +1,3 @@
+• Sketcher: B-splines are visible while editing and can be selected, dragged and deleted; deleting a selected point works like on the desktop.
+• Zoom from fractions of a millimetre to kilometres (buildings, sites); the grid scales with the zoom.
+• Dropdown tools show their icons; tools without an icon are text buttons instead of gray boxes.
