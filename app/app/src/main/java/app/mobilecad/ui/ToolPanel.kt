@@ -37,7 +37,7 @@ import app.mobilecad.freecad.GuiCommands
 /** Tool panel: 5-column grid of a toolset's tools, sectioned by FreeCAD toolbar, searchable across every command. */
 @Composable
 fun ToolPanel(cat: Catalog, toolset: ToolsetDef, isAvailable: (String) -> Boolean, onPick: (FcCommand) -> Unit, modifier: Modifier = Modifier,
-              extras: List<String> = emptyList()) {
+              extras: List<String> = emptyList(), columns: Int = 5) {
     var query by remember(toolset) { mutableStateOf("") }
     val sections: List<Pair<String, List<FcCommand>>> = remember(toolset, query, extras) {
         if (query.isNotBlank()) cat.search(query).groupBy { it.workbench }.map { (wb, l) -> wb to l }
@@ -57,10 +57,10 @@ fun ToolPanel(cat: Catalog, toolset: ToolsetDef, isAvailable: (String) -> Boolea
         Spacer(Modifier.height(8.dp))
         // "More tools" (commands of this workbench outside its toolbars) folds away so the toolset stays readable
         var moreOpen by remember(toolset) { mutableStateOf(false) }
-        LazyVerticalGrid(GridCells.Fixed(5), Modifier.fillMaxWidth()) {
+        LazyVerticalGrid(GridCells.Fixed(columns), Modifier.fillMaxWidth()) {
             sections.forEach { (title, cmds) ->
                 val foldable = title == "More tools" && query.isBlank()
-                item(span = { GridItemSpan(5) }) {
+                item(span = { GridItemSpan(columns) }) {
                     Row(Modifier.fillMaxWidth().then(if (foldable) Modifier.clickable { moreOpen = !moreOpen } else Modifier).padding(top = 10.dp, bottom = 4.dp),
                         verticalAlignment = Alignment.CenterVertically) {
                         Text(if (foldable) "$title (${cmds.size})" else title, Modifier.weight(1f), color = if (foldable) OS.Primary else OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)

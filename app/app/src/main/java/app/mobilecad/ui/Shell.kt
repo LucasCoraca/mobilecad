@@ -32,6 +32,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -219,6 +220,9 @@ fun Shell(app: AppState) {
             EmptyState("No drawing yet", "New drawing page", Modifier.align(Alignment.Center)) { app.run("TechDraw_PageDefault") }
         if (stage) if (app.inAssembly && app.objects.none { it.type == "Assembly::AssemblyObject" })
             EmptyState("No assembly yet", "Create assembly", Modifier.align(Alignment.Center)) { app.run("Assembly_CreateAssembly") }
+        // MobileCAD XR (the view itself is in the room): with nothing open here, the context panel (XrPanel.kt)
+        if (stage && app.xr && app.edit == null && app.taskPanel == null && app.openToolset == null && !app.inSheet && !app.inDrawing)
+            XrContextPanel(app, Modifier.fillMaxSize().padding(start = 6.dp, top = 6.dp, end = 6.dp, bottom = if (sk != null) 120.dp else 6.dp))
         if (side) app.openToolset?.let { ts ->
             ToolPanel(app.catalog, ts, { MobileCommands.available(it) }, { app.run(it.id) }, panelPad.align(panelAlign),
                 extras = remember(ts, sk != null) { Workspaces.extras(app.catalog, app.workspace, ts, sketchMode = sk != null) })
@@ -239,7 +243,8 @@ fun Shell(app: AppState) {
         if (side) app.taskPanel?.let { p -> TaskPanelView(app, p, panelPad.align(panelAlign)) }
         if (stage) if (app.inDrawing) Text("Fit", Modifier.align(Alignment.TopEnd).padding(8.dp).background(OS.Surface.copy(alpha = .92f), RoundedCornerShape(6.dp))
             .clickable { app.pageView?.fit() }.padding(horizontal = 16.dp, vertical = 10.dp), color = OS.Primary, fontSize = 12.sp)
-        if (stage) if (sk == null && app.openToolset == null && app.selection.isNotEmpty() && (app.xr || !((compact || Screen.height < 560.dp) && (app.edit != null || app.taskPanel != null)))) SelectionChips(app, Modifier.align(Alignment.BottomStart).padding(8.dp))
+        if (stage) if (sk == null && app.openToolset == null && app.selection.isNotEmpty() && (if (app.xr) app.edit != null || app.taskPanel != null   // (XR: else the context panel shows it)
+            else !((compact || Screen.height < 560.dp) && (app.edit != null || app.taskPanel != null)))) SelectionChips(app, Modifier.align(Alignment.BottomStart).padding(8.dp))
         if (stage) app.draft?.let { t -> DraftBanner(app, t, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
         if (stage) app.mate?.let { m -> MateBanner(app, m.jointType, m.picks.size, Modifier.align(Alignment.TopCenter).padding(top = 10.dp)) }
         if (stage) app.partPicker?.let { parts -> PartPicker(app, parts) }
@@ -293,17 +298,21 @@ fun Shell(app: AppState) {
     }
 
     if (app.xr) {
-        // MobileCAD XR: the same interface, laid out to be cut into surfaces around the user (XrLayout): the feature list
-        // on the left, the view area ahead with the bars (shown under it, like a keyboard), the docked panels on the right; nothing is drawn where
-        // the model in the room should show through. Its dialogs are drawn in the view area (LocalInlineDialogs).
-        CompositionLocalProvider(LocalInlineDialogs provides true) { Row(Modifier.fillMaxSize()) {
-            Box(Modifier.width(XrLayout.TREE.dp).fillMaxHeight()) { if (app.treeOpen) FeatureTree(app, Modifier.fillMaxSize()) { app.treeOpen = false } else treeTab() }
-            Column(Modifier.width(XrLayout.STAGE.dp).fillMaxHeight()) {
-                // the bars first: their menus drop down into the view area, which is shown in one piece
-                Column(Modifier.height(XrLayout.BARS.dp).fillMaxWidth()) { topBar(); if (sk != null) SketchStrip(app) else ToolStrip(app); ElementTabs(app) }
-                Box(Modifier.weight(1f).fillMaxWidth()) { viewArea(true, false); message(Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)) }
+        // MobileCAD XR: one window with the whole interface (the bars, the feature list, the panels and dialogs where the
+        // view would be: the model is in the room), and beside it, in a part of its own, the number pad and the keyboard,
+        // which the headset shows as a second, floating surface (XrLayout). Dialogs are drawn in the window (LocalInlineDialogs).
+        CompositionLocalProvider(LocalInlineDialogs provides true) { Box(Modifier.fillMaxSize()) {
+            Column(Modifier.size(XrLayout.WIDTH.dp, XrLayout.HEIGHT.dp).clip(RoundedCornerShape(14.dp)).background(OS.Metal6)) {
+                topBar()
+                if (sk != null) SketchStrip(app) else ToolStrip(app)
+                Row(Modifier.weight(1f)) {
+                    Box(Modifier.width(XrLayout.TREE.dp).fillMaxHeight()) { if (app.treeOpen) FeatureTree(app, Modifier.fillMaxSize()) { app.treeOpen = false } else treeTab() }
+                    Box(Modifier.weight(1f).fillMaxHeight().background(OS.Surface)) {
+                        viewArea(true, true); message(Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp)) }
+                }
+                ElementTabs(app)
             }
-            Box(Modifier.width(XrLayout.SIDE.dp).fillMaxHeight()) { viewArea(false, true); numpad(Modifier.align(Alignment.BottomCenter).padding(6.dp)) }
+            Box(Modifier.offset(x = XrLayout.WIDTH.dp).size(XrLayout.PAD_W.dp, XrLayout.PAD_H.dp)) { numpad(Modifier.align(Alignment.TopCenter)) }
         } }
         return@BoxWithConstraints
     }
@@ -364,9 +373,9 @@ fun AppDialog(onDismissRequest: () -> Unit, confirmButton: @Composable () -> Uni
     }
 }
 
-/** MobileCAD XR's layout (dp): the parts the headset cuts the interface into, left to right: feature list, [BARS] (top
- *  bar, tool strip, element tabs) over the view area, docked panels; [HEIGHT] tall. */
-object XrLayout { const val TREE = 320; const val STAGE = 800; const val SIDE = 360; const val HEIGHT = 800; const val BARS = 154 }   // (whole pixels at 1.5 px per dp)
+/** MobileCAD XR's layout (dp): the window ([WIDTH] x [HEIGHT], the feature list [TREE] wide) and, right of it, the
+ *  keypad's part ([PAD_W] x [PAD_H]: the number pad or the keyboard). */
+object XrLayout { const val WIDTH = 880; const val HEIGHT = 620; const val TREE = 300; const val PAD_W = 480; const val PAD_H = 380 }   // (whole pixels at 1.5 px per dp)
 
 /** Draft tool prompt (desktop: the Draft task panel with its coordinate fields, Finish, Close, Undo, Copy). */
 @Composable
