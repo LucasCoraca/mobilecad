@@ -1,0 +1,3 @@
+• Assembly: inserting a body into an assembly no longer hides it (and its features) in the Part tab, so it can be edited and picked by the sketcher again. Only what is inside the assembly belongs to it; the bodies it links to stay parts of the document, as on the desktop.
+• A body already used in an assembly can be inserted again (into the same or another assembly).
+• Deleting an assembly also deletes its Joints group and its component links, as on the desktop; the linked bodies stay.

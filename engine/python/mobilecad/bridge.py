@@ -200,6 +200,18 @@ def _failed_dependency(o):
     except Exception: pass
     return next((d for d in o.OutListRecursive if 'Invalid' in d.State or 'Error' in d.State), None)
 
+def _assembly_of(o):
+    """The assembly containing o through its group chain (GroupExtension::getGroupOfObject), or None. Links don't count:
+    a body linked into an assembly as a component stays a part of the document, like on the desktop."""
+    def parent(o):   # the group holding o, or the Part / Body whose Origin it is
+        return next((p for p in o.InList if p.TypeId != 'App::Link' and p.hasExtension('App::GroupExtension')
+                     and (o in p.Group or getattr(p, 'Origin', None) == o)), None)
+    seen = {o.Name}; o = parent(o)
+    while o is not None and o.Name not in seen:
+        if o.TypeId == 'Assembly::AssemblyObject': return o.Name
+        seen.add(o.Name); o = parent(o)
+    return None
+
 def _has_shape_prop(o):
     return 'Shape' in o.PropertiesList
 
@@ -213,7 +225,7 @@ def _obj_info(o):
             'group': [c.Name for c in getattr(o, 'Group', [])] if hasattr(o, 'Group') else [],
             'tip': o.Tip.Name if getattr(o, 'Tip', None) is not None and o.TypeId == 'PartDesign::Body' else None,
             'hasShape': _has_shape(o),
-            'assembly': next((p.Name for p in o.InListRecursive if p.TypeId == 'Assembly::AssemblyObject'), None),
+            'assembly': _assembly_of(o),
             'linked': o.LinkedObject.Name if o.TypeId == 'App::Link' and o.LinkedObject is not None else None,
             'error': o.getStatusString() if ('Invalid' in o.State or 'Error' in o.State) else
                      ('%s failed: %s' % (blocked.Label, blocked.getStatusString()) if blocked is not None else None),

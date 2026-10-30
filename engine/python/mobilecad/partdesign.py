@@ -261,7 +261,16 @@ def delete_objects(names):
     """Std_Delete."""
     d = _doc()
     for n in names:
-        if d.getObject(n) is not None: d.removeObject(n)
+        o = d.getObject(n)
+        if o is None: continue
+        if o.TypeId == 'Assembly::AssemblyObject':
+            # ViewProviderAssembly::onDelete: the assembly's Joints / Views / BOM groups go with it
+            for g in [g for g in o.OutList if g.TypeId in ('Assembly::JointGroup', 'Assembly::ViewGroup', 'Assembly::BomGroup')]:
+                g.removeObjectsFromDocument(); d.removeObject(g.Name)
+            # its components are links made for it (the linked parts stay): kept, they would show as copies in the Part tab
+            for c in list(o.Group):
+                if c.TypeId == 'App::Link': d.removeObject(c.Name)
+        d.removeObject(n)
     d.recompute(); return True
 
 @op

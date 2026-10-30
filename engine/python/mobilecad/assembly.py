@@ -2,7 +2,7 @@
 the same objects (Assembly::AssemblyObject, Assembly::JointGroup, App::Link, JointObject.Joint / GroundedJoint) and the
 same reference format ([component, ['Link.Face3', 'Link.Vertex2']]) built with FreeCAD's own UtilsAssembly helpers."""
 import FreeCAD as App
-from .bridge import op, _doc
+from .bridge import op, _doc, _assembly_of
 
 def _asm(name=None):
     d = _doc()
@@ -26,7 +26,7 @@ def asm_parts():
     out = []
     for o in _doc().Objects:
         if o.TypeId in ('PartDesign::Body', 'App::Part') or (o.isDerivedFrom('Part::Feature') and not any(p.TypeId in ('PartDesign::Body', 'App::Part') for p in o.InList)):
-            if any(p.TypeId == 'Assembly::AssemblyObject' for p in o.InListRecursive): continue
+            if _assembly_of(o): continue
             if o.TypeId.startswith('PartDesign::') and o.TypeId != 'PartDesign::Body': continue
             out.append({'name': o.Name, 'label': o.Label, 'type': o.TypeId})
     return out
