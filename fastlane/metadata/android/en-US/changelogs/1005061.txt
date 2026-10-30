@@ -1,0 +1,2 @@
+• Updates: MobileCAD checks for a new version once a day (and from About ▸ Check for updates), downloads it with a progress bar, verifies it and installs it after you confirm. Android asks once to allow MobileCAD to install apps. Copies installed from F-Droid keep updating through F-Droid.
+• Preferences ▸ Check for updates daily turns the daily check off.

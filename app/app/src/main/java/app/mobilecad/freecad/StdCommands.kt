@@ -248,13 +248,16 @@ result = [list(n), list(c)]""", mapOf("o" to r.obj, "s" to r.sub)) as JSONArray 
             id == "Std_ExportDependencyGraph" -> s.fileRequest = AppState.FileRequest("graph", suggested = "${s.docName}.gv")
             id == "Std_CommandLine" || id == "Std_SendToPythonConsole" -> s.console()
             id == "Std_DlgMacroExecute" || id == "Std_DlgMacroExecuteDirect" -> s.fileRequest = AppState.FileRequest("macro")
-            id == "Std_DlgPreferences" -> s.choose("Preferences", listOf("units" to "Unit system", "theme" to "Theme (current: ${s.theme.replaceFirstChar { it.uppercase() }})")) { page ->
-                if (page == "theme") s.choose("Theme", listOf("system" to "System (follow Android)", "light" to "Light", "dark" to "Dark")) { t -> s.setThemeMode(t) }
+            id == "Std_DlgPreferences" -> s.choose("Preferences", listOf("units" to "Unit system", "theme" to "Theme (current: ${s.theme.replaceFirstChar { it.uppercase() }})") +
+                    (if (s.updater.enabled) listOf("updates" to "Check for updates daily (${if (s.updater.auto) "on" else "off"})") else emptyList())) { page ->
+                if (page == "updates") { s.updater.auto = !s.updater.auto; s.message = "Daily update check ${if (s.updater.auto) "on" else "off"}" }
+                else if (page == "theme") s.choose("Theme", listOf("system" to "System (follow Android)", "light" to "Light", "dark" to "Dark")) { t -> s.setThemeMode(t) }
                 else s.eng({ call("unit_schemas") as JSONObject }) { j -> val a = j.getJSONArray("schemas")
                     s.choose("Unit system (current: ${a.getString(j.getInt("current"))})", List(a.length()) { i -> i.toString() to a.getString(i) }) { i ->
                         s.eng({ call("set_unit_schema", mapOf("index" to i.toInt())) }) { s.message = "Units: ${a.getString(i.toInt())}" } } } }
-            id == "Std_About" || id == "Std_AboutQt" -> s.choose("MobileCAD", listOf("about" to "About MobileCAD", "licenses" to "Open-source licenses")) { what ->
+            id == "Std_About" || id == "Std_AboutQt" -> s.choose("MobileCAD", listOf("about" to "About MobileCAD", "updates" to "Check for updates", "licenses" to "Open-source licenses")) { what ->
                 if (what == "licenses") s.showLicenses()
+                else if (what == "updates") { s.message = "Checking for updates…"; s.updater.check(manual = true) }
                 else s.eng({ run("import FreeCAD; result = ' '.join(FreeCAD.Version()[:4])") }) { ver ->
                     s.info = "MobileCAD ${s.appVersion}" to ("CAD for Android, built on FreeCAD $ver (LGPL-2.1-or-later) with Open CASCADE, Qt 6 and Python 3.14.\n\n" +
                         "MobileCAD is an independent project. It is not affiliated with, sponsored or endorsed by the FreeCAD project or the " +

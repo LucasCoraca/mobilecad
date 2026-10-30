@@ -77,6 +77,7 @@ fun Shell(app: AppState) {
         app.message = null
         if (onSecondary) inUiMessage = it else Toast.makeText(ctx, it, Toast.LENGTH_LONG).show()
     } }
+    LaunchedEffect(app.updater.message) { app.updater.message?.let { app.updater.message = null; app.message = it } }
     // (its own effect: clearing app.message above restarts that one)
     LaunchedEffect(inUiMessage) { if (inUiMessage != null) { kotlinx.coroutines.delay(3500); inUiMessage = null } }
     if (!app.ready) { Splash(app.status); return }
@@ -253,6 +254,19 @@ fun Shell(app: AppState) {
                 androidx.compose.foundation.Image(bmp.asImageBitmap(), null, Modifier.fillMaxWidth().heightIn(max = 480.dp).clipToBounds()
                     .pointerInput(bmp) { detectTransformGestures { _, pan, zoom, _ -> sc = (sc * zoom).coerceIn(1f, 12f); off += pan } }
                     .graphicsLayer { scaleX = sc; scaleY = sc; translationX = off.x; translationY = off.y }) }) }
+        if (stage) app.updater.offer?.let { r -> AppDialog(onDismissRequest = { app.updater.offer = null },
+            title = { Text("MobileCAD ${r.version} is available") },
+            text = { Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text("You have ${app.updater.version}. The update is a ${"%.0f".format(r.size / 1e6)} MB download. Android closes MobileCAD to install it: " +
+                    "save your work first.", fontSize = 13.sp)
+                if (r.notes.isNotBlank()) { Spacer(Modifier.height(12.dp)); Text(r.notes.replace("**", "").trim(), fontSize = 13.sp, color = OS.Steel) } } },
+            confirmButton = { TextButton({ app.updater.download(r) }) { Text("Update") } },
+            dismissButton = { TextButton({ app.updater.offer = null }) { Text("Later") } }) }
+        if (stage) app.updater.progress?.let { p -> AppDialog(onDismissRequest = {},
+            title = { Text("Downloading the update") },
+            text = { Column { LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth()); Spacer(Modifier.height(8.dp))
+                Text("${(p * 100).toInt()} %", fontSize = 13.sp, color = OS.Steel) } },
+            confirmButton = {}, dismissButton = { TextButton({ app.updater.cancel() }) { Text("Cancel") } }) }
         if (stage) app.info?.let { (t, body) -> AppDialog(onDismissRequest = { app.info = null }, title = { Text(t) },
             text = { Text(body, fontSize = 13.sp, modifier = Modifier.verticalScroll(rememberScrollState())) },
             confirmButton = { TextButton({ app.info = null }) { Text("Close") } }) }

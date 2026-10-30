@@ -12,6 +12,9 @@ import app.mobilecad.ui.OS
 class MainActivity : ComponentActivity() {
     /** Developer hook: adb shell am start -n app.mobilecad/.MainActivity --es fcscript "print(App.Version())" (debug builds only). */
     private fun devScript(i: android.content.Intent?) {
+        // --es update_feed URL: check for updates against a test feed (GitHub release JSON) instead of GitHub
+        i?.getStringExtra("update_feed")?.let { u -> if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) {
+            app.updater.testFeed = u; app.updater.check(manual = true) }; return }
         // --es fcopen /path/file.FCStd: open a document as File ▸ Open would (screenshots, tests)
         i?.getStringExtra("fcopen")?.let { p -> if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) app.whenReady { app.open(p) }; return }
         val src = i?.getStringExtra("fcscript") ?: i?.getStringExtra("fcscript64")?.let { String(android.util.Base64.decode(it, 0)) } ?: return

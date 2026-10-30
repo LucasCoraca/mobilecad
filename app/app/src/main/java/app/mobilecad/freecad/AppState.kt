@@ -302,6 +302,8 @@ class AppState(private val ctx: Context) {
             Regex("""-?\d+(\.\d+)?""").find(v)?.value?.toDoubleOrNull()?.let(onValue) ?: run { message = "Not a number: $v" } }
     }
     var message by mutableStateOf<String?>(null)
+    /** New versions from the GitHub releases (release-signed builds only). */
+    val updater = Updater(ctx, scope).also { Updater.current = it }
     var undoNames by mutableStateOf<List<String>>(emptyList())
     var redoNames by mutableStateOf<List<String>>(emptyList())
     val sceneVersion = mutableIntStateOf(0)
@@ -375,6 +377,7 @@ class AppState(private val ctx: Context) {
             docName = withContext(engine.dispatcher) { engine.newDocument("Unnamed") }
             ready = true; status = ""
             refresh()
+            updater.checkDaily()
             GuiCommands.load(this@AppState)
             savedSig = docSig(); autosavedSig = savedSig          // the empty start document is not unsaved work
             recoverIfCrashed()
