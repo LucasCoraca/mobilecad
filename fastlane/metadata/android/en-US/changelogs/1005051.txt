@@ -1,0 +1,3 @@
+• Sketcher: cancelling the value of a new dimension (✕ on the number pad or Back) removes the dimension, as on the desktop.
+• Sketcher: tap a dimension's value to select it, then Delete removes it (Delete now also removes selected constraints).
+• PartDesign: showing a feature of a Body hides the Body's other features, as on the desktop, so switching between features takes one step.

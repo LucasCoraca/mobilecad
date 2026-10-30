@@ -72,7 +72,7 @@ class DraftTool(val id: String, val label: String, val prompts: List<String>, va
 /** Free-text input (sketch text, labels). */
 class TextPrompt(val title: String, val initial: String, val multiline: Boolean = false, val onAccept: (String) -> Unit)
 
-class NumpadRequest(val title: String, val initial: String, val units: List<String>, val onAccept: (String) -> Unit)
+class NumpadRequest(val title: String, val initial: String, val units: List<String>, val onCancel: () -> Unit = {}, val onAccept: (String) -> Unit)
 
 /** UI state for one open FreeCAD document; all engine work is funnelled through [eng]. */
 class AppState(private val ctx: Context) {

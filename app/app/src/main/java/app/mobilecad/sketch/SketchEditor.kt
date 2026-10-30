@@ -430,7 +430,8 @@ class SketchEditor(private val app: AppState, val name: String) {
     fun tap(p: P2, tolMm: Double) {
         val e = pickElement(p, tolMm)
         if (tool.points == 0 && tool !in setOf(SketchTool.SELECT, SketchTool.TRIM, SketchTool.DIMENSION)) { action(p, e); return }
-        if (tool == SketchTool.SELECT && e == null) { consAt(p, tolMm)?.let { c -> toggleCons(c); onChanged(); return } }
+        // a dimension's value label wins over the curve under it, other constraint glyphs only over empty space
+        if (tool == SketchTool.SELECT) (pickLabel(p, tolMm) ?.i ?: if (e == null) consAt(p, tolMm) else null)?.let { c -> toggleCons(c); onChanged(); return }
         when (tool) {
             SketchTool.TRIM -> if (e != null && e.geo >= 0) exec("sketch_trim", mapOf("geo" to e.geo, "x" to p.x, "y" to p.y))
             SketchTool.DIMENSION -> { if (e == null) { selected.clear(); onChanged(); return }
@@ -567,11 +568,7 @@ class SketchEditor(private val app: AppState, val name: String) {
         }
         onChanged()
     }
-    private fun consAnchor(k: SkCons): P2? {
-        val g = geos.firstOrNull { it.i == k.first } ?: return null
-        return when { g.isLine -> P2((g.a!!.x + g.b!!.x) / 2, (g.a.y + g.b.y) / 2); g.c != null -> P2(g.c.x + g.r * 0.7, g.c.y + g.r * 0.7); else -> g.a }
-    }
-    private fun consAt(p: P2, tol: Double) = cons.mapNotNull { k -> consAnchor(k)?.let { k to it.d(p) } }.filter { it.second < tol * 1.6 }.minByOrNull { it.second }?.first?.i
+    private fun consAt(p: P2, tol: Double) = cons.mapNotNull { k -> labelPoint(k)?.let { k to it.d(p) } }.filter { it.second < tol * 1.6 }.minByOrNull { it.second }?.first?.i
     private fun toggleCons(i: Int) { if (i in selectedCons) selectedCons.remove(i) else selectedCons.add(i) }
 
     /** Sketcher_Projection / Sketcher_Intersection: a tap on the (dimmed) 3D model adds external geometry. */
@@ -595,7 +592,8 @@ class SketchEditor(private val app: AppState, val name: String) {
     fun deleteSelected() {
         val g = selected.filter { it.pos == 0 && (it.geo >= 0 || it.geo <= -3) }.map { it.geo }.distinct()
         val pts = selected.filter { it.pos != 0 && (it.geo >= 0 || it.geo <= -3) }.map { listOf(it.geo, it.pos) }
-        selected.clear(); if (g.isNotEmpty() || pts.isNotEmpty()) exec("sketch_delete", mapOf("geometry" to g, "points" to pts))
+        val c = selectedCons.toList(); selected.clear(); selectedCons.clear()
+        if (g.isNotEmpty() || pts.isNotEmpty() || c.isNotEmpty()) exec("sketch_delete", mapOf("geometry" to g, "points" to pts, "constraints" to c))
     }
     fun toggleConstruction() {
         val g = selected.map { it.geo }.filter { it >= 0 }.distinct()
@@ -647,7 +645,7 @@ class SketchEditor(private val app: AppState, val name: String) {
         fun add(t: String, args: List<Int>, v: Double, units: List<String>) {
             val txt = if (units === ANGLE_UNITS) "%.4f deg".format(Math.toDegrees(v)) else "%.4f mm".format(v)
             exec("sketch_constrain", mapOf("ctype" to t, "args" to args, "value" to txt)); selected.clear()
-            app.eng({ 0 }) { askValue(cons.size, t, units) }
+            app.eng({ 0 }) { askValue(cons.size, t, units, created = true) }
         }
         val g0 = edges.firstOrNull()?.let { geo(it.geo) }
         when {
@@ -674,9 +672,11 @@ class SketchEditor(private val app: AppState, val name: String) {
         onChanged()
     }
 
-    private fun askValue(index: Int, title: String, units: List<String>) {
+    /** The value pad for dimension [index]; cancelling it removes a just [created] one (EditDatumDialog: abortCommand). */
+    private fun askValue(index: Int, title: String, units: List<String>, created: Boolean = false) {
         val c = cons.getOrNull(index - 1) ?: cons.lastOrNull() ?: return
-        app.numpad = NumpadRequest(title, c.label.ifEmpty { "%.3f".format(c.value) }, units) { v ->
+        val cancel = { if (created) exec("sketch_delete", mapOf("constraints" to listOf(c.i))) }
+        app.numpad = NumpadRequest(title, c.label.ifEmpty { "%.3f".format(c.value) }, units, cancel) { v ->
             app.numpad = null
             if (Regex("""^-?[\d.]+\s*[a-zA-Z°µ]*$""").matches(v.trim())) exec("sketch_set_datum", mapOf("index" to c.i, "value" to v.replace("°", "deg")))
             else exec("sketch_set_datum_expression", mapOf("index" to c.i, "expression" to v))

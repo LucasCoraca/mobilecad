@@ -87,7 +87,7 @@ fun Shell(app: AppState) {
     // nothing open the app goes to the background instead of finishing, so the open document is never lost.
     androidx.activity.compose.BackHandler {
         when {
-            app.numpad != null -> app.numpad = null
+            app.numpad != null -> app.numpad?.let { n -> app.numpad = null; n.onCancel() }
             app.textPrompt != null -> app.textPrompt = null
             app.choice != null -> app.choice = null
             menu != null -> menu = null
@@ -195,7 +195,7 @@ fun Shell(app: AppState) {
     val message: @Composable (Modifier) -> Unit = { mod -> inUiMessage?.let { m ->
         Text(m, color = Color.White, fontSize = 14.sp, modifier = mod.shadow(6.dp, RoundedCornerShape(20.dp)).background(Color(0xE6202428), RoundedCornerShape(20.dp)).padding(horizontal = 18.dp, vertical = 10.dp))
     } }
-    val numpad: @Composable (Modifier) -> Unit = { mod -> app.numpad?.let { n -> key(n) { Numpad(n.title, n.initial, n.units, n.onAccept, { app.numpad = null }, mod) } } }   // fresh state per request
+    val numpad: @Composable (Modifier) -> Unit = { mod -> app.numpad?.let { n -> key(n) { Numpad(n.title, n.initial, n.units, n.onAccept, { app.numpad = null; n.onCancel() }, mod) } } }   // fresh state per request
     // What the 3D view area holds: the view itself and what floats over it (`stage`: banners, chips, menus, dialogs, the
     // drawing / spreadsheet that replace the view), and the panels docked in it (`side`: tool panels, feature dialogs,
     // task panels, the constraint list). One area on phones and tablets; MobileCAD XR shows them as two surfaces.

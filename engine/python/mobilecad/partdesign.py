@@ -267,7 +267,14 @@ def delete_objects(names):
 @op
 def set_visibility(names, visible):
     """Std_ToggleVisibility / Std_ShowSelection / Std_HideSelection."""
-    for n in names: _doc().getObject(n).Visibility = bool(visible)
+    for n in names:
+        o = _doc().getObject(n)
+        o.Visibility = bool(visible)
+        if visible and o.isDerivedFrom('PartDesign::Feature'):
+            # as PartDesignGui::ViewProvider::onChanged: a shown feature is the only visible one in its Body
+            body = next((b for b in o.InList if b.TypeId == 'PartDesign::Body'), None)
+            for f in (body.Group if body else []):
+                if f is not o and f.isDerivedFrom('PartDesign::Feature') and f.Visibility: f.Visibility = False
     return True
 
 # ------------------------------------------------------------------ manipulators (drag arrows)
