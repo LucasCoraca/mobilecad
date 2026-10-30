@@ -3,7 +3,18 @@ import json, os, re, sys, ast
 root, cmds_path, out = sys.argv[1], sys.argv[2], sys.argv[3]
 cmds = json.load(open(cmds_path))['commands']
 mods = os.path.join(root, 'src', 'Mod')
+def _named_ctor(t):
+    """Cls::Cls(const char* initName) : Base(initName), with the name as the declaration's default argument
+    (CmdSketcherConstrainCoincidentUnified): rewritten as Cls::Cls() : Base("Sketcher_...")"""
+    for cls, name in re.findall(r'\b(\w+)\(\s*const char\s*\*\s*\w+\s*=\s*"(\w+)"\s*\)', t):
+        t = re.sub(r'\b%s::%s\(\s*const char\s*\*\s*(\w+)\s*\)\s*:\s*(\w+)\(\s*\1\s*\)' % (cls, cls), r'%s::%s() : \2("%s")' % (cls, cls, name), t)
+    return t
 res = {}
+# C++ commands whose constructor hands the name to a base class: CmdSketcherConstraint("Sketcher_ConstrainEqual")
+cpp_named = set()
+for dp, _, fs in os.walk(os.path.join(root, 'src')):
+    for f in fs:
+        if f.endswith('.cpp'): cpp_named.update(re.findall(r'::\w+\(\)\s*:\s*\w+\(\s*"(\w+)"\s*\)', _named_ctor(open(os.path.join(dp, f), errors='ignore').read())))
 
 def cpp_toolbars(path):
     s = open(path, errors='ignore').read()
@@ -14,8 +25,15 @@ def cpp_toolbars(path):
         for c in cands:
             if 'ToolBarItem' in (c.group(1) or '') + c.group(2): return c.group(3), c.group(4)
         return (cands[0].group(3), cands[0].group(4)) if cands else None
+    def defaults(body):
+        # preference branches (if (hGrp->GetBool("UnifiedCoincident", true)) {..} else {..}): keep the default one
+        pat = re.compile(r'if\s*\(\s*(!?)\s*\w+->GetBool\(\s*"[^"]+"\s*,\s*(true|false)\s*\)\s*\)\s*\{([^{}]*)\}(?:\s*else\s*\{([^{}]*)\})?')
+        while True:
+            b = pat.sub(lambda g: (g.group(3) if (g.group(2) == 'true') != (g.group(1) == '!') else (g.group(4) or '')) + ';', body)
+            if b == body: return body
+            body = b
     def expand(body, depth=0):
-        out = []
+        body = defaults(body); out = []
         for st in re.split(r';', body):
             call = re.search(r'(\w+)(?:<[^>]*>)?\(\s*\*?(\w+)\s*\)\s*$', st.strip())
             if call and depth < 3 and not st.strip().startswith(('auto', 'Gui', 'return')) and '<<' not in st:
@@ -27,7 +45,7 @@ def cpp_toolbars(path):
             out.append(st)
         return out
     tbs = []; cur = {}
-    for st in expand(m.group(1)):
+    for st in expand(defaults(m.group(1))):
         sc = re.search(r'(\w+)->setCommand\(\s*(?:QT_TR_NOOP\()?"([^"]+)"', st)
         if sc:
             t = {'toolbar': sc.group(2).replace('&', ''), 'items': []}; tbs.append(t); cur[sc.group(1)] = t; continue
@@ -36,7 +54,7 @@ def cpp_toolbars(path):
             var = mm.group(1); t = cur.get(var) or next((cur[v] for v in cur if v.startswith(var) or var.startswith(v)), None)
             if t is None: continue
             for it in re.findall(r'"([\w.]+)"', st):
-                if (it in cmds or it == 'Separator') and (it == 'Separator' or it not in t['items']): t['items'].append(it)
+                if (it in cmds or it == 'Separator' or it in cpp_named) and (it == 'Separator' or it not in t['items']): t['items'].append(it)
     return [t for t in tbs if any(i != 'Separator' for i in t['items']) and t['toolbar'] not in ('Std', 'Edit Mode')]
 
 def py_lists(src):

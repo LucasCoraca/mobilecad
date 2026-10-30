@@ -75,6 +75,9 @@ class SketchEditor(private val app: AppState, val name: String) {
     var construction by mutableStateOf(false)
     var dof by mutableStateOf(-1); var fully by mutableStateOf(false)
     var status by mutableStateOf("")
+    /** A constraint picked with nothing selected (DrawSketchHandlerGenConstraint): taps select its elements and it is
+     *  applied as soon as they form a valid selection; it stays active for the next one until another tool is chosen. */
+    var armed by mutableStateOf<String?>(null)
     var geos: List<SkGeo> = emptyList(); var cons: List<SkCons> = emptyList()
     /** The part's vertices / edges on the sketch plane (sketch on a face, snap to its edges and corners). */
     var modelPts: List<Pair<String, P2>> = emptyList(); var modelCurves: List<ModelCurve> = emptyList()
@@ -139,7 +142,7 @@ class SketchEditor(private val app: AppState, val name: String) {
             geos.none { !it.external } -> if (geos.isEmpty()) "Empty sketch" else "Only external geometry"
             fully -> "Fully constrained"
             else -> "$dof degrees of freedom"
-        }
+        }.let { st -> armed?.let { "${armedHint(it)}  ($st)" } ?: st }
         app.sceneVersion.intValue++; onChanged()
     }
 
@@ -247,7 +250,7 @@ class SketchEditor(private val app: AppState, val name: String) {
 
     // ------------------------------------------------------------------ tools
     fun selectTool(t: SketchTool) {
-        finishChain(); actionPicks.clear()
+        finishChain(); actionPicks.clear(); armed = null
         // selection-based tools keep the current selection (Symmetry, Move, Rotate ... act on it)
         if (t !in setOf(SketchTool.SYMMETRY, SketchTool.TRANSLATE, SketchTool.COPY, SketchTool.ROTATE, SketchTool.SCALE, SketchTool.ARRAY)) { selected.clear(); selectedCons.clear() }
         tool = t; status = hint(); onChanged()
@@ -257,6 +260,8 @@ class SketchEditor(private val app: AppState, val name: String) {
     /** Finger lifted at a snapped point. */
     fun place(s: Snap) {
         preview = null
+        // a second tap on the point just placed would make a zero-length curve (OCC "Both points are equal")
+        if (pending.lastOrNull()?.first?.let { it.d(s.p) < 1e-9 } == true) { onChanged(); return }
         pending.add(s.p to s.auto)
         val pts = pending.map { it.first }
         fun auto(map: (Int) -> Pair<Int, Int>?) = JSONArray().also { arr ->
@@ -327,7 +332,7 @@ class SketchEditor(private val app: AppState, val name: String) {
     private fun hint(): String {
         val n = pending.size
         return when (tool) {
-            SketchTool.SELECT -> "Tap geometry to select, drag points to move"
+            SketchTool.SELECT -> "Tap geometry to select, drag points or curves to move"
             SketchTool.POLYLINE -> if (n == 0) "Polyline: tap the start point" else "Tap the next point · double tap to end"
             SketchTool.LINE -> if (n == 0) "Line: tap the start point" else "Tap the end point or type Length"
             SketchTool.RECTANGLE -> if (n == 0) "Rectangle: tap the first corner" else "Tap the opposite corner or type Width / Height"
@@ -430,8 +435,26 @@ class SketchEditor(private val app: AppState, val name: String) {
             SketchTool.TRIM -> if (e != null && e.geo >= 0) exec("sketch_trim", mapOf("geo" to e.geo, "x" to p.x, "y" to p.y))
             SketchTool.DIMENSION -> { if (e == null) { selected.clear(); onChanged(); return }
                 toggle(e); dimensionFromSelection(auto = true) }
-            else -> { if (e == null) selected.clear() else toggle(e); onChanged() }
+            else -> { if (e == null) selected.clear() else toggle(e)
+                armed?.let { t -> if (e != null) applyArmed(t) else status = armedHint(t) }
+                onChanged() }
         }
+    }
+    private fun armedHint(t: String) = when (t) {
+        "Coincident" -> "Coincident: tap two points, or a point and a curve"; "PointOnObject" -> "Point on object: tap a point and a curve"
+        "Horizontal", "Vertical", "HorVer" -> "$t: tap a line or two points"; "Parallel", "Perpendicular" -> "$t: tap two lines"
+        "Equal" -> "Equal: tap two lines, circles or arcs"; "Tangent" -> "Tangent: tap two curves, or two end points"
+        "Symmetric" -> "Symmetric: tap two points, then the symmetry line or point"; "Block" -> "Block: tap the curves to fix"
+        "Lock" -> "Lock: tap a point"; "Angle" -> "Angle: tap two lines"; "Radius", "Diameter", "Radiam" -> "$t: tap a circle or arc"
+        else -> "$t: tap a line, or two points"
+    } + " · Select to finish"
+    /** Applies the armed constraint once the tapped elements are a complete selection for it (keeps waiting otherwise). */
+    private fun applyArmed(t: String) {
+        val n = selected.size
+        // a single line is a complete selection for Angle only from the menu (its angle to the horizontal axis)
+        if (!(t == "Angle" && n == 1)) { constrain(t, fromArmed = true); if (selected.isEmpty()) { status = armedHint(t); return } }
+        // no constraint takes more than three elements: start over, as the desktop does with an invalid sequence
+        if (n >= 3) { selected.clear(); status = "Not a valid selection for $t · " + armedHint(t) } else status = armedHint(t)
     }
     private fun toggle(e: SkSel) { if (e in selected) selected.remove(e) else selected.add(e) }
 
@@ -557,7 +580,17 @@ class SketchEditor(private val app: AppState, val name: String) {
         exec("sketch_external", mapOf("obj" to obj, "sub" to sub, "intersection" to (tool == SketchTool.INTERSECTION)))
     }
 
-    fun drag(sel: SkSel, p: P2) { if (sel.geo >= 0) exec("sketch_move_point", mapOf("geo" to sel.geo, "pos" to sel.pos, "x" to p.x, "y" to p.y)) }
+    private var dragLast: P2? = null
+    /** Finger down on [p] to drag an element: a curve then follows the finger from where it was grabbed. */
+    fun dragStart(p: P2) { dragLast = p }
+    fun drag(sel: SkSel, p: P2) {
+        if (sel.geo < 0) return
+        // ViewProviderSketch STATUS_SKETCH_DragCurve: a curve moves by the finger's offset (moveGeometry relative);
+        // a point goes to the finger
+        if (sel.pos == 0) { val q = dragLast ?: p; dragLast = p
+            if (q.d(p) > 0) exec("sketch_move_point", mapOf("geo" to sel.geo, "pos" to 0, "x" to p.x - q.x, "y" to p.y - q.y, "relative" to true)) }
+        else exec("sketch_move_point", mapOf("geo" to sel.geo, "pos" to sel.pos, "x" to p.x, "y" to p.y))
+    }
 
     fun deleteSelected() {
         val g = selected.filter { it.pos == 0 && (it.geo >= 0 || it.geo <= -3) }.map { it.geo }.distinct()
@@ -573,7 +606,9 @@ class SketchEditor(private val app: AppState, val name: String) {
     private fun pt(s: SkSel): P2? = if (s.geo == -1 && s.pos == 1) P2(0.0, 0.0) else geo(s.geo)?.points()?.firstOrNull { it.first == s.pos }?.second
 
     /** Applies a FreeCAD constraint to the current selection, with FreeCAD's argument conventions. */
-    fun constrain(type: String) {
+    fun constrain(type: String, fromArmed: Boolean = false) {
+        // nothing selected: the constraint waits for its elements (desktop: the command starts its selection mode)
+        if (!fromArmed && selected.isEmpty()) { selectTool(SketchTool.SELECT); armed = type; status = armedHint(type); onChanged(); return }
         val pts = selected.filter { it.pos != 0 }; val edges = selected.filter { it.pos == 0 }
         fun add(t: String, args: List<Int>, value: Any? = null, edit: Pair<String, List<String>>? = null) {
             exec("sketch_constrain", mapOf("ctype" to t, "args" to args, "value" to value)); selected.clear()

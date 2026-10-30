@@ -337,7 +337,7 @@ def shape_info(name):
 @op
 def import_file(path):
     """Part_Import / Std_Import: STEP/IGES go through Import.insert (as ImportGui would), BREP through Part.insert."""
-    low = path.lower()
+    path = _with_type(path); low = path.lower()
     before = {o.Name for o in _doc().Objects}
     if low.endswith(('.step', '.stp', '.iges', '.igs')):
         import Import; Import.insert(path, _doc().Name)
@@ -376,6 +376,29 @@ def _export_whole(o):
         return False
     g = o.getParentGeoFeatureGroup()
     return not (g and g.isDerivedFrom('PartDesign::Body') and o is not g)
+
+def _with_type(path):
+    """[path], or a copy named with the extension its content shows when the name has no known one: Android file
+    providers may hand over "document:1234" or "model" without the .step / .stl the importers are chosen by."""
+    import os, shutil, zipfile
+    ext = os.path.splitext(path)[1].lstrip('.').lower()
+    if ext and (App.getImportType(ext) or ext in ('step', 'stp', 'iges', 'igs', 'stl', 'brep', 'brp', 'fcstd')): return path
+    with open(path, 'rb') as fh: head = fh.read(4096)
+    size = os.path.getsize(path); text = head.decode('latin-1')
+    kind = None
+    if text.startswith('ISO-10303-21'): kind = 'ifc' if 'IFC' in text.upper().split('FILE_SCHEMA', 1)[-1][:200] else 'step'
+    elif len(text) > 72 and text[72] == 'S' and text[73:80].strip().isdigit(): kind = 'iges'
+    elif 'CASCADE Topology' in text or 'DBRep_DrawableShape' in text: kind = 'brep'
+    elif text.lstrip().startswith('solid') and 'facet' in text: kind = 'stl'
+    elif size >= 84 and size == 84 + 50 * int.from_bytes(head[80:84], 'little'): kind = 'stl'
+    elif head.startswith(b'PK') and zipfile.is_zipfile(path):
+        names = zipfile.ZipFile(path).namelist()
+        kind = 'FCStd' if 'Document.xml' in names else '3mf' if any(n.endswith('.model') for n in names) else None
+    elif '<svg' in text: kind = 'svg'
+    elif text.lstrip().startswith('0') and 'SECTION' in text[:200]: kind = 'dxf'
+    elif any(l.startswith(('v ', 'f ')) for l in text.splitlines()[:200]): kind = 'obj'
+    if kind is None: raise RuntimeError('Unknown file type: %s' % os.path.basename(path))
+    typed = path + '.' + kind; shutil.copyfile(path, typed); return typed
 
 def _registered(kind, path):
     """The module FreeCAD registered for this file type (Init.py addImportType / addExportType), GUI-free ones first."""

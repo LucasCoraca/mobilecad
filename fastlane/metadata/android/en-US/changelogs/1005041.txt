@@ -1,0 +1,5 @@
+• Sketcher: the Constrain menu has every desktop constraint again (Coincident, Parallel, Perpendicular, Tangent, Equal, Symmetric, Block, Angle).
+• Constraints work both ways, like on the desktop: select the geometry and pick the constraint, or pick the constraint and then tap the geometry (it stays active until you choose Select).
+• Drag a line or curve by its middle to move it; double taps no longer create zero-length lines.
+• Chamfer: the Angle field appears with the "Distance and Angle" type, which is the type it applies to (as on the desktop).
+• Import and Open recognise STEP, IGES, STL, BREP and other files by their content when the file picker gives a name without an extension.

@@ -518,8 +518,6 @@
    "items": [
     "Sketcher_CreatePoint",
     "Sketcher_CompLine",
-    "Sketcher_CreatePolyline",
-    "Sketcher_CreateLine",
     "Sketcher_CompCreateArc",
     "Sketcher_CompCreateConic",
     "Sketcher_CompCreateRectangles",
@@ -535,11 +533,15 @@
    "toolbar": "Constraints",
    "items": [
     "Sketcher_CompDimensionTools",
-    "Sketcher_Dimension",
-    "Sketcher_CompConstrainRadDia",
-    "Sketcher_ConstrainSnellsLaw",
     "Separator",
+    "Sketcher_ConstrainCoincidentUnified",
     "Sketcher_CompHorVer",
+    "Sketcher_ConstrainParallel",
+    "Sketcher_ConstrainPerpendicular",
+    "Sketcher_ConstrainTangent",
+    "Sketcher_ConstrainEqual",
+    "Sketcher_ConstrainSymmetric",
+    "Sketcher_ConstrainBlock",
     "Sketcher_ConstrainGroup",
     "Separator",
     "Sketcher_CompToggleConstraints"

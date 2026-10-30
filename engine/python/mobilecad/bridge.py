@@ -37,6 +37,8 @@ def _ifc_defaults():
 
 @op
 def open_document(path):
+    from .part import _with_type
+    path = _with_type(path)
     if path.lower().endswith('.ifc'): _ifc_defaults()
     if not path.lower().endswith(('.fcstd', '.fcstd1')):     # Std_Open of an IFC / STEP / DXF ...: the registered opener
         import importlib, os

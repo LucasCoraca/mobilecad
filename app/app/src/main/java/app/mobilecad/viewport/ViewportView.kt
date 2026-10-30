@@ -214,6 +214,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                     dragLab = if (p != null && !sk.hasPending()) sk.pickLabel(p, tolMm(12f)) else null
                     dragSel = if (dragLab == null && sk.tool == SketchTool.SELECT && p != null) sk.pickElement(p, tolMm(12f)) else null
                     mode = if (dragLab != null) Mode.LABEL_DRAG else if (dragSel != null) Mode.SKETCH_DRAG else Mode.SKETCH_PLACE
+                    if (dragSel != null && p != null) sk.dragStart(p)
                     if (dragLab != null) { labMoved = false; handler.postDelayed(labelHold, ViewConfiguration.getLongPressTimeout().toLong()) }
                     // pressing while a shape is in progress previews it (rubber band, live dimension, inference) at once
                     if (mode == Mode.SKETCH_PLACE && sk.tool.points != 0 && sk.hasPending() && p != null) sk.hover(sk.snap(p, tolMm(18f)))

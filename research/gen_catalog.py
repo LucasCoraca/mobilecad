@@ -26,13 +26,19 @@ if os.path.exists(_cg):
         if not cmds.setdefault(n, {}).get('group'): cmds[n]['group'] = members
 # C++ commands whose constructor hands the name to a base class (CmdSketcherConstraint("Sketcher_ConstrainDistanceX"),
 # GroupCommand ...): the static extraction misses their sMenuText / sToolTipText / sPixmap; read them from the source
+def _named_ctor(t):
+    """Cls::Cls(const char* initName) : Base(initName), with the name as the declaration's default argument
+    (CmdSketcherConstrainCoincidentUnified): rewritten as Cls::Cls() : Base("Sketcher_...")"""
+    for cls, name in re.findall(r'\b(\w+)\(\s*const char\s*\*\s*\w+\s*=\s*"(\w+)"\s*\)', t):
+        t = re.sub(r'\b%s::%s\(\s*const char\s*\*\s*(\w+)\s*\)\s*:\s*(\w+)\(\s*\1\s*\)' % (cls, cls), r'%s::%s() : \2("%s")' % (cls, cls, name), t)
+    return t
 def _cpp_resources():
     out = {}
     for dp, _, fs in os.walk(os.path.join(root, 'src')):
         for f in fs:
             if not f.endswith('.cpp'): continue
-            t = open(os.path.join(dp, f), errors='ignore').read()
-            for m in re.finditer(r'::\w+\(\)\s*:\s*\w+\(\s*"(\w+)"\s*\)\s*\{(.{0,1500}?)\n\}', t, re.S):
+            t = _named_ctor(open(os.path.join(dp, f), errors='ignore').read())
+            for m in re.finditer(r'::\w+\(\)\s*:\s*\w+\(\s*"(\w+)"\s*\)\s*\{(.{0,6000}?)\n\}', t, re.S):
                 body = m.group(2); r = {}
                 for key in ('sMenuText', 'sToolTipText', 'sPixmap'):
                     mm = re.search(key + r'\s*=\s*(?:QT_TR_NOOP\(|QT_TRANSLATE_NOOP\([^,]*,\s*)?"((?:[^"\\]|\\.)*)"', body)

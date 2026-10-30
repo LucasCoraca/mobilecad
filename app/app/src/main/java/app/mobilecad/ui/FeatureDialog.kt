@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.mobilecad.freecad.FcProperty
@@ -109,7 +110,9 @@ object DialogSpec {
             "UpToShape" -> return mode == "UpToShape"
             "Angle2" -> return mode == "TwoAngles"
             "Angle" -> if (type.endsWith("Revolution") || type.endsWith("Groove")) return mode == null || mode in setOf("Angle", "TwoAngles")
+                else if (values.containsKey("ChamferType")) return values["ChamferType"]?.toString() == "Distance and Angle"
             "Midplane" -> return mode == null || mode in setOf("Length", "Dimension", "Angle")
+            // TaskChamferParameters: the second size / the angle only apply to their chamfer type
             "Size2" -> return values["ChamferType"]?.toString() == "Two distances"
             "Depth" -> return values["DepthType"]?.toString() == "Dimension"
             "ThreadType", "ThreadSize", "ThreadClass", "ThreadFit", "ThreadDirection" -> return prop == "ThreadType" || values["Threaded"] == true || prop == "ThreadSize"
@@ -264,11 +267,12 @@ private fun PropRow(p: FcProperty, activeQuery: String?, onQueryFocus: (String) 
             p.kind == "edges" && ed != null -> EdgesEditor(p, label, activeQuery == p.name, { onQueryFocus(p.name) }, { v -> onSet(p, v) }, ed)
             p.type == "App::PropertyEnumeration" -> {
                 Text(label, fontSize = 11.sp, color = OS.Steel)
-                if (p.enums.size <= 4) Row(Modifier.padding(top = 4.dp).fillMaxWidth().border(1.dp, OS.Metal4, RoundedCornerShape(4.dp))) {
+                if (p.enums.size <= 4) Row(Modifier.padding(top = 4.dp).fillMaxWidth().height(IntrinsicSize.Min).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp))) {
                     p.enums.forEach { e ->
                         val sel = e == p.value?.toString()
-                        Box(Modifier.weight(1f).height(32.dp).background(if (sel) OS.Primary else OS.Surface).clickable { onSet(p, e) }, contentAlignment = Alignment.Center) {
-                            Text(e.replace(Regex("([a-z])([A-Z])"), "$1 $2"), fontSize = 11.sp, color = if (sel) Color.White else OS.Navy, maxLines = 1)
+                        // long choices ("Distance and Angle") wrap onto a second line instead of being cut off
+                        Box(Modifier.weight(1f).fillMaxHeight().heightIn(min = 32.dp).background(if (sel) OS.Primary else OS.Surface).clickable { onSet(p, e) }.padding(horizontal = 2.dp), contentAlignment = Alignment.Center) {
+                            Text(e.replace(Regex("([a-z])([A-Z])"), "$1 $2"), fontSize = 11.sp, lineHeight = 13.sp, color = if (sel) Color.White else OS.Navy, maxLines = 2, textAlign = TextAlign.Center)
                         }
                     }
                 } else {
