@@ -1,0 +1,1 @@
+• Building MobileCAD from source needs less memory: the native build runs no more compile jobs than the available memory holds, and IfcOpenShell is compiled without debug information (removed from the app anyway). No change to the app itself.

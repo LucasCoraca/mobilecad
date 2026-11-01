@@ -2,13 +2,16 @@
 # scripts run on a developer machine (defaults below) and on a clean build server (F-Droid: see fdroid/README.md).
 #   FCDEPS        build root: src/ (source archives, engine/sources.lock), <abi>/ (install prefix per ABI), build dirs
 #   ANDROID_HOME  Android SDK;  ANDROID_NDK  NDK 29 (default: $ANDROID_HOME/ndk/29.0.14206865)
-#   JOBS          parallel jobs (default: all cores)
+#   JOBS          parallel jobs (default: all cores, at most one per 2 GB of available memory)
 ENGINE=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
 D=${FCDEPS:-$HOME/Android/fcdeps}; SRC=$D/src
 export ANDROID_HOME=${ANDROID_HOME:-$HOME/Android/sdk}
 NDK=${ANDROID_NDK:-$ANDROID_HOME/ndk/29.0.14206865}
 TB=$NDK/toolchains/llvm/prebuilt/linux-x86_64/bin
-J=${JOBS:-$(nproc)}
+# mem_jobs <GB per job>: how many compile jobs of that size the available memory holds (at least 1); build servers
+# often have little memory per core, and an out-of-memory compiler dies without a message
+mem_jobs() { awk -v g=$1 '/^MemAvailable:/{n=int($2/1048576/g); print (n<1?1:n)}' /proc/meminfo; }
+J=${JOBS:-$(n=$(nproc); m=$(mem_jobs 2); echo $((n<m?n:m)))}
 # CMake >= 3.25 and Ninja: the system's (Debian), else the host venv's (pip), else the SDK's
 if command -v cmake > /dev/null && cmake --version | awk 'NR==1{split($3,v,".");exit !(v[1]>3||(v[1]==3&&v[2]>=25))}'; then CMK=$(command -v cmake)
 elif [ -x $D/hostpy/bin/cmake ]; then CMK=$D/hostpy/bin/cmake
