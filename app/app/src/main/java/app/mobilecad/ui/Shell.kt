@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -720,7 +721,8 @@ private fun FeatureTree(app: AppState, modifier: Modifier, onCollapse: () -> Uni
     // element tabs: Drawing lists the TechDraw pages and their views, the other tabs never show them
     val roots = objs.filter { it.name !in claimed && ((it.type == "Assembly::AssemblyObject") == app.inAssembly) &&
         (it.type.startsWith("TechDraw::") == app.inDrawing) }
-    var rowMenu by remember { mutableStateOf<String?>(null) }
+    // the row whose menu is open: an object can be listed more than once (a sketch shared by two features)
+    var rowMenu by remember { mutableStateOf<Int?>(null) }
     val collapsed = app.collapsed.toSet(); val expanded = app.expanded.toSet()
     // FreeCAD opens group containers (Body, Part, groups); features with claimed children and the Origin start closed
     fun isOpen(o: FcObject) = o.name !in collapsed && (o.type in CONTAINERS || o.name in expanded)
@@ -749,7 +751,7 @@ private fun FeatureTree(app: AppState, modifier: Modifier, onCollapse: () -> Uni
         LazyColumn(Modifier.weight(1f)) {
             items(rows.size) { i ->
                 val line = rows[i]; val o = line.o
-                Box(Modifier.alpha(if (line.rolled) 0.4f else 1f)) { TreeRow(app, o, line.depth, rowMenu == o.name, line.hasKids, line.open) { rowMenu = it } }
+                Box(Modifier.alpha(if (line.rolled) 0.4f else 1f)) { TreeRow(app, o, line.depth, rowMenu == i, line.hasKids, line.open) { rowMenu = if (it) i else null } }
                 // rollback bar after the body's Tip
                 val parent = o.parents.firstNotNullOfOrNull { byName[it] }?.takeIf { it.type == "PartDesign::Body" }
                 if (parent != null && parent.tip == o.name && parent.group.lastOrNull() != o.name) RollbackBar()
@@ -771,12 +773,12 @@ private class TreeLine(val o: FcObject, val depth: Int, val rolled: Boolean, val
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, hasKids: Boolean, open: Boolean, setMenu: (String?) -> Unit) {
+private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, hasKids: Boolean, open: Boolean, setMenu: (Boolean) -> Unit) {
     val selected = app.selection.any { it.obj == o.name }
     Box {
         Row(Modifier.fillMaxWidth().height(40.dp).background(if (selected) OS.Cloud else OS.Surface)
             .combinedClickable(onClick = { if (o.type == "TechDraw::DrawPage") { app.page = o.name; app.refreshPage() }
-                else if (o.type == "Spreadsheet::Sheet" && app.inSheet) { app.sheet = o.name; app.refreshSheet() } else { app.select(SelRef(o.name), additive = false); app.refresh() } }, onDoubleClick = { app.openEditor(o.name) }, onLongClick = { setMenu(o.name) })
+                else if (o.type == "Spreadsheet::Sheet" && app.inSheet) { app.sheet = o.name; app.refreshSheet() } else { app.select(SelRef(o.name), additive = false); app.refresh() } }, onDoubleClick = { app.openEditor(o.name) }, onLongClick = { setMenu(true) })
             .padding(start = (4 + depth * 18).dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             // FreeCAD's expand arrow
             Box(Modifier.size(24.dp).then(if (hasKids) Modifier.clickable {
@@ -785,28 +787,33 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
                 if (hasKids) Icon(if (open) Icons.Default.ExpandMore else Icons.Default.ChevronRight, if (open) "Collapse" else "Expand", tint = OS.Steel, modifier = Modifier.size(18.dp))
             }
             val img = app.catalog.icon(typeIcon(app, o))
-            if (img != null) Image(img, null, Modifier.size(22.dp).alpha(if (o.visible) 1f else 0.4f)) else Icon(Icons.Default.Category, null, tint = OS.Primary, modifier = Modifier.size(22.dp))
+            Box(Modifier.size(22.dp)) {
+                if (img != null) Image(img, null, Modifier.size(22.dp).alpha(if (o.visible) 1f else 0.4f)) else Icon(Icons.Default.Category, null, tint = OS.Primary, modifier = Modifier.size(22.dp))
+                // FreeCAD's suppressed overlay (ViewProviderSuppressibleExtension) and struck-out label (Tree.cpp)
+                if (o.suppressed) app.catalog.icon("feature_suppressed")?.let { Image(it, "Suppressed", Modifier.size(14.dp).align(Alignment.TopStart)) }
+            }
             Spacer(Modifier.width(10.dp))
-            Text(o.label, Modifier.weight(1f), color = if (o.invalid) OS.Red else if (o.visible) OS.Navy else OS.Aluminum, fontSize = 14.sp, maxLines = 1)
+            Text(o.label, Modifier.weight(1f), color = if (o.invalid) OS.Red else if (o.visible) OS.Navy else OS.Aluminum, fontSize = 14.sp, maxLines = 1,
+                textDecoration = if (o.suppressed) TextDecoration.LineThrough else null)
             if (o.invalid) Icon(Icons.Default.Error, "Error", tint = OS.Red, modifier = Modifier.size(18.dp))
         }
-        DropdownMenu(menuOpen, { setMenu(null) }) {
-            DropdownMenuItem({ Text("Edit ${o.label}") }, { setMenu(null); app.openEditor(o.name) })
-            DropdownMenuItem({ Text("Rename") }, { setMenu(null)
+        DropdownMenu(menuOpen, { setMenu(false) }) {
+            DropdownMenuItem({ Text("Edit ${o.label}") }, { setMenu(false); app.openEditor(o.name) })
+            DropdownMenuItem({ Text("Rename") }, { setMenu(false)
                 app.textPrompt = TextPrompt("Rename ${o.label}", o.label) { t -> if (t.isNotBlank())
                     app.step("Rename", { setProperty(o.name, "Label", t.trim()) }) } })
-            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text("Suppress / unsuppress") }, { setMenu(null)
+            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text(if (o.suppressed) "Unsuppress" else "Suppress") }, { setMenu(false)
                 app.select(SelRef(o.name), additive = false); app.run("Std_ToggleSuppress") })
             // a Part Fillet / Chamfer made on a Body: move it into the Body's history where it was created
             if ((o.type == "Part::Fillet" || o.type == "Part::Chamfer") && o.claims.any { c -> app.obj(c)?.type == "PartDesign::Body" })
-                DropdownMenuItem({ Text("Move into Body") }, { setMenu(null)
+                DropdownMenuItem({ Text("Move into Body") }, { setMenu(false)
                     app.step("Move ${o.label} into Body", { call("pd_absorb_dressup", mapOf("name" to o.name)) }) { app.selection.clear() } })
-            DropdownMenuItem({ Text("Duplicate") }, { setMenu(null); app.select(SelRef(o.name), additive = false); app.run("Std_DuplicateSelection") })
-            DropdownMenuItem({ Text(if (o.visible) "Hide ${o.label}" else "Show ${o.label}") }, { setMenu(null)
+            DropdownMenuItem({ Text("Duplicate") }, { setMenu(false); app.select(SelRef(o.name), additive = false); app.run("Std_DuplicateSelection") })
+            DropdownMenuItem({ Text(if (o.visible) "Hide ${o.label}" else "Show ${o.label}") }, { setMenu(false)
                 app.eng({ call("set_visibility", mapOf("names" to listOf(o.name), "visible" to !o.visible)) }) { app.refresh() } })
-            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text("Roll tip to here") }, { setMenu(null)
+            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text("Roll tip to here") }, { setMenu(false)
                 app.eng({ begin("Set tip"); call("pd_set_tip", mapOf("name" to o.name)); commit() }) { app.refresh() } })
-            DropdownMenuItem({ Text("Delete ${o.label}", color = OS.Red) }, { setMenu(null)
+            DropdownMenuItem({ Text("Delete ${o.label}", color = OS.Red) }, { setMenu(false)
                 app.eng({ begin("Delete"); call("delete_objects", mapOf("names" to listOf(o.name))); commit() }) { app.selection.clear(); app.refresh() } })
         }
     }

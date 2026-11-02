@@ -1,0 +1,2 @@
+• Feature tree: suppressed features are struck through and carry the suppressed mark on their icon, as on the desktop. Their long-press menu says "Unsuppress" (and "Suppress" on the others).
+• Feature tree: a sketch used by two features is listed under both; long-pressing one of them now opens a single menu at that row (it opened one per copy, and none when the other copy was scrolled away).

@@ -230,6 +230,8 @@ def _obj_info(o):
             'error': o.getStatusString() if ('Invalid' in o.State or 'Error' in o.State) else
                      ('%s failed: %s' % (blocked.Label, blocked.getStatusString()) if blocked is not None else None),
             'subtype': ('Joint:' + o.JointType) if hasattr(o, 'JointType') else ('Grounded' if hasattr(o, 'ObjectToGround') else None),
+            # App::SuppressibleExtension (PartDesign features ...): the tree strikes it out with the suppressed overlay
+            'suppressed': bool(getattr(o, 'Suppressed', False)) if 'Suppressed' in o.PropertiesList else False,
             'claims': _claims(o)}
 
 def _links(v):

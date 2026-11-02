@@ -16,7 +16,9 @@ class FcObject(val name: String, val label: String, val type: String, val visibl
                val parents: List<String>, val group: List<String>, val tip: String?, val hasShape: Boolean,
                val assembly: String? = null, val linked: String? = null, val subtype: String? = null, val error: String? = null,
                /** what FreeCAD's tree shows under this object (ViewProvider::claimChildren) */
-               val claims: List<String> = emptyList())
+               val claims: List<String> = emptyList(),
+               /** App::SuppressibleExtension's Suppressed (Std_ToggleSuppress) */
+               val suppressed: Boolean = false)
 
 class FcProperty(val name: String, val type: String, val group: String, val doc: String, val readonly: Boolean,
                  val value: Any?, val expression: String?, val enums: List<String>,
@@ -122,7 +124,7 @@ class Engine private constructor(private val ctx: Context) {
                 l("parents"), l("group"), if (o.isNull("tip")) null else o.getString("tip"), o.getBoolean("hasShape"),
                 if (o.isNull("assembly")) null else o.getString("assembly"), if (o.isNull("linked")) null else o.getString("linked"),
                 if (o.isNull("subtype")) null else o.getString("subtype"), if (o.isNull("error")) null else o.getString("error"),
-                if (o.has("claims")) l("claims") else emptyList())
+                if (o.has("claims")) l("claims") else emptyList(), o.optBoolean("suppressed"))
         }
     }
 
