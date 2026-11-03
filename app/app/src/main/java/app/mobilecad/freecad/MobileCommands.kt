@@ -390,7 +390,7 @@ object MobileCommands {
             id == "Part_RemoveSelectionGate" -> { s.selFilter = null; s.boxSelect = null }
             id == "Part_SelectFilter" -> s.choose("Selection filter", listOf("Vertex" to "Vertexes", "Edge" to "Edges", "Face" to "Faces", "" to "No filter")) { f -> s.selFilter = f.ifEmpty { null } }
             id == "Part_BoxSelection" -> s.boxSelect = "faces"
-            id == "Part_EditAttachment" -> s.selection.firstOrNull()?.let { s.openEditor(it.obj) } ?: run { s.message = "Select an object first" }
+            id == "Part_EditAttachment" -> s.selection.firstOrNull()?.let { s.openEditor(it.obj, attachment = true) } ?: run { s.message = "Select an object first" }
             id == "PartDesign_MoveFeature" -> { val names = s.selection.map { it.obj }.distinct()
                 if (names.isEmpty()) s.message = "Select features first"
                 else s.eng({ call("pd_bodies") as org.json.JSONArray }) { a -> s.choose("Move to body", List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } }) { b ->

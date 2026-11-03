@@ -1,0 +1,4 @@
+• Feature tree: "Edit Attachment" in the long-press menu of sketches, datums and every attachable object — what it is attached to, the attachment mode, flip sides and the offset, as on the desktop.
+• Sketch: horizontal and vertical distances are never negative — the points are swapped like on the desktop, whichever one you tap first.
+• Sketch: external geometry can be switched between reference (dashed) and defining (solid) with the Construction switch, as on the desktop.
+• Navigation: three fingers rotate the view in 3D, also in a sketch; lifting one of two fingers no longer starts a rotation by accident.

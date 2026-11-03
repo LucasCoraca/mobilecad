@@ -29,6 +29,7 @@ import app.mobilecad.ui.OS
  *  model: 1 finger orbit · 2 fingers pan+pinch · tap select Face/Edge · double tap clear · 2-finger tap context menu ·
  *         long press precision pointer (60dp above finger) · 2-finger long press box select
  *  sketch: 1 finger draws (pointer 50dp above finger while dragging) · 2nd finger within 300ms cancels and pans · drag geometry
+ *  both: 3 fingers orbit (the 3D rotation a sketch's one finger can't do; the NaviCube can be dragged too)
  */
 private const val HALF_PI = (Math.PI / 2).toFloat()
 
@@ -44,7 +45,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     private val dp = resources.displayMetrics.density
     private val slop = ViewConfiguration.get(ctx).scaledTouchSlop.toFloat()
     private val handler = Handler(Looper.getMainLooper())
-    private enum class Mode { NONE, ORBIT, SLIDE, PRECISION, BOX, SKETCH_PLACE, SKETCH_DRAG, COMPONENT_DRAG, MANIPULATOR, LABEL_DRAG }
+    private enum class Mode { NONE, ORBIT, SLIDE, PRECISION, BOX, SKETCH_PLACE, SKETCH_DRAG, COMPONENT_DRAG, MANIPULATOR, LABEL_DRAG, ORBIT3, IDLE }
     private var mode = Mode.NONE
     private var downX = 0f; private var downY = 0f; private var downT = 0L; private var lastX = 0f; private var lastY = 0f
     private var lastCx = 0f; private var lastCy = 0f; private var lastD = 1f; private var lastA = 0f; private var slideMoved = false; private var slideStartT = 0L
@@ -199,6 +200,8 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     // ------------------------------------------------------------------ touch
     private val longPress = Runnable { if (mode == Mode.NONE && sketch == null && !xr) { mode = Mode.PRECISION; offX = 0f; offY = -60 * dp; precision(lastX, lastY) } }
     private val longPress2 = Runnable { if (mode == Mode.SLIDE && !slideMoved && sketch == null) { mode = Mode.BOX; overlay.pointer = null; box() } }
+    private fun centroidX(e: MotionEvent) = (0 until e.pointerCount).sumOf { e.getX(it).toDouble() }.toFloat() / e.pointerCount
+    private fun centroidY(e: MotionEvent) = (0 until e.pointerCount).sumOf { e.getY(it).toDouble() }.toFloat() / e.pointerCount
     private fun readPts(e: MotionEvent) { p0x = e.getX(0); p0y = e.getY(0); if (e.pointerCount > 1) { p1x = e.getX(1); p1y = e.getY(1) } }
 
     override fun onTouchEvent(e: MotionEvent): Boolean {
@@ -227,7 +230,10 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
             }
             MotionEvent.ACTION_POINTER_DOWN -> {
                 handler.removeCallbacks(longPress); readPts(e)
-                if (e.pointerCount == 2) {
+                if (e.pointerCount == 3 && mode != Mode.PRECISION && mode != Mode.BOX) {
+                    // three fingers orbit about their centre's movement
+                    handler.removeCallbacks(longPress2); mode = Mode.ORBIT3; lastCx = centroidX(e); lastCy = centroidY(e)
+                } else if (e.pointerCount == 2) {
                     if (mode == Mode.PRECISION) { offX = p1x - p0x; offY = p1y - p0y; precision(p0x, p0y) }
                     else {
                         // sketch: a second finger within 300ms cancels the point being placed (BTSketchCreatorTool.onPointerDown)
@@ -263,6 +269,8 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                         if (now - lastDragT > 120) { lastDragT = now; flushDrag() }
                     }
                     Mode.ORBIT -> { icam.orbit(e.x - lastX, e.y - lastY); lastX = e.x; lastY = e.y; refresh() }
+                    Mode.IDLE -> {}
+                    Mode.ORBIT3 -> if (e.pointerCount >= 3) { val cx = centroidX(e); val cy = centroidY(e); icam.orbit(cx - lastCx, cy - lastCy); lastCx = cx; lastCy = cy; refresh() }
                     Mode.SLIDE -> if (e.pointerCount >= 2) {
                         val cx = (p0x + p1x) / 2; val cy = (p0y + p1y) / 2; val d = hypot(p1x - p0x, p1y - p0y).coerceAtLeast(1f)
                         // two-finger twist rotates the view about the screen axis (FreeCAD touchpad navigation)
@@ -290,9 +298,12 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                 handler.removeCallbacks(longPress2)
                 if (mode == Mode.SLIDE) {
                     if (!slideMoved && now - slideStartT < 400 && sk == null) { onContextMenu((p0x + p1x) / 2, (p0y + p1y) / 2); mode = Mode.NONE; suppressTap = true }
-                    else if (sk != null) { mode = Mode.NONE; suppressTap = true }
+                    // in a sketch the finger left on the screen does nothing (one finger draws; 3D rotation is three fingers)
+                    else if (sk != null) { mode = Mode.IDLE; suppressTap = true }
                     else { val k = if (e.actionIndex == 0) 1 else 0; lastX = e.getX(k); lastY = e.getY(k); mode = Mode.ORBIT }
                 } else if (mode == Mode.BOX) { commitBox(); suppressTap = true }
+                else if (mode == Mode.ORBIT3) { mode = Mode.IDLE; suppressTap = true }      // the rest of the hand lifts off
+
             }
             MotionEvent.ACTION_UP -> {
                 handler.removeCallbacks(longPress); handler.removeCallbacks(longPress2)

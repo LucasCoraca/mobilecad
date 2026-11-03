@@ -232,6 +232,8 @@ def _obj_info(o):
             'subtype': ('Joint:' + o.JointType) if hasattr(o, 'JointType') else ('Grounded' if hasattr(o, 'ObjectToGround') else None),
             # App::SuppressibleExtension (PartDesign features ...): the tree strikes it out with the suppressed overlay
             'suppressed': bool(getattr(o, 'Suppressed', False)) if 'Suppressed' in o.PropertiesList else False,
+            # Part::AttachExtension (sketches, datums, primitives ...): the tree menu's "Edit Attachment"
+            'attachable': o.hasExtension('Part::AttachExtension'),
             'claims': _claims(o)}
 
 def _links(v):

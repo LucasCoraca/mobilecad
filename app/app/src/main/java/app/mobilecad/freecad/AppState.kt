@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import app.mobilecad.sketch.SketchEditor
+import app.mobilecad.ui.DialogSpec
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -516,10 +517,12 @@ class AppState(private val ctx: Context) {
         try { val n = script(); recompute(); commit(); n to mark } catch (e: Throwable) { abort(); throw e }
     }) { (name, mark) -> selection.clear(); refresh { openEditor(name, mark) } }
 
-    fun openEditor(name: String, mark: Int? = null) {
+    /** Edits [name]: its feature dialog (a sketch: the sketch editor), or with [attachment] only its attachment
+     *  (desktop: "Edit Attachment" / Part_EditAttachment, the TaskAttacher dialog). */
+    fun openEditor(name: String, mark: Int? = null, attachment: Boolean = false) {
         val o = obj(name) ?: return
-        if (o.type == "Sketcher::SketchObject") { editSketch(name, mark); return }
-        val e = EditState(name, o.type, o.label, mark != null)
+        if (o.type == "Sketcher::SketchObject" && !attachment) { editSketch(name, mark); return }
+        val e = if (attachment) EditState(name, DialogSpec.ATTACHMENT, "${o.label} attachment", false) else EditState(name, o.type, o.label, mark != null)
         e.undoMark = mark ?: undoPos
         enterEditHistory(mark)
         edit = e

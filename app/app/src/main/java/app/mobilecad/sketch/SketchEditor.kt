@@ -88,8 +88,9 @@ class SketchEditor(private val app: AppState, val name: String) {
     val selected = mutableListOf<SkSel>()
     /** Bumped on every change (selection included) so the Compose selection bar recomposes. */
     val tick = androidx.compose.runtime.mutableIntStateOf(0)
-    /** Selected sketch curves (not points / external geometry) and whether they are all construction geometry. */
-    fun selectedCurves() = selected.filter { it.geo >= 0 && it.pos == 0 }.map { it.geo }.distinct()
+    /** Selected curves - the sketch's own and external geometry, not the axes - and whether they are all construction
+     *  geometry (external geometry: reference, i.e. not "defining"). */
+    fun selectedCurves() = selected.filter { (it.geo >= 0 || it.geo <= -3) && it.pos == 0 }.map { it.geo }.distinct()
     fun selectionIsConstruction() = selectedCurves().let { g -> g.isNotEmpty() && g.all { i -> geos.firstOrNull { it.i == i }?.construction == true } }
     private val pending = mutableListOf<Pair<P2, List<JSONArray>>>()     // placed points + their auto-constraints
     var preview: Snap? = null
@@ -595,8 +596,10 @@ class SketchEditor(private val app: AppState, val name: String) {
         val c = selectedCons.toList(); selected.clear(); selectedCons.clear()
         if (g.isNotEmpty() || pts.isNotEmpty() || c.isNotEmpty()) exec("sketch_delete", mapOf("geometry" to g, "points" to pts, "constraints" to c))
     }
+    /** Sketcher_ToggleConstruction: the selected curves (external geometry switches between reference and defining);
+     *  vertices only count when nothing but vertices is selected, and then only sketch points. */
     fun toggleConstruction() {
-        val g = selected.map { it.geo }.filter { it >= 0 }.distinct()
+        val g = selectedCurves().ifEmpty { selected.map { it.geo }.filter { i -> geo(i)?.isPoint == true && i >= 0 }.distinct() }
         if (g.isEmpty()) { construction = !construction; status = hint(); onChanged() } else { selected.clear(); exec("sketch_toggle_construction", mapOf("geometry" to g)) }
     }
 
@@ -648,6 +651,13 @@ class SketchEditor(private val app: AppState, val name: String) {
             app.eng({ 0 }) { askValue(cons.size, t, units, created = true) }
         }
         val g0 = edges.firstOrNull()?.let { geo(it.geo) }
+        // horizontal / vertical distance between two points: like the desktop, the points are swapped so the value is
+        // never negative (a line counts as its start and end point)
+        fun addXY(t: String, a: SkSel, b: SkSel) {
+            val pa = pt(a)!!; val pb = pt(b)!!; val d = if (t == "DistanceX") pb.x - pa.x else pb.y - pa.y
+            val (p, q) = if (d < -1e-7) b to a else a to b
+            add(t, listOf(p.geo, p.pos, q.geo, q.pos), abs(d), LENGTH_UNITS)
+        }
         when {
             (forced == null || forced == "Distance") && edges.size == 1 && pts.isEmpty() && g0?.isLine == true -> add("Distance", listOf(g0.i), g0.a!!.d(g0.b!!), LENGTH_UNITS)
             forced in setOf(null, "Radius", "Radiam") && edges.size == 1 && g0?.isArc == true -> add("Radius", listOf(g0.i), g0.r, LENGTH_UNITS)
@@ -655,9 +665,8 @@ class SketchEditor(private val app: AppState, val name: String) {
             forced == "Radius" && g0?.isCircle == true -> add("Radius", listOf(g0.i), g0.r, LENGTH_UNITS)
             forced == "Diameter" && g0?.isArc == true -> add("Diameter", listOf(g0.i), 2 * g0.r, LENGTH_UNITS)
             forced in setOf("DistanceX", "DistanceY") && edges.size == 1 && g0?.isLine == true ->
-                add(forced!!, listOf(g0.i), if (forced == "DistanceX") g0.b!!.x - g0.a!!.x else g0.b!!.y - g0.a!!.y, LENGTH_UNITS)
-            forced in setOf("DistanceX", "DistanceY") && pts.size == 2 -> { val a = pt(pts[0])!!; val b = pt(pts[1])!!
-                add(forced!!, listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos), if (forced == "DistanceX") b.x - a.x else b.y - a.y, LENGTH_UNITS) }
+                addXY(forced!!, SkSel(g0.i, 1), SkSel(g0.i, 2))
+            forced in setOf("DistanceX", "DistanceY") && pts.size == 2 -> addXY(forced!!, pts[0], pts[1])
             forced in setOf(null, "Distance") && pts.size == 2 -> add("Distance", listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos), pt(pts[0])!!.d(pt(pts[1])!!), LENGTH_UNITS)
             forced in setOf(null, "Distance") && pts.size == 1 && edges.size == 1 && g0?.isLine == true ->
                 add("Distance", listOf(pts[0].geo, pts[0].pos, g0.i), seg(pt(pts[0])!!, g0.a!!, g0.b!!), LENGTH_UNITS)

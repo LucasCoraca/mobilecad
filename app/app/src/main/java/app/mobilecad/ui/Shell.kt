@@ -573,7 +573,7 @@ private fun SketchSelectionBar(sk: SketchEditor, modifier: Modifier) {
     if (!any) return
     Row(modifier.shadow(6.dp, RoundedCornerShape(24.dp)).background(OS.Surface, RoundedCornerShape(24.dp)).padding(horizontal = 6.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        val n = curves.size + sk.selected.count { it.pos != 0 || it.geo < 0 } + sk.selectedCons.size
+        val n = curves.size + sk.selected.count { it.pos != 0 || it.geo !in curves } + sk.selectedCons.size
         Text("$n selected", Modifier.padding(horizontal = 10.dp), color = OS.Steel, fontSize = 13.sp)
         if (curves.isNotEmpty()) {
             val on = sk.selectionIsConstruction()
@@ -799,6 +799,7 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
         }
         DropdownMenu(menuOpen, { setMenu(false) }) {
             DropdownMenuItem({ Text("Edit ${o.label}") }, { setMenu(false); app.openEditor(o.name) })
+            if (o.attachable) DropdownMenuItem({ Text("Edit Attachment") }, { setMenu(false); app.openEditor(o.name, attachment = true) })
             DropdownMenuItem({ Text("Rename") }, { setMenu(false)
                 app.textPrompt = TextPrompt("Rename ${o.label}", o.label) { t -> if (t.isNotBlank())
                     app.step("Rename", { setProperty(o.name, "Label", t.trim()) }) } })

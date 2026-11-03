@@ -41,6 +41,8 @@ class DialogEditors(
  * Primary rows + visibility rules mirror FreeCAD's task panels (e.g. TaskPadPocketParameters); everything else is under "More".
  */
 object DialogSpec {
+    /** The dialog type for editing only an object's attachment (any Part::AttachExtension object). */
+    const val ATTACHMENT = "Part::AttachExtension"
     private val primary = mapOf(
         // FEM solvers (CalculiX / Elmer / Z88 ...): the analysis setup first, the many solver controls under More options
         "Fem::FemSolverObjectPython" to listOf("AnalysisType", "SimulationType", "GeometricalNonlinearity", "MaterialNonlinearity",
@@ -76,6 +78,8 @@ object DialogSpec {
         "PartDesign::SubtractiveHelix" to listOf("Profile", "ReferenceAxis", "Mode", "Pitch", "Height", "Turns", "Angle", "Growth", "LeftHanded", "Reversed", "Refine"),
         "PartDesign::Plane" to listOf("AttachmentSupport", "MapMode", "AttachmentOffset"),
         "Sketcher::SketchObject" to listOf("AttachmentSupport", "MapMode", "AttachmentOffset"),
+        // TaskAttacher: references, attachment mode, flip sides, the offset in local coordinates
+        ATTACHMENT to listOf("AttachmentSupport", "MapMode", "MapReversed", "AttachmentOffset", "MapPathParameter"),
     )
 
     // Assembly joints: src/Mod/Assembly/JointObject.py JointUsing* lists drive TaskAssemblyCreateJoint's rows

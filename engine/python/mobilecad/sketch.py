@@ -14,7 +14,7 @@ def _sk(name):
 
 # ------------------------------------------------------------------ state for the UI
 def _geo_json(g, i, sk):
-    d = {'i': i, 'construction': sk.getConstruction(i) if i >= 0 else False, 'type': type(g).__name__}
+    d = {'i': i, 'construction': sk.getConstruction(i) if i >= 0 else not _defining(g), 'type': type(g).__name__}
     if i < 0: d['external'] = True
     if isinstance(g, Part.LineSegment):
         d.update(a=[g.StartPoint.x, g.StartPoint.y], b=[g.EndPoint.x, g.EndPoint.y])
@@ -83,6 +83,12 @@ def sketch_state(name):
             'dof': sk.DoF, 'fully': bool(sk.FullyConstrained),
             'conflicting': list(sk.ConflictingConstraints), 'redundant': list(sk.RedundantConstraints),
             'malformed': list(sk.MalformedConstraints), 'partially_redundant': list(sk.PartiallyRedundantConstraints)}
+
+def _defining(g):
+    """External geometry that is part of the sketch's profile (desktop: solid, toggled by Sketcher_ToggleConstruction);
+    otherwise it is reference geometry, drawn dashed like construction geometry."""
+    try: return g.getExtensionOfType('Sketcher::ExternalGeometryExtension').testFlag('Defining')
+    except Exception: return False
 
 def _external_json(sk):
     """Projected / intersected external geometry (Sketcher_Projection / _Intersection): ExternalGeo[k] is geo id -(k+1);

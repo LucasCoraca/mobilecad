@@ -2,8 +2,8 @@ import java.util.Properties
 // One release = one versionName and one base versionCode (raise both per release; F-Droid's update check reads them):
 // 1000000 + major*100000 + minor*1000 + patch*10, plus the ABI digit per APK (arm64 1, x86_64 2). The codes stay above
 // the time-based ones of 0.4, and a tag builds to the same versionCode on GitHub and on F-Droid.
-val appVersion = "0.5.9"
-val baseVersionCode = 1005090
+val appVersion = "0.5.10"
+val baseVersionCode = 1005100
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
