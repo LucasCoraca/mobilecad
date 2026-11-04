@@ -106,6 +106,14 @@ object DialogSpec {
     /** Rows hidden by the current enum mode (FreeCAD task panels hide them the same way). */
     fun visible(type: String, prop: String, values: Map<String, Any?>): Boolean {
         if (values.containsKey("JointType")) return jointVisible(prop, values)
+        // PatternParametersWidget::adaptVisibilityToMode: Extent shows the total length / angle, Spacing the offset
+        // between instances (Linear / Polar patterns, and the second direction's Mode2 rows)
+        val patternModes = setOf("Extent", "Spacing")
+        for ((m, extent, offset) in listOf(Triple("Mode", setOf("Length", "Angle"), "Offset"), Triple("Mode2", setOf("Length2"), "Offset2"))) {
+            val pm = values[m]?.toString()?.takeIf { it in patternModes } ?: continue
+            if (prop in extent) return pm == "Extent"
+            if (prop == offset) return pm == "Spacing"
+        }
         val mode = values["Type"]?.toString()
         when (prop) {
             "Length" -> return mode == null || mode in setOf("Length", "TwoLengths", "Dimension")

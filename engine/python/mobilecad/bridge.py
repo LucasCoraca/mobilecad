@@ -483,7 +483,10 @@ def set_property(name, prop, value=None, expression=None):
             value = _doc().getObject(value) if value else None
         elif t in ('App::PropertyLinkSub', 'App::PropertyLinkSubList', 'App::PropertyLinkSubGlobal', 'App::PropertyLinkSubListGlobal'):
             value = [(_doc().getObject(n), tuple(subs)) for n, subs in value] if value else None
-            if t.startswith('App::PropertyLinkSub') and not t.startswith('App::PropertyLinkSubList') and value: value = value[0]
+            if t.startswith('App::PropertyLinkSub') and not t.startswith('App::PropertyLinkSubList') and value:
+                # a whole object (origin axis / plane, datum) is linked with the sub-name "" as the task panels do;
+                # with no sub-name at all patterns / revolutions ignore the reference and fall back to their default
+                value = (value[0][0], value[0][1] or ('',))
         elif t in ('App::PropertyLinkList', 'App::PropertyLinkListGlobal', 'App::PropertyXLinkList'):
             value = [_doc().getObject(x[0] if isinstance(x, (list, tuple)) else x) for x in (value or [])]
         elif t == 'Part::PropertyFilletEdges':        # [[EdgeN, r1, r2], ...] (DlgFilletEdges)
@@ -495,6 +498,10 @@ def set_property(name, prop, value=None, expression=None):
             value = App.Units.Quantity(value) if isinstance(value, str) else value
         elif isinstance(value, str) and o.getTypeIdOfProperty(prop).startswith('App::Property') and _is_unit_prop(o, prop):
             value = App.Units.Quantity(value)
+        elif isinstance(value, str) and type(getattr(o, prop)) in (int, float):
+            # numbers typed on the numpad (Occurrences, counts, plain floats): to the property's own number type
+            q = App.Units.Quantity(value).Value
+            value = int(round(q)) if type(getattr(o, prop)) is int else q
         setattr(o, prop, value)
     return True
 

@@ -1,0 +1,3 @@
+• Patterns: an origin axis, plane or datum picked as the polar axis / linear direction / mirror plane is used — the pattern no longer falls back to the default axis.
+• Feature dialogs: numbers typed for whole-number values (pattern Occurrences, counts) are accepted instead of failing with a TypeError.
+• Linear and polar patterns: the total length / angle is shown in Extent mode and the offset between instances in Spacing mode, as on the desktop.
