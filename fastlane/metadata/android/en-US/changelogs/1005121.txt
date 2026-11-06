@@ -1,0 +1,1 @@
+• Sketch: the selection bar (count, Construction, Delete) makes way for an open tool menu and, on phones, for dialogs and the constraint list instead of covering them.

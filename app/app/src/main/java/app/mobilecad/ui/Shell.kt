@@ -294,7 +294,10 @@ fun Shell(app: AppState) {
         if (side) sk?.takeIf { it.consList != null }?.let { s -> ConstraintList(app, s, panelPad.align(panelAlign)) }
         if (stage) sk?.let { s -> s.drawStep.let { _ -> SketchInputs(s, Modifier.align(if (compact) Alignment.BottomStart else Alignment.BottomCenter).padding(10.dp)) } }
         if (stage) ToolExit(app, Modifier.align(Alignment.BottomEnd).padding(12.dp))
-        if (stage) sk?.let { SketchSelectionBar(it, Modifier.align(Alignment.BottomCenter).padding(bottom = if (compact) 72.dp else 64.dp)) }
+        // the selection bar floats over the view only: it makes way for an open tool menu and, on phones, for the panels
+        // that slide up from the bottom (dialog, task panel, constraint list), like the selection chips outside sketches
+        if (stage) sk?.takeIf { app.openToolset == null && !(compact && (it.consList != null || app.edit != null || app.taskPanel != null)) }
+            ?.let { SketchSelectionBar(it, Modifier.align(Alignment.BottomCenter).padding(bottom = if (compact) 72.dp else 64.dp)) }
         if (stage) menu?.let { (x, y) -> Box(Modifier.offset { IntOffset(x.toInt(), y.toInt()) }) { ContextMenu(app, view) { menu = null } } }
     }
 
