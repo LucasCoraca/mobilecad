@@ -190,7 +190,9 @@ class _View(Stub):
         """Active body / part / assembly (desktop: the activated container).  The app has no activation step, so the
         document's (last) matching container is the active one."""
         o = _active.get(name)
-        if o is not None and getattr(o, 'Document', None) is App.ActiveDocument: return o
+        try:
+            if o is not None and o.Document is App.ActiveDocument and o.Document.getObject(o.Name) is o: return o
+        except Exception: pass          # deleted object
         d = App.ActiveDocument
         if d is None: return None
         want = {'pdbody': ('PartDesign::Body',), 'part': ('Assembly::AssemblyObject', 'App::Part')}.get(name, ())

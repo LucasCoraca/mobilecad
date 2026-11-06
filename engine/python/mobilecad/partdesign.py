@@ -80,9 +80,37 @@ def _active_body(sel=None, create=True):
         if o.TypeId == 'PartDesign::Body': return o
         b = _body_of(o)
         if b: return b
-    bodies = [o for o in d.Objects if o.TypeId == 'PartDesign::Body']
-    if bodies: return bodies[-1]
-    return d.addObject('PartDesign::Body', 'Body') if create else None
+    b = active_pdbody(d)
+    # PartDesignGui::getBody: with no active body the one used is activated (desktop: the only body; here the last)
+    if b is not None: return _set_active(b)
+    return _set_active(d.addObject('PartDesign::Body', 'Body')) if create else None
+
+def active_pdbody(d=None):
+    """The active body (ActiveView.getActiveObject('pdbody')): the one set with Toggle active body / the last one
+    created; without one, the document's last body (the app had no activation step before)."""
+    import FreeCADGui
+    return FreeCADGui.ActiveDocument.ActiveView.getActiveObject('pdbody') if (d or _doc()) is App.ActiveDocument else None
+
+def explicit_pdbody():
+    """The body activated by the user / a tool (None until one is): what the tree shows in bold."""
+    import FreeCADGui
+    b = FreeCADGui._active.get('pdbody')
+    try: return b if b is not None and b.Document is App.ActiveDocument and b.Document.getObject(b.Name) is b else None
+    except Exception: return None
+
+def _set_active(body):
+    import FreeCADGui
+    FreeCADGui._active['pdbody'] = body
+    return body
+
+@op
+def pd_toggle_active_body(name):
+    """ViewProviderBody::toggleActiveBody / double-click: activate the body, or deactivate it if it is active."""
+    import FreeCADGui
+    b = _doc().getObject(name)
+    cur = FreeCADGui._active.get('pdbody')
+    _set_active(None if cur is b else b)
+    return True
 
 def _origin(body, role):
     for o in body.Origin.OutList:
@@ -92,7 +120,8 @@ def _origin(body, role):
 @op
 def pd_body():
     """PartDesign_Body."""
-    return _doc().addObject('PartDesign::Body', 'Body').Name
+    # CmdPartDesignBody: the new body becomes the active one
+    return _set_active(_doc().addObject('PartDesign::Body', 'Body')).Name
 
 def _planar(o, sub):
     try:

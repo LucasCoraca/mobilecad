@@ -12,6 +12,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -224,6 +226,11 @@ fun Shell(app: AppState) {
         // MobileCAD XR (the view itself is in the room): with nothing open here, the context panel (XrPanel.kt)
         if (stage && app.xr && app.edit == null && app.taskPanel == null && app.openToolset == null && !app.inSheet && !app.inDrawing)
             XrContextPanel(app, Modifier.fillMaxSize().padding(start = 6.dp, top = 6.dp, end = 6.dp, bottom = if (sk != null) 120.dp else 6.dp))
+        // like every other menu, the open tool panel closes when the view is touched (the touch only closes it,
+        // so it can't place a point or select by accident); picking a tool closes it too (AppState.run)
+        if (stage && side && app.openToolset != null) Box(Modifier.fillMaxSize().pointerInput(Unit) {
+            awaitEachGesture { awaitFirstDown(requireUnconsumed = false).consume(); app.openToolset = null
+                do { val e = awaitPointerEvent(); e.changes.forEach { it.consume() } } while (e.changes.any { it.pressed }) } })
         if (side) app.openToolset?.let { ts ->
             ToolPanel(app.catalog, ts, { MobileCommands.available(it) }, { app.run(it.id) }, panelPad.align(panelAlign),
                 extras = remember(ts, sk != null) { Workspaces.extras(app.catalog, app.workspace, ts, sketchMode = sk != null) })
@@ -772,6 +779,10 @@ private fun RollbackBar() {
     }
 }
 
+/** ViewProviderBody::toggleActiveBody (its double-click and context menu entry): new features go into the active body. */
+private fun toggleActiveBody(app: AppState, o: FcObject) =
+    app.eng({ call("pd_toggle_active_body", mapOf("name" to o.name)) }) { app.refresh() }
+
 private class TreeLine(val o: FcObject, val depth: Int, val rolled: Boolean, val hasKids: Boolean, val open: Boolean)
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -781,7 +792,7 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
     Box {
         Row(Modifier.fillMaxWidth().height(40.dp).background(if (selected) OS.Cloud else OS.Surface)
             .combinedClickable(onClick = { if (o.type == "TechDraw::DrawPage") { app.page = o.name; app.refreshPage() }
-                else if (o.type == "Spreadsheet::Sheet" && app.inSheet) { app.sheet = o.name; app.refreshSheet() } else { app.select(SelRef(o.name), additive = false); app.refresh() } }, onDoubleClick = { app.openEditor(o.name) }, onLongClick = { setMenu(true) })
+                else if (o.type == "Spreadsheet::Sheet" && app.inSheet) { app.sheet = o.name; app.refreshSheet() } else { app.select(SelRef(o.name), additive = false); app.refresh() } }, onDoubleClick = { if (o.type == "PartDesign::Body") toggleActiveBody(app, o) else app.openEditor(o.name) }, onLongClick = { setMenu(true) })
             .padding(start = (4 + depth * 18).dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
             // FreeCAD's expand arrow
             Box(Modifier.size(24.dp).then(if (hasKids) Modifier.clickable {
@@ -797,12 +808,13 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
             }
             Spacer(Modifier.width(10.dp))
             Text(o.label, Modifier.weight(1f), color = if (o.invalid) OS.Red else if (o.visible) OS.Navy else OS.Aluminum, fontSize = 14.sp, maxLines = 1,
-                textDecoration = if (o.suppressed) TextDecoration.LineThrough else null)
+                textDecoration = if (o.suppressed) TextDecoration.LineThrough else null, fontWeight = if (o.active) FontWeight.Bold else null)
             if (o.invalid) Icon(Icons.Default.Error, "Error", tint = OS.Red, modifier = Modifier.size(18.dp))
         }
         DropdownMenu(menuOpen, { setMenu(false) }) {
             DropdownMenuItem({ Text("Edit ${o.label}") }, { setMenu(false); app.openEditor(o.name) })
             if (o.attachable) DropdownMenuItem({ Text("Edit Attachment") }, { setMenu(false); app.openEditor(o.name, attachment = true) })
+            if (o.type == "PartDesign::Body") DropdownMenuItem({ Text("Toggle active body") }, { setMenu(false); toggleActiveBody(app, o) })
             DropdownMenuItem({ Text("Rename") }, { setMenu(false)
                 app.textPrompt = TextPrompt("Rename ${o.label}", o.label) { t -> if (t.isNotBlank())
                     app.step("Rename", { setProperty(o.name, "Label", t.trim()) }) } })

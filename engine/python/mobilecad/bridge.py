@@ -234,7 +234,15 @@ def _obj_info(o):
             'suppressed': bool(getattr(o, 'Suppressed', False)) if 'Suppressed' in o.PropertiesList else False,
             # Part::AttachExtension (sketches, datums, primitives ...): the tree menu's "Edit Attachment"
             'attachable': o.hasExtension('Part::AttachExtension'),
+            # the active body is shown in bold in the tree (Tree.cpp ActiveObject highlight)
+            'active': o.TypeId == 'PartDesign::Body' and o is _active_body_now(),
             'claims': _claims(o)}
+
+def _active_body_now():
+    try:
+        from .partdesign import explicit_pdbody
+        return explicit_pdbody()
+    except Exception: return None
 
 def _links(v):
     """Objects named by a link property value (Link, LinkSub, LinkList, LinkSubList)."""

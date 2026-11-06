@@ -1,0 +1,2 @@
+• Feature tree: the active body is shown in bold. "Toggle active body" in a body's long-press menu, or a double tap on the body, activates or deactivates it, as on the desktop. New features go into the active body, and a newly created body becomes the active one.
+• Tool menus close when you touch the view, like every other menu. That touch only closes the menu, so it can't place a point or select something by accident.
