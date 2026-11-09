@@ -30,6 +30,25 @@ here = os.path.dirname(os.path.abspath(__file__))
 def reset(d):
     shutil.rmtree(d, ignore_errors=True); os.makedirs(d)
 
+def stage_bridge():
+    """engine/python (mobilecad bridge, shims, vendored modules) -> the staged runtime's bridge/."""
+    br = os.path.join(rt, 'bridge')
+    shutil.rmtree(os.path.join(br, 'mobilecad'), ignore_errors=True)
+    shutil.copytree(os.path.join(here, 'python', 'mobilecad'), os.path.join(br, 'mobilecad'), ignore=shutil.ignore_patterns('__pycache__'))
+    shutil.copytree(os.path.join(here, 'python', 'shims'), br, ignore=shutil.ignore_patterns('__pycache__'), dirs_exist_ok=True)
+    # pure-Python third-party modules FreeCAD imports (typing_extensions 4.15 for freecad.deprecation)
+    shutil.copytree(os.path.join(here, 'python', 'vendor'), br, ignore=shutil.ignore_patterns('__pycache__'), dirs_exist_ok=True)
+
+# Without the native build tree (a machine that only has the staged runtime of an earlier full run), or with
+# --bridge-only: refresh just the Python bridge in the existing staged runtime.
+if '--bridge-only' in sys.argv[3:] or not os.path.isdir(P):
+    if not os.path.isfile(os.path.join(rt, 'preload.txt')):
+        sys.exit('no native build in %s and no staged runtime in %s: run engine/build_all.sh %s' % (P, rt, abi))
+    stage_bridge()
+    print('bridge refreshed in the staged %s runtime (native libraries unchanged: %s not found)' % (abi, P) if not os.path.isdir(P)
+          else 'bridge refreshed in the staged %s runtime' % abi)
+    sys.exit(0)
+
 # ---------------------------------------------------------------- CPython
 py = os.path.join(P, 'python/prefix')
 stdlib = os.path.join(py, 'lib/python3.14')
@@ -110,10 +129,7 @@ for f in os.listdir(os.path.join(P, 'lib')):
         soname = subprocess.run([READELF, '-d', src], capture_output=True, text=True).stdout
         m = re.search(r'\(SONAME\)\s+Library soname: \[(.+?)\]', soname)
         shutil.copy(src, os.path.join(lib, m.group(1) if m else f))
-shutil.copytree(os.path.join(here, 'python', 'mobilecad'), os.path.join(rt, 'bridge', 'mobilecad'), ignore=shutil.ignore_patterns('__pycache__'))
-shutil.copytree(os.path.join(here, 'python', 'shims'), os.path.join(rt, 'bridge'), ignore=shutil.ignore_patterns('__pycache__'), dirs_exist_ok=True)
-# pure-Python third-party modules FreeCAD imports (typing_extensions 4.15 for freecad.deprecation)
-shutil.copytree(os.path.join(here, 'python', 'vendor'), os.path.join(rt, 'bridge'), ignore=shutil.ignore_patterns('__pycache__'), dirs_exist_ok=True)
+stage_bridge()
 # IfcOpenShell (engine/build_ifcopenshell.sh): the ifcopenshell package with its SWIG wrapper, for BIM's IFC / NativeIFC
 ios = os.path.join(P, 'ifcopenshell', 'python', 'ifcopenshell')
 if os.path.isdir(ios):

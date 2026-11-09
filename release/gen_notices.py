@@ -90,12 +90,20 @@ def icon_credits():
         out.append('%s — %s — https://creativecommons.org/%s' % (f, (who[0].strip() if who else 'FreeCAD contributors'), m.group(1)))
     return out
 
-shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT)
 idx, texts = [], {}
+try:
+    bodies = {(name, title): load() for name, lic, src, files in C for title, load in files}
+except FileNotFoundError as e:
+    # a machine without the native build sources (only the staged runtime): the dependencies are unchanged, so the
+    # committed notices stay as they are; they are only replaced once every text could be read
+    if os.path.isfile(os.path.join(OUT, 'index.json')):
+        print('kept the existing notices (%s not found)' % e.filename); raise SystemExit(0)
+    raise
+shutil.rmtree(OUT, ignore_errors=True); os.makedirs(OUT)
 for name, lic, src, files in C:
     refs = []
     for title, load in files:
-        body = load(); key = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.txt'
+        body = bodies[(name, title)]; key = re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-') + '.txt'
         if key in texts and texts[key] != body: key = re.sub(r'[^a-z0-9]+', '-', (name + ' ' + title).lower()).strip('-')[:60] + '.txt'
         texts[key] = body; refs.append({'title': title, 'file': key})
     idx.append({'name': name, 'license': lic, 'source': src, 'texts': refs})

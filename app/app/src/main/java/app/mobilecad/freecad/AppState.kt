@@ -533,7 +533,14 @@ class AppState(private val ctx: Context) {
         e.props = p
         if (e.autoQuery) {
             e.autoQuery = false
-            p.firstOrNull { it.name == "References" && it.value.let { v -> v == null || v.toString() in setOf("", "[]", "null") } }?.let { e.activeQuery = it.name }
+            // a reference list nothing is picked for yet: References, or a dress-up feature's Base without edges/faces
+            // (desktop: the task panel starts in selection mode when it has no references)
+            fun noSubs(v: Any?) = v == null || v.toString() in setOf("", "[]", "null") ||
+                (v as? JSONArray)?.let { a -> (0 until a.length()).all { i -> a.optJSONArray(i)?.optJSONArray(1)?.length() == 0 } } == true
+            p.firstOrNull { it.name == "References" && noSubs(it.value) }
+                ?: p.firstOrNull { it.name == "Base" && it.type == "App::PropertyLinkSub" && noSubs(it.value) &&
+                    p.none { q -> q.name == "UseAllEdges" && q.value == true } }
+            ?.let { e.activeQuery = it.name }
         }
         manipulator = (m as? org.json.JSONObject)?.let { j ->
             fun v(k: String) = j.getJSONArray(k).let { a -> FloatArray(3) { a.getDouble(it).toFloat() } }

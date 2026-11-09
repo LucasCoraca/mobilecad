@@ -103,6 +103,12 @@ def force_recompute(names=None):
     d.recompute(); return True
 
 @op
+def mark_recompute(names):
+    """Tree "Mark to Recompute" (TreeWidget::onMarkRecompute): enforceRecompute on the objects, no recompute yet."""
+    for o in _objs(names): o.enforceRecompute()
+    return True
+
+@op
 def toggle_suppress(names):
     """Std_ToggleSuppress: flip the SuppressibleExtension 'Suppressed' property where it is visible."""
     n = 0

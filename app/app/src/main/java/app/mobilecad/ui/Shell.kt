@@ -299,8 +299,9 @@ fun Shell(app: AppState) {
             // the solver message opens the constraint list on the problems (desktop: the message links select them)
             s.consList = if (s.conflicting.isNotEmpty() || s.redundant.isNotEmpty() || s.malformed.isNotEmpty()) "problems" else "all" } }
         if (side) sk?.takeIf { it.consList != null }?.let { s -> ConstraintList(app, s, panelPad.align(panelAlign)) }
-        if (stage) sk?.let { s -> s.drawStep.let { _ -> SketchInputs(s, Modifier.align(if (compact) Alignment.BottomStart else Alignment.BottomCenter).padding(10.dp)) } }
-        if (stage) ToolExit(app, Modifier.align(Alignment.BottomEnd).padding(12.dp))
+        // the typed-value bar and the tool's exit chip make way for an open tool menu, like the selection bar below
+        if (stage && app.openToolset == null) sk?.let { s -> s.drawStep.let { _ -> SketchInputs(s, Modifier.align(if (compact) Alignment.BottomStart else Alignment.BottomCenter).padding(10.dp)) } }
+        if (stage && app.openToolset == null) ToolExit(app, Modifier.align(Alignment.BottomEnd).padding(12.dp))
         // the selection bar floats over the view only: it makes way for an open tool menu and, on phones, for the panels
         // that slide up from the bottom (dialog, task panel, constraint list), like the selection chips outside sketches
         if (stage) sk?.takeIf { app.openToolset == null && !(compact && (it.consList != null || app.edit != null || app.taskPanel != null)) }
@@ -603,13 +604,17 @@ private fun SketchSelectionBar(sk: SketchEditor, modifier: Modifier) {
 @Composable
 private fun ToolExit(app: AppState, modifier: Modifier) {
     val sk = app.sketch
+    // a constraint tool waiting for its elements (constraint first, then geometry) has the constraint colour
+    val armed = sk?.armed
     val (label, exit) = when {
+        sk != null && armed != null -> constraintLabel(armed) to { sk.selectTool(SketchTool.SELECT) }
         sk != null && sk.tool != SketchTool.SELECT -> sk.tool.label to { sk.selectTool(SketchTool.SELECT) }
         app.draft != null -> (app.draft?.label ?: "Tool") to { app.cancelDraft() }
         app.mate != null -> "Joint" to { app.cancelMate() }
         else -> return
     }
-    Row(modifier.shadow(6.dp, RoundedCornerShape(24.dp)).background(OS.Primary, RoundedCornerShape(24.dp)).clickable { exit() }
+    val bg = if (armed != null) OS.Red else OS.Primary
+    Row(modifier.shadow(6.dp, RoundedCornerShape(24.dp)).background(bg, RoundedCornerShape(24.dp)).clickable { exit() }
         .padding(start = 16.dp, end = 10.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         Spacer(Modifier.width(10.dp))
@@ -617,6 +622,10 @@ private fun ToolExit(app: AppState, modifier: Modifier) {
             Icon(Icons.Default.Close, "Exit ${label}", tint = Color.White, modifier = Modifier.size(18.dp)) }
     }
 }
+
+/** "DistanceX" -> "Distance X", "PointOnObject" -> "Point On Object" (the armed constraint's name on its exit chip). */
+private fun constraintLabel(t: String) = when (t) { "HorVer" -> "Horizontal/Vertical"; "Radiam" -> "Radius/Diameter"
+    else -> t.replace(Regex("(?<=[a-z])(?=[A-Z])"), " ") }
 
 /** Values that can be typed for the next point of the shape being drawn (FreeCAD 1.x on-view parameters): the point is
  *  placed from them and they become the shape's dimensions. */
@@ -761,7 +770,8 @@ private fun FeatureTree(app: AppState, modifier: Modifier, onCollapse: () -> Uni
         LazyColumn(Modifier.weight(1f)) {
             items(rows.size) { i ->
                 val line = rows[i]; val o = line.o
-                Box(Modifier.alpha(if (line.rolled) 0.4f else 1f)) { TreeRow(app, o, line.depth, rowMenu == i, line.hasKids, line.open) { rowMenu = if (it) i else null } }
+                // features after the Tip are not dimmed (desktop: only the Tip marks them): grey text means hidden only
+                TreeRow(app, o, line.depth, rowMenu == i, line.hasKids, line.open) { rowMenu = if (it) i else null }
                 // rollback bar after the body's Tip
                 val parent = o.parents.firstNotNullOfOrNull { byName[it] }?.takeIf { it.type == "PartDesign::Body" }
                 if (parent != null && parent.tip == o.name && parent.group.lastOrNull() != o.name) RollbackBar()
@@ -810,6 +820,8 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
             Text(o.label, Modifier.weight(1f), color = if (o.invalid) OS.Red else if (o.visible) OS.Navy else OS.Aluminum, fontSize = 14.sp, maxLines = 1,
                 textDecoration = if (o.suppressed) TextDecoration.LineThrough else null, fontWeight = if (o.active) FontWeight.Bold else null)
             if (o.invalid) Icon(Icons.Default.Error, "Error", tint = OS.Red, modifier = Modifier.size(18.dp))
+            // desktop's recompute marker on touched objects (they change on the next Recompute)
+            else if (o.touched) Icon(Icons.Default.Refresh, "Needs recompute", tint = OS.BlueMed, modifier = Modifier.size(18.dp))
         }
         DropdownMenu(menuOpen, { setMenu(false) }) {
             DropdownMenuItem({ Text("Edit ${o.label}") }, { setMenu(false); app.openEditor(o.name) })
@@ -825,6 +837,11 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
                 DropdownMenuItem({ Text("Move into Body") }, { setMenu(false)
                     app.step("Move ${o.label} into Body", { call("pd_absorb_dressup", mapOf("name" to o.name)) }) { app.selection.clear() } })
             DropdownMenuItem({ Text("Duplicate") }, { setMenu(false); app.select(SelRef(o.name), additive = false); app.run("Std_DuplicateSelection") })
+            // Tree.cpp context menu: "Mark to Recompute" (enforceRecompute) and "Recompute Object" (Std_Recompute)
+            DropdownMenuItem({ Text("Mark to recompute") }, { setMenu(false)
+                app.eng({ call("mark_recompute", mapOf("names" to listOf(o.name))) }) { app.refresh() } })
+            DropdownMenuItem({ Text("Recompute object") }, { setMenu(false)
+                app.step("Recompute", { call("force_recompute", mapOf("names" to listOf(o.name))) }) })
             DropdownMenuItem({ Text(if (o.visible) "Hide ${o.label}" else "Show ${o.label}") }, { setMenu(false)
                 app.eng({ call("set_visibility", mapOf("names" to listOf(o.name), "visible" to !o.visible)) }) { app.refresh() } })
             if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text("Roll tip to here") }, { setMenu(false)

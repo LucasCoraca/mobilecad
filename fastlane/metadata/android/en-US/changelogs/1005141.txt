@@ -1,0 +1,4 @@
+• Fillet and Chamfer with nothing selected no longer show an error. As on the desktop, the feature is added on the body's tip and its dialog waits for you to tap the edges or faces to round or bevel.
+• Feature tree: grey text now always means hidden. Features below the Tip are no longer dimmed, so a visible sketch there no longer looks hidden.
+• Feature tree: the long-press menu has "Mark to recompute" and "Recompute object", as on the desktop. Objects waiting for a recompute show a recompute marker.
+• Sketcher: a constraint tool picked before its geometry now shows a red chip with its name and an ✕ to leave it, like the drawing tools. The tool chip and the typed-value bar make way while a tool menu is open.

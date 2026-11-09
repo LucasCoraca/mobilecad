@@ -196,13 +196,20 @@ def pd_profile_feature(kind, sel=None):
 def pd_dressup(kind, sel=None):
     """PartDesign_Fillet/Chamfer/Draft/Thickness (makeChamferOrFillet / dress-up commands): Base = (feature, [edges|faces])."""
     s = [(o, subs) for o, subs in _sel_in(sel, _active_body(sel)) if o.TypeId != 'PartDesign::Body']
-    if not s: raise RuntimeError('Select edges or faces of a solid first')
-    base = s[0][0]
-    subs = [x for o, ss in s if o == base for x in ss]
+    if s:
+        base = s[0][0]
+        subs = [x for o, ss in s if o == base for x in ss]
+        all_edges = not subs and kind in ('Fillet', 'Chamfer')   # a whole feature picked: all its edges
+    else:
+        # nothing selected (dressupGetSelected noSelection): on the body's Tip with no references yet; the dialog
+        # then waits for edge / face taps like the desktop task panel's selection mode
+        base = _active_body(sel).Tip
+        if base is None: raise RuntimeError('The body has no solid yet: make a Pad or another feature first')
+        subs, all_edges = [], False
     body = _body_of(base) or _active_body(sel)
     f = body.newObject('PartDesign::' + kind, kind)
     f.Base = (base, subs)
-    if not subs and kind in ('Fillet', 'Chamfer'): f.UseAllEdges = True
+    if all_edges: f.UseAllEdges = True
     base.Visibility = False
     _doc().recompute()
     return f.Name

@@ -1,7 +1,7 @@
 #!/bin/bash
 export ANDROID_SERIAL=${ANDROID_SERIAL:-emulator-5554}   # the emulator, not a phone that may be plugged in
 # Dev loop: copy engine/python/{mobilecad,shims} into the installed debug app's runtime and restart it.
-ADB=$HOME/Android/sdk/platform-tools/adb; E=/home/lucas/Documents/freecadmobile/engine/python
+ADB=$HOME/Android/sdk/platform-tools/adb; E=$(dirname "$(readlink -f "$0")")/python
 T=/data/local/tmp/fcbridge; $ADB shell rm -rf $T; $ADB shell mkdir -p $T
 $ADB push $E/mobilecad $T/ > /dev/null; $ADB push $E/shims/. $T/ > /dev/null; $ADB push $E/vendor/. $T/ > /dev/null
 Q=/tmp/claude-1000/fcqtres; rm -rf $Q; python3 - "$Q" <<'PY'
