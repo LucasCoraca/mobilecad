@@ -14,9 +14,9 @@ RepoType: git
 Repo: https://github.com/LucasCoraca/mobilecad.git
 
 Builds:
-  - versionName: 0.5.13
-    versionCode: 1005131
-    commit: e3e175906bc1c8d203faac9d4872a0c04eb7825a
+  - versionName: 0.5.14
+    versionCode: 1005141
+    commit: 63782ee956d6ca95a094923cb5efead72794e69e
     timeout: 43200
     subdir: app/app
     sudo:
@@ -45,5 +45,5 @@ VercodeOperation:
   - '%c + 1'
 UpdateCheckData: app/app/build.gradle.kts|val baseVersionCode = (\d+)|.|val appVersion
   = "(.*)"
-CurrentVersion: 0.5.13
-CurrentVersionCode: 1005131
+CurrentVersion: 0.5.14
+CurrentVersionCode: 1005141
