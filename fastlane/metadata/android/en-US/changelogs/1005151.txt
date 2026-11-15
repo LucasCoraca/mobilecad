@@ -1,0 +1,2 @@
+• Sketcher: a line point can snap to several constraints at once, as on the desktop. Snapping to a point, a curve or an axis also makes the line horizontal or vertical when it is level with the previous point, and a point on a curve lands where the curve crosses that horizontal or vertical. The hint names every constraint, e.g. "coincident + horizontal".
+• Sketcher: automatic constraints that would be redundant are left out, as on the desktop.

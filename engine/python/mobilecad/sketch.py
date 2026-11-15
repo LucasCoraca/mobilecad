@@ -200,7 +200,12 @@ def _auto(sk, auto, first):
         elif t == 'Symmetric': cs.append(Sketcher.Constraint('Symmetric', a[3], START, a[3], END, g, pos))
         # values typed while drawing (FreeCAD on-view parameters): [type, localGeo, value]; Angle in radians
         elif t in ('Distance', 'Radius', 'Diameter', 'Angle'): cs.append(Sketcher.Constraint(t, g, float(a[2])))
-    if cs: sk.addConstraint(cs)
+    if cs:
+        n0 = sk.ConstraintCount
+        sk.addConstraint(cs)
+        # DrawSketchHandler::filterRedundantAutoConstraints: auto constraints that turn out redundant are removed
+        sk.solve()
+        for i in sorted((r - 1 for r in sk.RedundantConstraints if r - 1 >= n0), reverse=True): sk.delConstraint(i)
 
 @op
 def sketch_polyline(name, points, closed=False, construction=False, auto=None, chain=False):

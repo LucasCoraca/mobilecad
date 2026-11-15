@@ -99,7 +99,7 @@ class SketchEditor(private val app: AppState, val name: String) {
     var onChanged: () -> Unit = {}
     var viewNormalRequest: (() -> Unit)? = null
 
-    class Snap(val p: P2, val auto: List<JSONArray>, val kind: String, val guide: P2? = null, val guide2: P2? = null)
+    class Snap(val p: P2, val auto: List<JSONArray>, val kind: String, val guide: P2? = null, val guide2: P2? = null, val also: String? = null)
 
     // ------------------------------------------------------------------ engine sync
     fun loadModelRefs() = app.eng({ call("sketch_model_refs", mapOf("name" to name)) as JSONObject }) { j ->
@@ -178,54 +178,98 @@ class SketchEditor(private val app: AppState, val name: String) {
     fun viewNormal() { val r = viewNormalRequest; if (r != null) { pendingNormal = false; r() } else pendingNormal = true }
 
     // ------------------------------------------------------------------ inference (FreeCAD autoconstraints, touch tolerance)
+    /** DrawSketchHandler::seekAutoConstraint: a point constraint (coincident / symmetric / point on object) and, for a
+     *  line, horizontal / vertical with the previous point are suggested together and all applied. */
     fun snap(p: P2, tolMm: Double): Snap {
         if (!snapToGrid) return Snap(p, emptyList(), "free")      // Sketcher_Snap off: no snapping / inference
         val local = pending.size     // auto constraints refer to the point index within the new shape; resolved at commit
-        // 1. points: end points, centres, the origin -> Coincident (FreeCAD preselected vertex)
-        var best: Triple<SkSel, P2, String>? = null; var bd = tolMm
-        for (g in geos) for ((pos, q) in g.points()) { val d = q.d(p); if (d < bd) { bd = d; best = Triple(SkSel(g.i, pos), q, if (pos == 3) "center" else "point") } }
-        if (P2(0.0, 0.0).d(p) < bd) { bd = P2(0.0, 0.0).d(p); best = Triple(SkSel(-1, 1), P2(0.0, 0.0), "origin") }
-        best?.let { (s, q, k) -> return Snap(q, listOf(JSONArray(listOf("Coincident", local, s.geo, s.pos))), k) }
-        // 1b. the part's corners and circle centres on the sketch plane (projected on use)
-        var mb: Triple<String, P2, Int>? = null; var md = tolMm
-        for ((ref, q) in modelPts) { val d = q.d(p); if (d < md) { md = d; mb = Triple(ref, q, 1) } }
-        for (m in modelCurves) if (m.kind == "circle" && m.c != null) { val d = m.c.d(p); if (d < md) { md = d; mb = Triple(m.ref, m.c, 3) } }
-        mb?.let { (ref, q, pos) -> return Snap(q, listOf(JSONArray(listOf("Coincident", local, ref, pos))), if (pos == 3) "model center" else "model point") }
-        // 2. midpoints (SnapManager::snapToLineMiddle / snapToArcMiddle): a line's middle -> Symmetric about its ends
-        //    (symmetric constraint); an arc's middle -> point on the arc, as FreeCAD does
-        for (g in geos) {
-            if (g.isLine) { val m = P2((g.a!!.x + g.b!!.x) / 2, (g.a.y + g.b.y) / 2)
-                if (m.d(p) < tolMm) return Snap(m, listOf(JSONArray(listOf("Symmetric", local, g.i))), "midpoint") }
-            if (g.isArc) { val t = (g.a0 + g.a1) / 2; val m = P2(g.c!!.x + g.r * cos(t), g.c.y + g.r * sin(t))
-                if (m.d(p) < tolMm) return Snap(m, listOf(JSONArray(listOf("PointOnObject", local, g.i))), "midpoint") }
-        }
-        for (m in modelCurves) if (m.kind == "line" && m.pts.size >= 2) { val a = m.pts.first(); val b = m.pts.last(); val mid = P2((a.x + b.x) / 2, (a.y + b.y) / 2)
-            if (mid.d(p) < tolMm) return Snap(mid, listOf(JSONArray(listOf("Symmetric", local, m.ref))), "model midpoint") }
-        // 3. point on curve / axis
-        for (g in geos) if (!g.isPoint) {
-            val d = dist(g, p); if (d < tolMm * 0.6) return Snap(project(g, p), listOf(JSONArray(listOf("PointOnObject", local, g.i))), "on curve")
-        }
-        for (m in modelCurves) {
-            var bestQ: P2? = null; var bdq = tolMm * 0.6
-            for ((a, b) in m.pts.zipWithNext()) { val q = closest(p, a, b); val d = q.d(p); if (d < bdq) { bdq = d; bestQ = q } }
-            bestQ?.let { q -> return Snap(q, listOf(JSONArray(listOf("PointOnObject", local, m.ref))), "on model edge") }
-        }
-        if (abs(p.y) < tolMm * 0.6) return Snap(P2(p.x, 0.0), listOf(JSONArray(listOf("PointOnObject", local, -1))), "on axis")
-        if (abs(p.x) < tolMm * 0.6) return Snap(P2(0.0, p.y), listOf(JSONArray(listOf("PointOnObject", local, -2))), "on axis")
-        // 4. horizontal / vertical with the previous point (DrawSketchHandler::seekAlignmentAutoConstraint)
         val last = pending.lastOrNull()?.first
-        if (last != null) {
-            if (abs(p.y - last.y) < tolMm * 0.5) return Snap(P2(p.x, last.y), listOf(JSONArray(listOf("Horizontal", local))), "horizontal", last)
-            if (abs(p.x - last.x) < tolMm * 0.5) return Snap(P2(last.x, p.y), listOf(JSONArray(listOf("Vertical", local))), "vertical", last)
+        val line = last != null && (tool == SketchTool.POLYLINE || tool == SketchTool.LINE)
+        snapPoint(p, tolMm, local)?.let { (s, slide) ->
+            if (!line) return s
+            if (slide == null) {
+                // a fixed point (vertex, centre, midpoint): seekAlignmentAutoConstraint, 2° of the line direction
+                val ang = abs(atan2(s.p.y - last!!.y, s.p.x - last.x)); val dev = Math.toRadians(2.0)
+                val hv = when { s.p.d(last) < 1e-9 -> null; ang < dev || Math.PI - ang < dev -> "Horizontal"; abs(ang - Math.PI / 2) < dev -> "Vertical"; else -> null }
+                return hv?.let { Snap(s.p, s.auto + JSONArray(listOf(it, local)), s.kind, last, also = it.lowercase()) } ?: s
+            }
+            // a point sliding on a curve / axis: where it crosses the horizontal / vertical through the previous point
+            for ((h, t) in listOf(true to "Horizontal", false to "Vertical")) {
+                if (abs(if (h) p.y - last!!.y else p.x - last!!.x) >= tolMm * 0.5) continue
+                val q = slide(h, if (h) last.y else last.x) ?: continue
+                if (q.d(p) < tolMm && q.d(last) > 1e-9) return Snap(q, s.auto + JSONArray(listOf(t, local)), s.kind, last, also = t.lowercase())
+            }
+            return s
         }
-        // 5. alignment with other points (inference lines): the position lines up, no constraint is added
+        // horizontal / vertical with the previous point (seekAlignmentAutoConstraint), lined up with another point
+        // on the other axis at the same time (inference line, no constraint)
         var ax: P2? = null; var ay: P2? = null; var bx = tolMm * 0.5; var by = tolMm * 0.5
         for (g in geos) for ((_, q) in g.points()) {
             if (q == last) continue
             abs(p.x - q.x).let { if (it < bx) { bx = it; ax = q } }; abs(p.y - q.y).let { if (it < by) { by = it; ay = q } }
         }
+        if (last != null) {
+            if (abs(p.y - last.y) < tolMm * 0.5) return Snap(P2(ax?.x ?: p.x, last.y), listOf(JSONArray(listOf("Horizontal", local))), "horizontal", last, ax)
+            if (abs(p.x - last.x) < tolMm * 0.5) return Snap(P2(last.x, ay?.y ?: p.y), listOf(JSONArray(listOf("Vertical", local))), "vertical", last, ay)
+        }
         if (ax != null || ay != null) return Snap(P2(ax?.x ?: p.x, ay?.y ?: p.y), emptyList(), "aligned", ax ?: ay, if (ax != null && ay != null) ay else null)
         return Snap(p, emptyList(), "free")
+    }
+
+    /** The point snap under the finger (seekPreselectionAutoConstraint / SnapManager), with, for a point that slides
+     *  on a curve or axis, the curve's point at a given y (horizontal) or x (vertical) nearest the finger. */
+    private fun snapPoint(p: P2, tolMm: Double, local: Int): Pair<Snap, ((Boolean, Double) -> P2?)?>? {
+        // 1. points: end points, centres, the origin -> Coincident (FreeCAD preselected vertex)
+        var best: Triple<SkSel, P2, String>? = null; var bd = tolMm
+        for (g in geos) for ((pos, q) in g.points()) { val d = q.d(p); if (d < bd) { bd = d; best = Triple(SkSel(g.i, pos), q, if (pos == 3) "center" else "point") } }
+        if (P2(0.0, 0.0).d(p) < bd) { bd = P2(0.0, 0.0).d(p); best = Triple(SkSel(-1, 1), P2(0.0, 0.0), "origin") }
+        best?.let { (s, q, k) -> return Snap(q, listOf(JSONArray(listOf("Coincident", local, s.geo, s.pos))), k) to null }
+        // 1b. the part's corners and circle centres on the sketch plane (projected on use)
+        var mb: Triple<String, P2, Int>? = null; var md = tolMm
+        for ((ref, q) in modelPts) { val d = q.d(p); if (d < md) { md = d; mb = Triple(ref, q, 1) } }
+        for (m in modelCurves) if (m.kind == "circle" && m.c != null) { val d = m.c.d(p); if (d < md) { md = d; mb = Triple(m.ref, m.c, 3) } }
+        mb?.let { (ref, q, pos) -> return Snap(q, listOf(JSONArray(listOf("Coincident", local, ref, pos))), if (pos == 3) "model center" else "model point") to null }
+        // 2. midpoints (SnapManager::snapToLineMiddle / snapToArcMiddle): a line's middle -> Symmetric about its ends
+        //    (symmetric constraint); an arc's middle -> point on the arc, as FreeCAD does
+        for (g in geos) {
+            if (g.isLine) { val m = P2((g.a!!.x + g.b!!.x) / 2, (g.a.y + g.b.y) / 2)
+                if (m.d(p) < tolMm) return Snap(m, listOf(JSONArray(listOf("Symmetric", local, g.i))), "midpoint") to null }
+            if (g.isArc) { val t = (g.a0 + g.a1) / 2; val m = P2(g.c!!.x + g.r * cos(t), g.c.y + g.r * sin(t))
+                if (m.d(p) < tolMm) return Snap(m, listOf(JSONArray(listOf("PointOnObject", local, g.i))), "midpoint") to null }
+        }
+        for (m in modelCurves) if (m.kind == "line" && m.pts.size >= 2) { val a = m.pts.first(); val b = m.pts.last(); val mid = P2((a.x + b.x) / 2, (a.y + b.y) / 2)
+            if (mid.d(p) < tolMm) return Snap(mid, listOf(JSONArray(listOf("Symmetric", local, m.ref))), "model midpoint") to null }
+        // 3. point on curve / axis
+        for (g in geos) if (!g.isPoint) {
+            val d = dist(g, p); if (d < tolMm * 0.6) return Snap(project(g, p), listOf(JSONArray(listOf("PointOnObject", local, g.i))), "on curve") to
+                { h: Boolean, v: Double -> crossing(g.polyline(), g, p, h, v) }
+        }
+        for (m in modelCurves) {
+            var bestQ: P2? = null; var bdq = tolMm * 0.6
+            for ((a, b) in m.pts.zipWithNext()) { val q = closest(p, a, b); val d = q.d(p); if (d < bdq) { bdq = d; bestQ = q } }
+            bestQ?.let { q -> return Snap(q, listOf(JSONArray(listOf("PointOnObject", local, m.ref))), "on model edge") to
+                { h: Boolean, v: Double -> crossing(m.pts, null, p, h, v) } }
+        }
+        if (abs(p.y) < tolMm * 0.6) return Snap(P2(p.x, 0.0), listOf(JSONArray(listOf("PointOnObject", local, -1))), "on axis") to
+            { h: Boolean, v: Double -> if (h) null else P2(v, 0.0) }
+        if (abs(p.x) < tolMm * 0.6) return Snap(P2(0.0, p.y), listOf(JSONArray(listOf("PointOnObject", local, -2))), "on axis") to
+            { h: Boolean, v: Double -> if (h) P2(0.0, v) else null }
+        return null
+    }
+
+    /** Where a curve crosses the line y = v ([h]) or x = v, nearest [p]: exact for lines and circles, along the
+     *  tessellation otherwise. */
+    private fun crossing(pts: List<P2>, g: SkGeo?, p: P2, h: Boolean, v: Double): P2? {
+        if (g != null && g.isLine) { val a = g.a!!; val b = g.b!!
+            val da = if (h) b.y - a.y else b.x - a.x; if (abs(da) < 1e-12) return null
+            val t = ((v - if (h) a.y else a.x) / da); return P2(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y)) }
+        if (g != null && g.isCircle) { val c = g.c!!; val k = v - if (h) c.y else c.x; if (abs(k) > g.r) return null
+            val w = kotlin.math.sqrt(g.r * g.r - k * k)
+            return listOf(-w, w).map { if (h) P2(c.x + it, v) else P2(v, c.y + it) }.minBy { it.d(p) } }
+        return pts.zipWithNext().mapNotNull { (a, b) ->
+            val av = if (h) a.y else a.x; val bv = if (h) b.y else b.x
+            if ((av - v) * (bv - v) > 0 || abs(bv - av) < 1e-12) null else { val t = (v - av) / (bv - av); P2(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y)) }
+        }.minByOrNull { it.d(p) }
     }
 
     private fun dist(g: SkGeo, p: P2) = when {
@@ -867,7 +911,8 @@ class SketchEditor(private val app: AppState, val name: String) {
                 val tag = when (s.kind) { "point" -> "coincident"; "origin" -> "origin"; "center" -> "center"; "midpoint" -> "midpoint"; "on curve" -> "on curve"
                     "on axis" -> "on axis"; "horizontal" -> "horizontal"; "vertical" -> "vertical"; "aligned" -> "aligned"
                     "model point" -> "part vertex"; "model center" -> "part center"; "model midpoint" -> "part midpoint"; "on model edge" -> "on part edge"; else -> null }
-                tag?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }
+                // every suggested constraint is named (desktop draws one icon per auto constraint next to the cursor)
+                listOfNotNull(tag, s.also).joinToString(" + ").takeIf { it.isNotEmpty() }?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }
             } }
         }
     }
