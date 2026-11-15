@@ -1,0 +1,1 @@
+• Sketcher: a sketch now opens with no drawing tool active (Select), as on the desktop. Pick Polyline or another tool to start drawing.

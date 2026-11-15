@@ -72,7 +72,7 @@ class SkCons(val i: Int, val type: String, val first: Int, val firstPos: Int, va
 class DimLayout(val label: P2, val lines: List<Pair<P2, P2>>)
 
 class SketchEditor(private val app: AppState, val name: String) {
-    var tool by mutableStateOf(SketchTool.POLYLINE)
+    var tool by mutableStateOf(SketchTool.SELECT)     // desktop: a sketch opens with no tool active (selection)
     var construction by mutableStateOf(false)
     var dof by mutableStateOf(-1); var fully by mutableStateOf(false)
     var status by mutableStateOf("")
