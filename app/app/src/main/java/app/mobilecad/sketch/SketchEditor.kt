@@ -959,7 +959,7 @@ class SketchEditor(private val app: AppState, val name: String) {
                 SketchTool.CENTER_RECTANGLE -> if (all.size == 2) { val o = all[0]; val q = all[1]; val m = P2(2 * o.x - q.x, 2 * o.y - q.y)
                     poly(c, listOf(m, P2(q.x, m.y), q, P2(m.x, q.y), m), ::scr) }
                 SketchTool.CIRCLE -> if (all.size == 2) { val r = all[0].d(all[1]); poly(c, (0..72).map { P2(all[0].x + r * cos(it * Math.PI / 36), all[0].y + r * sin(it * Math.PI / 36)) }, ::scr) }
-                else -> if (all.size >= 2) poly(c, all, ::scr)
+                else -> { val sh = shapePreview(all); if (sh != null) sh.forEach { poly(c, it, ::scr) } else if (all.size >= 2) poly(c, all, ::scr) }
             }
             pLine.pathEffect = null
             pFill.color = 0xFF418FDE.toInt(); pp.forEach { p -> scr(p)?.let { q -> c.drawCircle(q[0], q[1], 5 * dp, pFill) } }
@@ -978,6 +978,93 @@ class SketchEditor(private val app: AppState, val name: String) {
                 // every suggested constraint is named (desktop draws one icon per auto constraint next to the cursor)
                 listOfNotNull(tag, s.also).joinToString(" + ").takeIf { it.isNotEmpty() }?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }
             } }
+        }
+    }
+
+    /** The shape the tool will make from the points so far plus the finger (the desktop handlers draw the curve while
+     *  it is defined), built like the engine's sketch_* creators; null: the points joined by lines. */
+    private fun shapePreview(all: List<P2>): List<List<P2>>? {
+        val n = all.size; if (n < 2) return null
+        fun arc(c: P2, r: Double, a0: Double, a1: Double, k: Int = 64) = (0..k).map { val t = a0 + (a1 - a0) * it / k; P2(c.x + r * cos(t), c.y + r * sin(t)) }
+        fun ccw(c: P2, s: P2, e: P2): Pair<Double, Double> {      // counter-clockwise from s to e, as sketch_arc_center
+            val a0 = atan2(s.y - c.y, s.x - c.x); var a1 = atan2(e.y - c.y, e.x - c.x); if (a1 <= a0) a1 += 2 * Math.PI; return a0 to a1 }
+        fun circum(a: P2, b: P2, q: P2): Pair<P2, Double>? {
+            val d = 2 * (a.x * (b.y - q.y) + b.x * (q.y - a.y) + q.x * (a.y - b.y)); if (abs(d) < 1e-12) return null
+            val a2 = a.x * a.x + a.y * a.y; val b2 = b.x * b.x + b.y * b.y; val q2 = q.x * q.x + q.y * q.y
+            val c = P2((a2 * (b.y - q.y) + b2 * (q.y - a.y) + q2 * (a.y - b.y)) / d, (a2 * (q.x - b.x) + b2 * (a.x - q.x) + q2 * (b.x - a.x)) / d)
+            return c to c.d(a) }
+        fun ellipse(c: P2, major: P2, minorPt: P2, a0: Double = 0.0, a1: Double = 2 * Math.PI): List<P2>? {
+            val big = c.d(major); if (big < 1e-9) return null
+            val dx = (major.x - c.x) / big; val dy = (major.y - c.y) / big
+            var r = abs(-dy * (minorPt.x - c.x) + dx * (minorPt.y - c.y)); if (r < 1e-9 || r >= big) r = (r).coerceIn(big * 0.1, big * 0.999)
+            return (0..72).map { val t = a0 + (a1 - a0) * it / 72; val u = big * cos(t); val v = r * sin(t); P2(c.x + u * dx - v * dy, c.y + u * dy + v * dx) } }
+        fun slot(a: P2, b: P2, r: Double): List<P2> {
+            val ang = atan2(b.y - a.y, b.x - a.x)
+            return arc(b, r, ang - Math.PI / 2, ang + Math.PI / 2, 32) + arc(a, r, ang + Math.PI / 2, ang + 3 * Math.PI / 2, 32) + listOf(arc(b, r, ang - Math.PI / 2, ang - Math.PI / 2, 1)[0]) }
+        val c = all[0]
+        return when (tool) {
+            // center, start, end: the circle while the start is placed, then the arc (counter-clockwise from the start)
+            SketchTool.ARC_CENTER -> if (n == 2) listOf(arc(c, c.d(all[1]), 0.0, 2 * Math.PI, 72), listOf(c, all[1]))
+                else { val (a0, a1) = ccw(c, all[1], all[2]); val r = c.d(all[1]); listOf(arc(c, r, a0, a1), listOf(c, all[1]), listOf(c, arc(c, r, a1, a1, 1)[0])) }
+            // start, end, point on the arc
+            SketchTool.ARC3 -> if (n == 2) null else circum(all[0], all[2], all[1])?.let { (cc, r) ->
+                val pa = atan2(all[0].y - cc.y, all[0].x - cc.x); val pb = atan2(all[1].y - cc.y, all[1].x - cc.x); val pm = atan2(all[2].y - cc.y, all[2].x - cc.x)
+                fun norm(t: Double) = ((t % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)
+                listOf(if (norm(pm - pa) < norm(pb - pa)) arc(cc, r, pa, pa + norm(pb - pa)) else arc(cc, r, pb, pb + norm(pa - pb))) }
+            SketchTool.CIRCLE3 -> if (n == 2) null else circum(all[0], all[1], all[2])?.let { (cc, r) -> listOf(arc(cc, r, 0.0, 2 * Math.PI, 72)) }
+            SketchTool.SLOT -> if (n == 2) listOf(listOf(all[0], all[1])) else listOf(slot(all[0], all[1], maxOf(0.1, seg(all[2], all[0], all[1]))))
+            SketchTool.POLYGON3, SketchTool.POLYGON4, SketchTool.POLYGON5, SketchTool.POLYGON6, SketchTool.POLYGON7, SketchTool.POLYGON8 -> {
+                val k = tool.name.removePrefix("POLYGON").toInt(); val r = c.d(all[1]); val a0 = atan2(all[1].y - c.y, all[1].x - c.x)
+                listOf((0..k).map { P2(c.x + r * cos(a0 + 2 * Math.PI * it / k), c.y + r * sin(a0 + 2 * Math.PI * it / k)) }) }
+            SketchTool.ELLIPSE -> if (n == 2) listOf(listOf(P2(2 * c.x - all[1].x, 2 * c.y - all[1].y), all[1])) else ellipse(c, all[1], all[2])?.let { listOf(it) }
+            SketchTool.ELLIPSE3 -> if (n == 2) listOf(listOf(all[0], all[1])) else
+                ellipse(P2((all[0].x + all[1].x) / 2, (all[0].y + all[1].y) / 2), all[0], all[2])?.let { listOf(it) }
+            SketchTool.ARC_ELLIPSE -> when (n) {
+                2 -> listOf(listOf(P2(2 * c.x - all[1].x, 2 * c.y - all[1].y), all[1]))
+                3 -> run { val big = c.d(all[1]); if (big < 1e-9) return@run null
+                    val dx = (all[1].x - c.x) / big; val dy = (all[1].y - c.y) / big; val lx = (all[2].x - c.x) * dx + (all[2].y - c.y) * dy
+                    val ly = -dy * (all[2].x - c.x) + dx * (all[2].y - c.y)
+                    val r = (abs(ly) / kotlin.math.sqrt(maxOf(1e-12, 1 - minOf(0.999999, (lx / big) * (lx / big))))).coerceIn(big * 0.05, big * 0.999)
+                    ellipse(c, all[1], P2(c.x - dy * r, c.y + dx * r))?.let { listOf(it) } }
+                else -> run { val big = c.d(all[1]); if (big < 1e-9) return@run null
+                    val dx = (all[1].x - c.x) / big; val dy = (all[1].y - c.y) / big
+                    fun loc(q: P2) = ((q.x - c.x) * dx + (q.y - c.y) * dy) to (-dy * (q.x - c.x) + dx * (q.y - c.y))
+                    val (lx, ly) = loc(all[2])
+                    val r = (abs(ly) / kotlin.math.sqrt(maxOf(1e-12, 1 - minOf(0.999999, (lx / big) * (lx / big))))).coerceIn(big * 0.05, big * 0.999)
+                    fun param(q: P2) = loc(q).let { (x, y) -> atan2(y / r, x / big) }
+                    val a0 = param(all[2]); var a1 = param(all[3]); if (a1 <= a0) a1 += 2 * Math.PI
+                    ellipse(c, all[1], P2(c.x - dy * r, c.y + dx * r), a0, a1)?.let { listOf(it) } }
+            }
+            // center, major vertex, minor point, end (sketch_arc_of_hyperbola): the branch, then the arc symmetric about the axis
+            SketchTool.ARC_HYPERBOLA -> run { val big = c.d(all[1]); if (big < 1e-9) return@run null
+                val dx = (all[1].x - c.x) / big; val dy = (all[1].y - c.y) / big
+                fun perp(q: P2) = -dy * (q.x - c.x) + dx * (q.y - c.y)
+                if (n == 2) return@run listOf(listOf(c, all[1]))
+                val b = maxOf(abs(perp(all[2])), big * 0.05)
+                val t = if (n == 4) kotlin.math.asinh(perp(all[3]) / b).let { if (abs(it) > 1e-6) abs(it) else 1.0 } else 1.5
+                listOf((0..64).map { val u = -t + 2 * t * it / 64; val x = big * kotlin.math.cosh(u); val y = b * kotlin.math.sinh(u)
+                    P2(c.x + x * dx - y * dy, c.y + x * dy + y * dx) }) }
+            // focus, vertex, start, end (sketch_arc_of_parabola)
+            SketchTool.ARC_PARABOLA -> run { val f = all[0]; val v = all[1]; val fl = f.d(v); if (fl < 1e-9) return@run null
+                val dx = (f.x - v.x) / fl; val dy = (f.y - v.y) / fl
+                fun par(q: P2) = -dy * (q.x - v.x) + dx * (q.y - v.y)
+                if (n == 2) return@run listOf(listOf(f, v))
+                val (u0, u1) = if (n == 4) listOf(par(all[2]), par(all[3])).sorted().let { (a, b) -> if (abs(b - a) < 1e-6) a to a + fl else a to b }
+                    else abs(par(all[2])).let { val m = maxOf(it, fl); -m to m }
+                listOf((0..64).map { val u = u0 + (u1 - u0) * it / 64; val x = u * u / (4 * fl); P2(v.x + x * dx - u * dy, v.y + x * dy + u * dx) }) }
+            SketchTool.OBLONG -> { val x1 = minOf(all[0].x, all[1].x); val x3 = maxOf(all[0].x, all[1].x); val y1 = minOf(all[0].y, all[1].y); val y3 = maxOf(all[0].y, all[1].y)
+                val r = maxOf(1e-3, minOf(0.2 * minOf(x3 - x1, y3 - y1), 0.49 * minOf(x3 - x1, y3 - y1)))
+                listOf(arc(P2(x3 - r, y1 + r), r, -Math.PI / 2, 0.0, 12) + arc(P2(x3 - r, y3 - r), r, 0.0, Math.PI / 2, 12) +
+                    arc(P2(x1 + r, y3 - r), r, Math.PI / 2, Math.PI, 12) + arc(P2(x1 + r, y1 + r), r, Math.PI, 1.5 * Math.PI, 12) + listOf(P2(x3 - r, y1))) }
+            SketchTool.ARC_SLOT -> { val R = c.d(all[1])
+                when (n) {
+                    2 -> listOf(arc(c, R, 0.0, 2 * Math.PI, 72), listOf(c, all[1]))
+                    3 -> ccw(c, all[1], all[2]).let { (a0, a1) -> listOf(arc(c, R, a0, a1), listOf(c, all[1])) }
+                    else -> ccw(c, all[1], all[2]).let { (a0, a1) -> val w = minOf(2 * abs(all[3].d(c) - R), R * 0.99).coerceAtLeast(1e-3)
+                        fun at(a: Double) = P2(c.x + R * cos(a), c.y + R * sin(a))
+                        listOf(arc(c, R + w / 2, a0, a1), arc(c, R - w / 2, a0, a1), arc(at(a0), w / 2, a0 + Math.PI, a0 + 2 * Math.PI, 16), arc(at(a1), w / 2, a1, a1 + Math.PI, 16)) }
+                } }
+            else -> null
         }
     }
 

@@ -1,0 +1,1 @@
+• Sketcher: arcs show the curve while you drag, as on the desktop: arc from center, 3-point arc, elliptical, hyperbolic and parabolic arcs, and the arc slot. Circles from 3 points, slots, polygons, ellipses and rounded rectangles preview their real shape too, instead of straight lines between the tapped points.
