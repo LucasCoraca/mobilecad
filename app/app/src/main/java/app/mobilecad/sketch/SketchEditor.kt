@@ -18,6 +18,7 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.hypot
+import kotlin.math.max
 import kotlin.math.sin
 import app.mobilecad.ui.OS
 
@@ -229,6 +230,8 @@ class SketchEditor(private val app: AppState, val name: String) {
         for ((ref, q) in modelPts) { val d = q.d(p); if (d < md) { md = d; mb = Triple(ref, q, 1) } }
         for (m in modelCurves) if (m.kind == "circle" && m.c != null) { val d = m.c.d(p); if (d < md) { md = d; mb = Triple(m.ref, m.c, 3) } }
         mb?.let { (ref, q, pos) -> return Snap(q, listOf(JSONArray(listOf("Coincident", local, ref, pos))), if (pos == 3) "model center" else "model point") to null }
+        // 1c. where two curves / axes / part edges cross: on both (one PointOnObject per curve)
+        intersection(p, tolMm)?.let { (q, refs) -> return Snap(q, refs.map { JSONArray(listOf("PointOnObject", local, it)) }, "intersection") to null }
         // 2. midpoints (SnapManager::snapToLineMiddle / snapToArcMiddle): a line's middle -> Symmetric about its ends
         //    (symmetric constraint); an arc's middle -> point on the arc, as FreeCAD does
         for (g in geos) {
@@ -270,6 +273,67 @@ class SketchEditor(private val app: AppState, val name: String) {
             val av = if (h) a.y else a.x; val bv = if (h) b.y else b.x
             if ((av - v) * (bv - v) > 0 || abs(bv - av) < 1e-12) null else { val t = (v - av) / (bv - av); P2(a.x + t * (b.x - a.x), a.y + t * (b.y - a.y)) }
         }.minByOrNull { it.d(p) }
+    }
+
+    /** A curve near the finger for intersection snapping: an (infinite) line, a circle (an arc: [pts] limits it) or a
+     *  polyline. [ref] is the sketch geo id, -1 / -2 for the axes, or a part edge "Obj:EdgeN". */
+    private class Crv(val ref: Any, val la: P2? = null, val lb: P2? = null, val c: P2? = null, val r: Double = 0.0, val pts: List<P2> = emptyList(), val partial: Boolean = false)
+
+    /** The crossing of two curves under the finger nearest to it, with the two curves. */
+    private fun intersection(p: P2, tolMm: Double): Pair<P2, List<Any>>? {
+        val near = mutableListOf<Crv>()
+        for (g in geos) if (!g.isPoint && dist(g, p) < tolMm) near += when {
+            g.isLine -> Crv(g.i, g.a, g.b)
+            g.isCircle -> Crv(g.i, c = g.c, r = g.r)
+            g.isArc -> Crv(g.i, c = g.c, r = g.r, pts = g.polyline(), partial = true)
+            else -> Crv(g.i, pts = g.polyline())
+        }
+        for (m in modelCurves) {
+            if (m.pts.zipWithNext().none { (a, b) -> seg(p, a, b) < tolMm }) continue
+            near += when { m.kind == "line" && m.pts.size >= 2 -> Crv(m.ref, m.pts.first(), m.pts.last())
+                m.kind == "circle" && m.c != null -> Crv(m.ref, c = m.c, r = m.r, pts = m.pts, partial = true)
+                else -> Crv(m.ref, pts = m.pts) }
+        }
+        if (abs(p.y) < tolMm) near += Crv(-1, P2(0.0, 0.0), P2(1.0, 0.0))
+        if (abs(p.x) < tolMm) near += Crv(-2, P2(0.0, 0.0), P2(0.0, 1.0))
+        var best: Pair<P2, List<Any>>? = null; var bd = tolMm
+        for (i in near.indices) for (j in i + 1 until near.size) for (q in crossings(near[i], near[j])) {
+            val d = q.d(p); if (d < bd) { bd = d; best = q to listOf(near[i].ref, near[j].ref) }
+        }
+        return best
+    }
+
+    private fun crossings(u: Crv, v: Crv): List<P2> {
+        fun onPartial(k: Crv, q: P2) = !k.partial || k.pts.zipWithNext().any { (a, b) -> seg(q, a, b) < max(1e-3, k.r * 2e-3) }
+        fun lineLine(a: P2, b: P2, c: P2, d: P2): List<P2> {
+            val rx = b.x - a.x; val ry = b.y - a.y; val sx = d.x - c.x; val sy = d.y - c.y; val den = rx * sy - ry * sx
+            if (abs(den) < 1e-12) return emptyList(); val t = ((c.x - a.x) * sy - (c.y - a.y) * sx) / den
+            return listOf(P2(a.x + t * rx, a.y + t * ry))
+        }
+        fun lineCircle(a: P2, b: P2, c: P2, r: Double): List<P2> {
+            val dx = b.x - a.x; val dy = b.y - a.y; val l2 = dx * dx + dy * dy; if (l2 < 1e-18) return emptyList()
+            val t0 = ((c.x - a.x) * dx + (c.y - a.y) * dy) / l2; val f = P2(a.x + t0 * dx, a.y + t0 * dy); val h2 = r * r - f.d(c).let { it * it }
+            if (h2 < 0) return emptyList(); val h = kotlin.math.sqrt(h2 / l2)
+            return listOf(P2(f.x + h * dx, f.y + h * dy), P2(f.x - h * dx, f.y - h * dy))
+        }
+        fun circleCircle(c1: P2, r1: Double, c2: P2, r2: Double): List<P2> {
+            val d = c1.d(c2); if (d < 1e-12 || d > r1 + r2 || d < abs(r1 - r2)) return emptyList()
+            val a = (r1 * r1 - r2 * r2 + d * d) / (2 * d); val h = kotlin.math.sqrt(max(0.0, r1 * r1 - a * a))
+            val mx = c1.x + a * (c2.x - c1.x) / d; val my = c1.y + a * (c2.y - c1.y) / d
+            return listOf(P2(mx + h * (c2.y - c1.y) / d, my - h * (c2.x - c1.x) / d), P2(mx - h * (c2.y - c1.y) / d, my + h * (c2.x - c1.x) / d))
+        }
+        val qs = when {
+            u.la != null && v.la != null -> lineLine(u.la, u.lb!!, v.la, v.lb!!)
+            u.la != null && v.c != null -> lineCircle(u.la, u.lb!!, v.c, v.r)
+            u.c != null && v.la != null -> lineCircle(v.la, v.lb!!, u.c, u.r)
+            u.c != null && v.c != null -> circleCircle(u.c, u.r, v.c, v.r)
+            else -> {   // along the tessellations (ellipses, B-splines, part edges)
+                val pu = u.pts.ifEmpty { listOfNotNull(u.la, u.lb) }; val pv = v.pts.ifEmpty { listOfNotNull(v.la, v.lb) }
+                pu.zipWithNext().flatMap { (a, b) -> pv.zipWithNext().mapNotNull { (c, d) ->
+                    lineLine(a, b, c, d).firstOrNull()?.takeIf { q -> seg(q, a, b) < 1e-6 && seg(q, c, d) < 1e-6 } } }
+            }
+        }
+        return qs.filter { onPartial(u, it) && onPartial(v, it) }
     }
 
     private fun dist(g: SkGeo, p: P2) = when {
@@ -905,11 +969,11 @@ class SketchEditor(private val app: AppState, val name: String) {
                 pLine.color = 0xFF47AB72.toInt(); pLine.strokeWidth = 1 * dp; pLine.pathEffect = DashPathEffect(floatArrayOf(4 * dp, 4 * dp), 0f)
                 listOfNotNull(s.guide, s.guide2).forEach { g -> scr(g)?.let { r -> c.drawLine(r[0], r[1], q[0], q[1], pLine) } }
                 pLine.pathEffect = null
-                pFill.color = when (s.kind.removePrefix("model ")) { "point", "origin", "center" -> 0xFFE0403F.toInt(); "midpoint" -> 0xFFB04ADB.toInt(); "on curve", "on axis", "on model edge" -> 0xFFFFC20E.toInt()
+                pFill.color = when (s.kind.removePrefix("model ")) { "point", "origin", "center" -> 0xFFE0403F.toInt(); "midpoint" -> 0xFFB04ADB.toInt(); "on curve", "on axis", "on model edge", "intersection" -> 0xFFFFC20E.toInt()
                     "horizontal", "vertical", "aligned" -> 0xFF47AB72.toInt(); else -> 0xFF2A6FC9.toInt() }
                 c.drawCircle(q[0], q[1], 6 * dp, pFill)
                 val tag = when (s.kind) { "point" -> "coincident"; "origin" -> "origin"; "center" -> "center"; "midpoint" -> "midpoint"; "on curve" -> "on curve"
-                    "on axis" -> "on axis"; "horizontal" -> "horizontal"; "vertical" -> "vertical"; "aligned" -> "aligned"
+                    "on axis" -> "on axis"; "intersection" -> "on both curves"; "horizontal" -> "horizontal"; "vertical" -> "vertical"; "aligned" -> "aligned"
                     "model point" -> "part vertex"; "model center" -> "part center"; "model midpoint" -> "part midpoint"; "on model edge" -> "on part edge"; else -> null }
                 // every suggested constraint is named (desktop draws one icon per auto constraint next to the cursor)
                 listOfNotNull(tag, s.also).joinToString(" + ").takeIf { it.isNotEmpty() }?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }

@@ -215,8 +215,10 @@ def sketch_polyline(name, points, closed=False, construction=False, auto=None, c
     if closed and len(pts) > 2: geos.append(Part.LineSegment(pts[-1], pts[0]))
     cons = [('Coincident', (i, END, i + 1, START), (0, 2)) for i in range(len(geos) - 1)]
     if closed and len(geos) > 2: cons.append(('Coincident', (len(geos) - 1, END, 0, START), (0, 2)))
-    first = _add(sk, geos, cons, construction); _auto(sk, auto, first)
+    first = _add(sk, geos, cons, construction)
+    # the chain coincidence goes first so the redundancy check of the auto constraints sees it
     if chain and prev >= 0: sk.addConstraint(Sketcher.Constraint('Coincident', first, START, prev, END))
+    _auto(sk, auto, first)
     return _commit(sk)
 
 @op

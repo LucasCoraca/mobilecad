@@ -1,0 +1,2 @@
+• Sketcher: a point drawn where two curves cross (lines, circles, arcs, the axes or edges of the part) snaps to the crossing and is put on both curves. The hint shows "on both curves".
+• Sketcher: a horizontal or vertical that the snapped points already imply is no longer added twice when a polyline continues.
