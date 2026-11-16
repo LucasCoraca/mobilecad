@@ -2,17 +2,17 @@
 
 \section{In one sentence}
 
-MobileCAD is \textbf{an Android front end for the FreeCAD engine}: it packs the desktop FreeCAD modelling
+MobileCAD is \textbf{an Android front end for the FreeCAD engine}: it packs the desktop FreeCAD modeling
 kernel, workbenches and Python ecosystem into a single APK, then rewrites the whole user interface in
 Kotlin + Jetpack Compose — for touch screens, for tablets and for phones.
 
 That means two things:
 
 \begin{enumerate}
-  \item What you get is not a “simplified” modeller. Parametric sketching, solid modelling, surfaces,
+  \item What you get is not a “simplified” modeler. Parametric sketching, solid modeling, surfaces,
         assembly, drawings, FEM, CAM, BIM, meshes and point clouds all rest on FreeCAD's native C++
         implementation;
-  \item The document format is fully interchangeable with FreeCAD. A part you modelled on the phone in a
+  \item The document format is fully interchangeable with FreeCAD. A part you modeled on the phone in a
         spare moment opens on the desktop and can be changed further, and the reverse is true as well.
 \end{enumerate}
 
@@ -36,12 +36,12 @@ phone counterpart. Grouped by purpose:
 \toprule
 \textbf{Category} & \textbf{Workbenches and capabilities} \\
 \midrule
-Parametric modelling & \textbf{Sketch} (Sketcher): geometry, constraints, dimensions, construction lines,
+Parametric modeling & \textbf{Sketch} (Sketcher): geometry, constraints, dimensions, construction lines,
 B-splines; \textbf{Part Design}: Pad, Pocket, Revolution, Loft, Pipe, Helix, Hole, Fillet, Chamfer, Draft,
 Thickness, Pattern, Mirrored, datum geometry \\
 Solids and surfaces & \textbf{Part}: primitives, booleans, extrude/revolve/sweep/loft, offset, check,
 measure; \textbf{Surface} \\
-Assembly & \textbf{Assembly}: 13 joint types, grounding, solving, conflict diagnostics, BOM, snapshots,
+Assembly & \textbf{Assembly}: 12 joint types, grounding, solving, conflict diagnostics, BOM, snapshots,
 simulation \\
 Drawing & \textbf{Drawing} (TechDraw): pages and templates, projection groups, sections, detail views,
 dimensions, symbols, export to PDF/SVG/DXF \\
@@ -60,7 +60,7 @@ and more \\
 
 \begin{tip}[Is every one of those commands used often?]
 No. Many of the 984 commands are synonyms or fine-grained operations of specialist workbenches. About
-\textbf{40} are genuinely frequent in everyday modelling: the dozen or so drawing and constraint tools in
+\textbf{40} are genuinely frequent in everyday modeling: the dozen or so drawing and constraint tools in
 Sketch, Pad/Pocket/Fillet/Pattern in Part Design, and opening, saving and exporting files. This book covers
 those in depth; for the rest, use Chapter 8 and the command reference in Appendix A.
 \end{tip}
@@ -100,11 +100,11 @@ parameters, for instance) are not lost in an older one.
         running Android use a separate MobileCAD XR build).
   \item \textbf{Storage}: the APK is about 165 MB; once the first launch has unpacked the runtime, it occupies
         about 1 GB. Set aside 2 GB or more.
-  \item \textbf{Memory}: 6 GB or more for smooth modelling; a tablet with 8--12 GB handles assemblies of
+  \item \textbf{Memory}: 6 GB or more for smooth modeling; a tablet with 8--12 GB handles assemblies of
         several hundred features with ease.
-  \item \textbf{Performance}: solid modelling is on a par with desktop FreeCAD. FEM solving is limited by phone
+  \item \textbf{Performance}: solid modeling is on a par with desktop FreeCAD. FEM solving is limited by phone
         thermals, so keep meshes to about a third of the size you would use on the desktop. Display of large
-        assemblies is optimised for mobile (the viewport redraws on demand and uses off-screen caching).
+        assemblies is optimized for mobile (the viewport redraws on demand and uses off-screen caching).
 \end{itemize}
 
 \section{License, privacy and data}

@@ -1,12 +1,12 @@
 \chapter{Your first part: a bracket in twenty minutes}
 
 This chapter is one complete, reproducible exercise. Work through it and you will use the most important
-modelling chain in the app: \textbf{Sketch → Pad → Fillet → Hole → Save}. When you have finished, you can
+modeling chain in the app: \textbf{Sketch → Pad → Fillet → Hole → Save}. When you have finished, you can
 already build simple parts with MobileCAD.
 
 \begin{practice}[Goal]
 A rectangular bracket 60 × 40 mm and 12 mm thick, with R6 fillets at the four corners, a ⌀10 through hole in
-the centre and one ⌀5 mounting hole on each side.
+the center and one ⌀5 mounting hole on each side.
 \end{practice}
 
 \section{Step 1: Create a document}
@@ -39,8 +39,8 @@ session a definite home and makes it easy to use Save a copy later to compare de
 
 \section{Step 3: Draw a rectangle}
 
-In sketch mode the toolstrip changes to sketch tools: four toolsets, \ui{Draw}, \ui{Constrain}, \ui{Modify}
-and \ui{View}, plus \ui{Construction: off}, \ui{Constraints} (the constraints list), the common
+In sketch mode the toolstrip switches to sketch tools: the four toolsets \ui{Draw}, \ui{Constrain},
+\ui{Modify} and \ui{View}, plus \ui{Construction: off}, \ui{Constraints} (the constraints list), the common
 \ui{Polyline}, \ui{Rectangle}, \ui{Circle}, \ui{3-point arc}, \ui{Dimension}, \ui{Trim}, \ui{Select} and
 \ui{Delete}, and at the far right ✓ (Leave sketch) and ✗ (Cancel sketch).
 
@@ -56,8 +56,8 @@ and \ui{View}, plus \ui{Construction: off}, \ui{Constraints} (the constraints li
 \section{Step 4: Add dimensions and make the sketch fully constrained}
 
 \begin{enumerate}
-  \item Tap \ui{Dimension} (\cmd{Sketcher\_Dimension}), tap the rectangle's two horizontal edges or two corners
-        in turn, drag to a good position and tap to place the dimension;
+  \item Tap \ui{Dimension} (\cmd{Sketcher\_Dimension}), tap two horizontal edges of the rectangle (or two
+        corners) in turn, drag to a good position and tap to place the dimension;
   \item the Numpad appears once the dimension is placed; type \file{60} and tap ✓ to confirm;
   \item dimension the other direction in the same way and enter \file{40};
   \item watch the status in the bottom-left corner: when it reads \ui{Fully constrained}, every degree of
@@ -84,7 +84,7 @@ to a body.
   \item tap \ui{Features} → \ui{Pad} in the toolstrip (\cmd{PartDesign\_Pad});
   \item the feature dialog opens with \ui{Profile} already filled in. Tap the \ui{Length} row and type
         \file{12} on the Numpad;
-  \item want to see the extrusion direction straight away? Flip the \ui{Reversed} switch;
+  \item want to see the extrusion direction right away? Flip the \ui{Reversed} switch;
   \item tap ✓ in the title bar to confirm. The block appears.
 \end{enumerate}
 
@@ -123,7 +123,7 @@ There are two ways to do this; the first is recommended:
   \item tap ✓.
 \end{enumerate}
 
-\begin{tip}[Standard threads and counterbores]
+\begin{tip}[Standard threads and countersinks]
 The \ui{Threaded} switch on the Hole feature generates threaded holes to ISO standards (choose thread type,
 size and class). \ui{Hole type} offers counterbore, countersink, counterdrill and other shapes, and shows the
 matching diameter, depth and angle parameters automatically.
@@ -185,8 +185,8 @@ You have now walked the main trunk of CAD:
 Sketch & A 2D profile plus constraints and dimensions; stable only once fully constrained \\
 Pad / Pocket & Add or remove material along the normal of a closed profile \\
 Fillet / Chamfer & Dress an edge; lives in the feature history \\
-Hole & A standardised hole, with threads and counterbores \\
-Feature tree & The modelling history; double-tap any step to change it \\
+Hole & A standardized hole, with threads and countersinks \\
+Feature tree & The modeling history; double-tap any step to change it \\
 Tip & Marks how far the body has been computed; roll it back to replay the history \\
 \bottomrule
 \end{tabularx}

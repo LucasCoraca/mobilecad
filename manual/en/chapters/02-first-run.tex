@@ -33,7 +33,7 @@ tablet):
 \begin{enumerate}
   \item \textbf{Unpack the runtime}: the roughly 1 GB of FreeCAD, Python, Open CASCADE and Qt runtime
         libraries inside the APK is unpacked into the app's private directory;
-  \item \textbf{Start the engine}: it loads more than 100 native libraries, initialises Python 3.14 and
+  \item \textbf{Start the engine}: it loads more than 100 native libraries, initializes Python 3.14 and
         imports FreeCAD; the splash screen shows \ui{Starting the CAD engine…}. The first launch after an app
         upgrade also shows \ui{Unpacking the CAD engine…} first;
   \item \textbf{Create an empty document}: a new document named \ui{Unnamed} opens with an empty feature tree.
@@ -56,31 +56,31 @@ After launching you will see the interface below (Chinese UI):
 \screenshot{ui-main-zh.jpg}{The MobileCAD main screen (Chinese UI). The feature tree is on the left, the ☰ menu and document information at the top, the 3D view in the middle, the element tabs (Part / Assembly / Drawing / Variables / More) at the bottom, and the NaviCube in the top-right corner of the view.}
 
 \begin{enumerate}
-  \item \textbf{Spin it}: drag in the view with one finger — the model rotates around its centre.
+  \item \textbf{Spin it}: drag in the view with one finger — the model rotates around its center.
   \item \textbf{Zoom in}: pinch with two fingers to zoom, drag with two fingers to pan.
   \item \textbf{Change the direction}: tap the \ui{Front}/\ui{Top}/\ui{Right} face of the NaviCube in the
         top-right corner and the view animates to that direction; drag the cube itself to rotate freely.
   \item \textbf{Open the menu}: tap ☰ in the top-left corner to see six menu groups: File, Edit, View, Tools,
         Macro and Help.
-  \item \textbf{Draw something}: tap \ui{Sketch} in the top toolstrip, choose \ui{New sketch} in the toolbar
+  \item \textbf{Draw something}: tap \ui{Sketch} in the top toolstrip, choose \ui{New Sketch} in the toolbar
         that unfolds, pick a datum plane and you are in sketch mode (Chapter 4 walks through it in full).
 \end{enumerate}
 
 \section{Gesture reference}
 
-MobileCAD's gestures differ between modelling and sketching. This is where it feels most different from
+MobileCAD's gestures differ between modeling and sketching. This is where it feels most different from
 desktop CAD, so it is worth learning first:
 
 \begin{center}
 \small
 \begin{tabularx}{\linewidth}{@{}lXX@{}}
 \toprule
-\textbf{Gesture} & \textbf{Modelling} & \textbf{Sketching} \\
+\textbf{Gesture} & \textbf{Modeling} & \textbf{Sketching} \\
 \midrule
 One finger drag & Rotate the view & Draw (the point that counts is 50 dp above your finger) \\
 Two fingers drag & Pan & Pan (a second finger landing within 300 ms cancels the stroke) \\
 Two fingers pinch & Zoom & Zoom \\
-Three fingers drag & Rotate around the centre of the three fingers (large reorientations) & Same \\
+Three fingers drag & Rotate around the center of the three fingers (large reorientations) & Same \\
 One finger tap & Select a face, edge or vertex & Select geometry or a constraint \\
 Double-tap & Clear the selection & Clear the selection \\
 Two fingers tap & Open the context menu (the desktop right-click) & Same \\
@@ -123,9 +123,9 @@ terminology on both.
 Three more settings you will use often live in \menupath{Edit → Preferences}:
 
 \begin{itemize}
-  \item \textbf{Unit system}: switch FreeCAD's unit scheme (millimetre/metre, inch and so on). It affects how
+  \item \textbf{Unit system}: switch FreeCAD's unit scheme (millimeter/meter, inch and so on). It affects how
         every value is displayed and entered;
-  \item \textbf{Theme}: follow the system, light or dark. Dark suits long modelling sessions and OLED screens;
+  \item \textbf{Theme}: follow the system, light or dark. Dark suits long modeling sessions and OLED screens;
   \item \textbf{Check for updates daily}: when on, the app quietly checks GitHub Releases at startup; if there
         is a new version, an update dialog appears (release notes, download size, and the reminder “Android
         closes MobileCAD during installation, so save your work first”).

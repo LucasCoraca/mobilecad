@@ -1,6 +1,6 @@
 \chapter{Draft: 2D Lines and the Working Plane}
 
-The Draft workbench is made for 2D drawing: lines, circles, polygons and dimensions on a plane, plus
+The Draft workbench is for 2D drawing: lines, circles, polygons and dimensions on a plane, plus
 drawing-style operations such as paths and arrays. Its coordinate system is the \textbf{working
 plane}, not a fixed XY plane — that is the key to using Draft well.
 
@@ -60,8 +60,8 @@ Tap to place a point; the top banner shows the tool name, the prompt, and
         coordinates}; \file{@} means relative to the previous point;
   \item Long-press to enter precise mode (the crosshair sits 60 dp above your finger); lift your
         finger and the point is placed;
-  \item Multi-segment tools end with a double tap (the second tap removes the point just added);
-        tools with a fixed number of points end by themselves once they have enough;
+  \item Multi-segment tools finish with a double tap (the second tap removes the point just added);
+        tools with a fixed number of points finish by themselves once they have enough;
   \item \ui{Finish} needs the minimum number of points; \ui{Close} exists only for polylines with at
         least 2 points; \ui{Undo} removes the last point.
 \end{itemize}
@@ -71,7 +71,7 @@ Tap to place a point; the top banner shows the tool name, the prompt, and
 \begin{longtable}{@{}p{0.18\linewidth}p{0.10\linewidth}p{0.62\linewidth}@{}}
 \toprule \textbf{Tool} & \textbf{Points} & \textbf{Notes} \\ \midrule \endhead
 Line & 2 & Start point → end point \\
-Polyline & Multiple & Connect points; double-tap to end \\
+Polyline & Multiple & Connect points; double-tap to finish \\
 Rectangle & 2 & Two opposite corners \\
 Circle & 2 & Center → radius point \\
 Arc & 3 & Center → start point → end point \\
@@ -79,13 +79,13 @@ Arc & 3 & Center → start point → end point \\
 Ellipse & 2 & Two opposite corners (major and minor axes swap automatically)\\
 Polygon & 2 & Asks for the number of sides (default 6), then center + vertex (inscribed)\\
 B-spline & Multiple & Connect points \\
-Bézier & Multiple & Cubic curve; after every 4 points you continue \\
+Bézier & Multiple & Cubic curve; continues after every 4 points \\
 Point & 1 & A single point \\
 Text & 2 & Enter the text first (\file{\textbackslash n} for a line break), then tap the position \\
 Shape string & 2 & Then asks for the height (default 10); the font is fixed to Roboto \\
 Dimension & 3 & Three-point linear dimension \\
 Label & Multiple & Enter the text first; the target is the current selection; then tap the target point and the label point \\
-Face & — & Select a face first, then run it (the face is bound)\\
+Face & — & Select a face first, then run the command (it is bound to that face)\\
 Hatch & — & Select the objects first; choose one of 8 patterns and a scale (default 10)\\
 \bottomrule
 \end{longtable}
@@ -138,7 +138,7 @@ to Construction Group}.
   \item \ui{Set Style}/\ui{Apply Current Style}/\ui{Annotation Styles Editor} all lead to the
         standard ``Appearance'' dialog: \textbf{only 12 colors + Default}, used to change the object
         color; on mobile there is no line width, line style, layer style or annotation style editor;
-  \item Layers: \ui{New Layer} (puts the selection inside if there is one), \ui{Add to Layer},
+  \item Layers: \ui{New Layer} (if something is selected, it goes into the new layer), \ui{Add to Layer},
         \ui{Layers Manager} (tap a layer to toggle its display), \ui{Auto-Group} (sets the default
         layer for new objects), \ui{Add to Group}/\ui{Select Group};
   \item Construction mode: adds new objects to the Construction group.

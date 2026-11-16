@@ -22,7 +22,7 @@ From left to right:
 
 \section{Element tabs and workbenches}
 
-The row of tabs along the bottom corresponds to FreeCAD's workbenches, but reorganised around the design
+The row of tabs along the bottom corresponds to FreeCAD's workbenches, but reorganized around the design
 workflow:
 
 \begin{center}
@@ -31,7 +31,7 @@ workflow:
 \toprule
 \textbf{Tab} & \textbf{Contents} \\
 \midrule
-\ui{Part} & A combined workspace with Part Design, Part, Sketch, Surface and Draft; everyday modelling happens
+\ui{Part} & A combined workspace with Part Design, Part, Sketch, Surface and Draft; everyday modeling happens
 here \\
 \ui{Assembly} & Joints, solving and BOM \\
 \ui{Drawing} & TechDraw: produce 2D drawings and export them to PDF/SVG/DXF \\
@@ -56,7 +56,7 @@ structure of the model:
         a drawing contains pages and views.
   \item \textbf{Icons}: each object type has its own icon (body, pad, sketch, datum plane, point, hole,
         pattern, …), the same as in desktop FreeCAD.
-  \item \textbf{State}: red text means the feature has an error; grey or translucent means hidden; a
+  \item \textbf{State}: red text means the feature has an error; gray or translucent means hidden; a
         strikethrough means suppressed; a small icon after the name means the object needs recomputing
         (Touched); the \ui{Tip} marker shows how far the body has been computed. A small red exclamation mark
         on the right of a feature row means that feature failed; open its dialog to see the error.
@@ -71,7 +71,7 @@ structure of the model:
         history. To change the order, use “Roll tip to here” and the references inside feature dialogs.
 \end{itemize}
 
-\screenshot[0.72]{tablet-partdesign.jpg}{The feature tree and a Part Design model. The tree shows the full modelling history — Pad, Groove, Mirrored, Revolution, DatumPlane, Pocket, PolarPattern and others — and that is what “parametric” means: every step can be changed later.}
+\screenshot[0.72]{tablet-partdesign.jpg}{The feature tree and a Part Design model. The tree shows the full modeling history — Pad, Groove, Mirrored, Revolution, DatumPlane, Pocket, PolarPattern and others — and that is what “parametric” means: every step can be changed later.}
 
 The menu that a long-press opens (it varies with the object type):
 
@@ -107,7 +107,7 @@ and \ui{Draft}. Each toolset corresponds to one or more FreeCAD toolbars:
   \item Tap a toolset → a \textbf{tool panel} unfolds in the top-left corner of the view area, with the buttons
         grouped by FreeCAD toolbar. A button's name is the FreeCAD command name;
   \item at the top of the panel is \ui{Search all tools}: you can search in English or Chinese (for example
-        “pad” or “凸台”), and the results are grouped by workbench;
+        “pad” or “hole”), and the results are grouped by workbench;
   \item \ui{More tools (N)} at the bottom of the panel folds away or expands the commands of this workbench that
         are not on a toolbar, so every command is reachable;
   \item the right side of the toolstrip shows the \textbf{six most recently used} tools, separated by vertical
@@ -115,13 +115,13 @@ and \ui{Draft}. Each toolset corresponds to one or more FreeCAD toolbars:
   \item tap the toolset again (or tap empty space in the view) to close the panel.
 \end{itemize}
 
-\screenshot{ui-toolpanel-zh.jpg}{The “Features” tool panel: sections follow FreeCAD toolbars (modelling features, …), and both command names and icons come from FreeCAD; the top of the panel searches all tools.}
+\screenshot{ui-toolpanel-zh.jpg}{The “Features” tool panel: sections follow FreeCAD toolbars (modeling features, …), and both command names and icons come from FreeCAD; the top of the panel searches all tools.}
 
 \section{View area}
 
 \begin{itemize}
   \item \textbf{NaviCube} (top right, 112×108 dp): its six faces (top, bottom, front, back, right, left)
-        correspond to the standard views; tap a face centre to animate to it. The edge strips and corner blocks
+        correspond to the standard views; tap a face center to animate to it. The edge strips and corner blocks
         between the faces give 26 directions; the ▲▼◀▶ around it rotate by 15° each time, and ↶ ↷ by 90°. The
         small ☰ menu at its top right switches \ui{Orthographic/Perspective}, \ui{Isometric} and \ui{Fit all}.
         Drag the cube itself to rotate freely. It always shows the current orientation.
@@ -137,7 +137,7 @@ and \ui{Draft}. Each toolset corresponds to one or more FreeCAD toolbars:
 
 \section{The dialog system}
 
-MobileCAD has five kinds of interactive control. Learn to recognise them and you will never be lost:
+MobileCAD has five kinds of interactive control. Learn to recognize them and you will never be lost:
 
 \begin{description}
   \item[Feature dialog] The equivalent of a desktop FreeCAD task panel: a 44 dp title bar (▾ collapses, ✓
@@ -146,8 +146,8 @@ MobileCAD has five kinds of interactive control. Learn to recognise them and you
         follow the order of the matching FreeCAD task panel (for a pad, for example: profile / type / length /
         length 2 / …), with the main rows first and the rest folded away. Row types include: number (Numpad),
         enumeration (up to 4 entries as segmented buttons, more as a drop-down), boolean (switch), link (shows
-        “Pad · Edge3, Edge7”; tap to enter picking mode with the \ui{Tap geometry} prompt), colour (swatch +
-        11-colour palette + custom), text/list/file, edge table (a radius per edge), and vector/placement (one
+        “Pad · Edge3, Edge7”; tap to enter picking mode with the \ui{Tap geometry} prompt), color (swatch +
+        11-color palette + custom), text/list/file, edge table (a radius per edge), and vector/placement (one
         row per component). \textbf{Every change is an undoable transaction and the model previews live}; ✓
         commits, ✗ rolls back to the state when the dialog opened.
   \item[Task panel] An interface built by FreeCAD's own Python commands (BIM, CAM, FEM, OpenSCAD, TechDraw and
@@ -194,7 +194,7 @@ settings: unit system, theme, language and update checks. See Section 2.6 for de
         tap cannot lose your document.
   \item \textbf{Undo/Redo} sits on the right of the top bar. Every feature change and every property edit is a
         separate transaction, and the Undo button's hint names the exact operation.
-  \item Unavailable commands (greyed out in menus, 38\% transparent in tool panels) show “<command> is not
+  \item Unavailable commands (grayed out in menus, 38\% transparent in tool panels) show “<command> is not
         available on mobile yet” when tapped at runtime. They usually belong to desktop window management and
         have no mobile counterpart.
 \end{itemize}

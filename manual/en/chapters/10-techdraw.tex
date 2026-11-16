@@ -2,7 +2,7 @@
 
 The TechDraw workbench turns a 3D model into deliverable 2D drawings: views, sections, detail
 enlargements, dimensions and symbols, exported at the end as PDF/SVG/DXF. It is the last stop of the
-whole workflow (modelling → assembly → drawings).
+whole workflow (modeling → assembly → drawings).
 
 \section{Pages and Templates}
 
@@ -30,12 +30,12 @@ its properties (scale, direction, X/Y position and so on); \ui{Redraw Page} redr
 \midrule
 View & Select parts (multiple selection allowed) → choose a direction (front, top, right, rear, bottom, left or isometric) → it is placed at the page center \\
 Projection group & Select parts → choose the projection directions (front/top/right by default) → they are laid out automatically as a standard third-angle set \\
-Section view & Select the base view first → choose a direction (right/left/up/down) → the cut goes through the center of the view; the symbol is labelled A/B/C automatically and placed 60 mm to the right (or below) \\
+Section view & Select the base view first → choose a direction (right/left/up/down) → the cut goes through the center of the view; the symbol is labeled A/B/C automatically and placed 60 mm to the right (or below) \\
 Complex section & Select the base view → select the cutting sketch/wire → offset strategy \\
 Detail view & Select the base view → tap the circle center on the page → radius (default 10) → a 2× enlargement with a letter label is generated at +80/+40 mm \\
 Active view & A screenshot of the current 3D viewport (100 mm wide)\\
 Image & Inserts an image (fixed 100 × 100 mm)\\
-Symbol / Surface finish & Chosen from the resource SVGs and inserted at the page center \\
+Symbol / Surface finish & Chosen from the bundled SVGs and inserted at the page center \\
 Text Annotation / Rich Text & Enter the text first, then tap the position \\
 Balloon & Select a view → tap the point to point at → tap the balloon position; the number is automatic \\
 Leader & Select a view → tap the arrow point → keep tapping → finish \\
@@ -66,7 +66,7 @@ On the page, tap an edge/vertex/face of a view, then tap a dimension command.
 
 \subsection{Dedicated Dimensions}
 
-Length, horizontal, vertical, angle, 3-point angle, area, radius, diameter, arc length, extent… every
+Length, horizontal, vertical, angle, 3-point angle, area, radius, diameter, arc length, extent… each
 command validates the selection, and a wrong selection shows
 \ui{Incorrect selection: select …}. There are also chain, coordinate and chamfer dimensions, plus
 ``align/stack'' actions based on the selected dimensions.
@@ -87,7 +87,7 @@ references).
   \item centerlines (face/two lines/two points), cosmetic vertex/midpoint/quadrant, cosmetic
         line/circle/arc, parallel/perpendicular cosmetic lines, the eraser and \ui{Show All};
   \item line attributes (line style 1--5, line width 0.18--0.7);
-  \item hatch (Hatch, using SVG patterns) and geometric hatch (Geometric Hatch, 11 PAT patterns).
+  \item hatch (Hatch) with SVG patterns, and geometric hatch (Geometric Hatch) with 11 PAT patterns.
 \end{itemize}
 
 \begin{warn}[Decorative geometry shows only partly on the page]
@@ -103,7 +103,7 @@ decoration as a supplement.
   \item \ui{Export as SVG}: template + outlines + dimensions + text + balloons (leaders, symbols,
         images and hatch are missing for now);
   \item \ui{Export as DXF}: the common 2D CAD format;
-  \item \ui{Export as PDF}: a vector drawing that converts the page's millimetres at 72 dpi; the
+  \item \ui{Export as PDF}: draws the page as vectors, converting its millimeters at 72 dpi; the
         entry is \ui{Export Page as PDF} in \ui{More tools};
   \item \ui{Print all} takes the same path as the PDF export: \textbf{only the current page is
         exported}, and the system print dialog is not shown.
@@ -157,7 +157,7 @@ decoration as a supplement.
 \begin{itemize}
   \item printing exports only the current page and has no system print dialog;
   \item the SVG export lacks leaders, symbols, images, hatch and cosmetic geometry;
-  \item the page does not draw centerlines/cosmetic geometry/threads/decoration lines, line style and
+  \item the page draws no centerlines/cosmetic geometry/threads/decoration lines; line style and
         line width have no effect, and hatching is always diagonal;
   \item a broken view has no break definition; a clip group does not clip; an image is fixed at
         100×100 mm;
