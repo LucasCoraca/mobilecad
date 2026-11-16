@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import app.mobilecad.i18n.I18n
 import app.mobilecad.sketch.SketchEditor
 import app.mobilecad.ui.DialogSpec
 import kotlinx.coroutines.CoroutineScope
@@ -77,6 +78,9 @@ class NumpadRequest(val title: String, val initial: String, val units: List<Stri
 
 /** UI state for one open FreeCAD document; all engine work is funnelled through [eng]. */
 class AppState(private val ctx: Context) {
+    /** Interface language: the saved choice ("system" follows Android) and the way to change it. */
+    fun interfaceLanguage(): String = I18n.saved(ctx)
+    fun setInterfaceLanguage(value: String) = I18n.setLanguage(ctx, value)
     val engine = Engine.get(ctx)
     val catalog = Catalog.get(ctx)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)

@@ -33,6 +33,7 @@ import app.mobilecad.freecad.Catalog
 import app.mobilecad.freecad.FcCommand
 import app.mobilecad.freecad.ToolsetDef
 import app.mobilecad.freecad.GuiCommands
+import app.mobilecad.i18n.I18n
 
 /** Tool panel: 5-column grid of a toolset's tools, sectioned by FreeCAD toolbar, searchable across every command. */
 @Composable
@@ -50,7 +51,7 @@ fun ToolPanel(cat: Catalog, toolset: ToolsetDef, isAvailable: (String) -> Boolea
         Row(Modifier.fillMaxWidth().height(36.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Search, null, tint = OS.Steel, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
             Box(Modifier.weight(1f)) {
-                if (query.isEmpty()) Text("Search all tools", color = OS.Aluminum, fontSize = 14.sp)
+                if (query.isEmpty()) Text(I18n.t("Search all tools"), color = OS.Aluminum, fontSize = 14.sp)
                 BasicTextField(query, { query = it }, singleLine = true, textStyle = TextStyle(fontSize = 14.sp, color = OS.Navy), modifier = Modifier.fillMaxWidth())
             }
         }
@@ -63,7 +64,7 @@ fun ToolPanel(cat: Catalog, toolset: ToolsetDef, isAvailable: (String) -> Boolea
                 item(span = { GridItemSpan(columns) }) {
                     Row(Modifier.fillMaxWidth().then(if (foldable) Modifier.clickable { moreOpen = !moreOpen } else Modifier).padding(top = 10.dp, bottom = 4.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        Text(if (foldable) "$title (${cmds.size})" else title, Modifier.weight(1f), color = if (foldable) OS.Primary else OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                        Text(if (foldable) I18n.tf("%s (%d)", I18n.t(title), cmds.size) else I18n.t(title), Modifier.weight(1f), color = if (foldable) OS.Primary else OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                         if (foldable) Icon(if (moreOpen) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = OS.Primary, modifier = Modifier.size(18.dp))
                     }
                 }

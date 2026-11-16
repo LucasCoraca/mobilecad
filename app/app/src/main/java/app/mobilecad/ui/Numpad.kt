@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import app.mobilecad.i18n.I18n
 
 /**
  * Numeric keypad (replaces the system keyboard for quantities).
@@ -42,7 +43,7 @@ fun Numpad(title: String, initial: String, units: List<String>, onAccept: (Strin
     // key height follows the screen so the pad fits in landscape on phones (5 rows + the value field)
     val keyH = ((Screen.height - 150.dp) / 5).coerceIn(36.dp, 52.dp)
     Column(modifier.then(if (Screen.compact) Modifier.widthIn(max = 420.dp).fillMaxWidth() else Modifier.width(320.dp)).shadow(10.dp, RoundedCornerShape(8.dp)).background(OS.Surface, RoundedCornerShape(8.dp)).padding(12.dp)) {
-        Text(title, color = OS.Steel, fontSize = 12.sp)
+        Text(I18n.t(title), color = OS.Steel, fontSize = 12.sp)
         Row(Modifier.fillMaxWidth().padding(vertical = 6.dp).border(1.dp, OS.BlueMed, RoundedCornerShape(4.dp)).padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically) {
             Text(text.ifEmpty { " " }, Modifier.weight(1f), fontSize = 22.sp, color = if (fresh) OS.Aluminum else OS.Navy, maxLines = 1)

@@ -30,7 +30,19 @@ The corresponding source of every release is this repository plus the archives a
 | `research/` | Generators for the command catalog from FreeCAD's sources |
 | `branding/` | Logo (`make_logo.py` generates the SVG master and the app's vector icons) |
 | `release/` | License notices, source archives, website (`make_site.py`), screenshots (`shot.sh`) and launch video (`video/`) |
+| `tools/` | Maintainer scripts (the Chinese catalog's FreeCAD import) |
 | `docs/` | The website, served by GitHub Pages (generated: `python3 release/make_site.py --github`) |
+
+## Interface languages
+
+The interface is English, or Simplified Chinese (简体中文) when the device language is Chinese. *Preferences ▸
+Language* pins a language instead of following Android, and the interface is drawn again at once.
+
+`app/app/src/main/assets/i18n/zh-Hans.tsv` holds the catalog: one `English<TAB>中文` line per string, and a string
+it does not hold stays English, so a partial catalog never breaks the interface. The command names, task panels
+and property names the engine reports use FreeCAD's own Chinese wording, regenerated with
+`python3 tools/i18n_import_freecad.py <FreeCAD checkout>` so both applications speak the same Chinese. Another
+language is one more `assets/i18n/<code>.tsv` and its code in `I18n.choices`.
 
 ## Building
 

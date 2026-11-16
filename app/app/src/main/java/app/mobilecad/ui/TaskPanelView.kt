@@ -28,6 +28,7 @@ import app.mobilecad.freecad.NumpadRequest
 import app.mobilecad.freecad.TextPrompt
 import org.json.JSONArray
 import org.json.JSONObject
+import app.mobilecad.i18n.I18n
 
 /**
  * A FreeCAD task panel / dialog of a Python command (BIM, CAM, FEM, OpenSCAD ...), rendered from the widget tree the
@@ -53,7 +54,7 @@ fun TaskPanelView(app: AppState, panel: JSONObject, modifier: Modifier = Modifie
             verticalAlignment = Alignment.CenterVertically) {
             Icon(if (collapsed) Icons.Default.ExpandMore else Icons.Default.ExpandLess, null, tint = OS.Steel, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(6.dp))
-            Text(panel.optString("title"), Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(I18n.t(panel.optString("title")), Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy, fontSize = 15.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         if (!collapsed) {
             Column(Modifier.heightIn(max = Screen.panelHeight(460.dp)).verticalScroll(rememberScrollState()).padding(horizontal = 10.dp, vertical = 4.dp)) {
@@ -67,7 +68,7 @@ fun TaskPanelView(app: AppState, panel: JSONObject, modifier: Modifier = Modifie
             Row(Modifier.fillMaxWidth().background(OS.Metal6).padding(horizontal = 6.dp), horizontalArrangement = Arrangement.End) {
                 for (i in 0 until buttons.length()) { val b = buttons.getString(i)
                     TextButton({ GuiCommands.panelButton(app, b) }) {
-                        Text(panel.optJSONObject("labels")?.optString(b)?.takeIf { it.isNotEmpty() } ?: when (b) { "ok" -> "OK"; "cancel" -> "Cancel"; "apply" -> "Apply"; "close" -> "Close"; "yes" -> "Yes"; "no" -> "No"; "reset" -> "Reset"; else -> b.replaceFirstChar { it.uppercase() } },
+                        Text(I18n.t(panel.optJSONObject("labels")?.optString(b)?.takeIf { it.isNotEmpty() } ?: when (b) { "ok" -> "OK"; "cancel" -> "Cancel"; "apply" -> "Apply"; "close" -> "Close"; "yes" -> "Yes"; "no" -> "No"; "reset" -> "Reset"; else -> b.replaceFirstChar { it.uppercase() } }),
                             color = if (b in setOf("cancel", "no")) OS.Red else OS.Primary, fontWeight = FontWeight.Medium) } }
             }
         }
@@ -76,7 +77,7 @@ fun TaskPanelView(app: AppState, panel: JSONObject, modifier: Modifier = Modifie
 
 @Composable
 private fun SectionTitle(t: String) =
-    Text(t, Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp), color = OS.Navy, fontWeight = FontWeight.Medium, fontSize = 14.sp)
+    Text(I18n.t(t), Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp), color = OS.Navy, fontWeight = FontWeight.Medium, fontSize = 14.sp)
 
 @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
@@ -106,7 +107,7 @@ private fun num(v: Double, dec: Int = 6): String = if (v == Math.floor(v) && Mat
 @Composable
 private fun Field(label: String, enabled: Boolean, content: @Composable RowScope.() -> Unit) {
     Row(Modifier.fillMaxWidth().heightIn(min = 44.dp).padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (label.isNotEmpty()) Text(label, Modifier.weight(1f).padding(end = 6.dp), color = if (enabled) OS.Steel else OS.Aluminum, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        if (label.isNotEmpty()) Text(I18n.t(label), Modifier.weight(1f).padding(end = 6.dp), color = if (enabled) OS.Steel else OS.Aluminum, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
         content()
     }
 }
@@ -123,7 +124,7 @@ private fun ValueBox(text: String, enabled: Boolean, modifier: Modifier = Modifi
 private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) {
     val id = n.optInt("id"); val en = n.optBoolean("enabled", true); val label = n.optString("label")
     when (n.optString("t")) {
-        "label" -> Text(n.optString("text"), Modifier.fillMaxWidth().padding(vertical = 4.dp), color = OS.Steel, fontSize = 13.sp)
+        "label" -> Text(I18n.t(n.optString("text")), Modifier.fillMaxWidth().padding(vertical = 4.dp), color = OS.Steel, fontSize = 13.sp)
         "group" -> {
             val title = n.optString("title")
             if (title.isNotEmpty() || n.optBoolean("checkable")) Row(verticalAlignment = Alignment.CenterVertically) {
@@ -137,7 +138,7 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
             val tabs = n.optJSONArray("tabs") ?: JSONArray(); val cur = n.optInt("value")
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
                 for (i in 0 until tabs.length()) { val sel = i == cur
-                    Text(tabs.getJSONObject(i).optString("title").ifEmpty { "Tab ${i + 1}" }, Modifier.padding(end = 4.dp).background(if (sel) OS.Primary else OS.Metal5, RoundedCornerShape(14.dp))
+                    Text(I18n.t(tabs.getJSONObject(i).optString("title").ifEmpty { "Tab ${i + 1}" }), Modifier.padding(end = 4.dp).background(if (sel) OS.Primary else OS.Metal5, RoundedCornerShape(14.dp))
                         .clickable { ev(id, "tab", i) }.padding(horizontal = 12.dp, vertical = 6.dp), color = if (sel) Color.White else OS.Navy, fontSize = 13.sp) }
             }
             if (cur in 0 until tabs.length()) Nodes(app, tabs.getJSONObject(cur).optJSONArray("kids"), ev)
@@ -157,44 +158,44 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
         "line", "text" -> Field(label, en) { ValueBox(n.optString("value").ifEmpty { " " }, en && !n.optBoolean("ro")) {
             app.textPrompt = TextPrompt(label.ifEmpty { n.optString("name") }, n.optString("value")) { s -> ev(id, "set", s) } } }
         "check" -> Row(Modifier.fillMaxWidth().clickable(enabled = en) { ev(id, "set", !n.optBoolean("value")) }, verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(n.optBoolean("value"), { ev(id, "set", it) }, enabled = en); Text(n.optString("text"), color = OS.Navy, fontSize = 14.sp) }
+            Checkbox(n.optBoolean("value"), { ev(id, "set", it) }, enabled = en); Text(I18n.t(n.optString("text")), color = OS.Navy, fontSize = 14.sp) }
         "radio" -> Row(Modifier.fillMaxWidth().clickable(enabled = en) { ev(id, "set", true) }, verticalAlignment = Alignment.CenterVertically) {
-            RadioButton(n.optBoolean("value"), { ev(id, "set", true) }, enabled = en); Text(n.optString("text"), color = OS.Navy, fontSize = 14.sp) }
+            RadioButton(n.optBoolean("value"), { ev(id, "set", true) }, enabled = en); Text(I18n.t(n.optString("text")), color = OS.Navy, fontSize = 14.sp) }
         "button" -> OutlinedButton({ ev(id, "set", if (n.optBoolean("checkable")) !n.optBoolean("value") else null) }, enabled = en,
             modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), shape = RoundedCornerShape(4.dp),
             colors = if (n.optBoolean("checkable") && n.optBoolean("value")) ButtonDefaults.outlinedButtonColors(containerColor = OS.SelBg) else ButtonDefaults.outlinedButtonColors()) {
-            Text(n.optString("text"), color = OS.Primary, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
+            Text(I18n.t(n.optString("text")), color = OS.Primary, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
         "combo" -> {
             val items = n.optJSONArray("items") ?: JSONArray(); val cur = n.optInt("value", -1); var open by remember { mutableStateOf(false) }
             Field(label, en) { Box {
                 Row(Modifier.widthIn(min = 120.dp, max = 190.dp).height(36.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).clickable(enabled = en) { open = true }.padding(start = 8.dp),
                     verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (cur in 0 until items.length()) items.getString(cur) else "", Modifier.weight(1f, fill = false), color = OS.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(if (cur in 0 until items.length()) I18n.t(items.getString(cur)) else "", Modifier.weight(1f, fill = false), color = OS.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Icon(Icons.Default.ArrowDropDown, null, tint = OS.Steel) }
-                DropdownMenu(open, { open = false }) { for (i in 0 until items.length()) DropdownMenuItem({ Text(items.getString(i)) }, { open = false; ev(id, "set", i) }) }
+                DropdownMenu(open, { open = false }) { for (i in 0 until items.length()) DropdownMenuItem({ Text(I18n.t(items.getString(i))) }, { open = false; ev(id, "set", i) }) }
             } }
         }
         "list" -> {
             val items = n.optJSONArray("items") ?: JSONArray()
-            if (label.isNotEmpty()) Text(label, Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
+            if (label.isNotEmpty()) Text(I18n.t(label), Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
             Column(Modifier.fillMaxWidth().heightIn(max = 220.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).verticalScroll(rememberScrollState())) {
-                if (items.length() == 0) Text("(empty)", Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
+                if (items.length() == 0) Text(I18n.t("(empty)"), Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
                 for (i in 0 until items.length()) { val it = items.getJSONObject(i); val sel = it.optBoolean("sel")
                     Row(Modifier.fillMaxWidth().background(if (sel) OS.SelBg else Color.Transparent).clickable(enabled = en) { ev(id, "set", i) }.padding(horizontal = 8.dp, vertical = 2.dp),
                         verticalAlignment = Alignment.CenterVertically) {
                         if (!it.isNull("check")) Checkbox(it.optInt("check") != 0, { on -> ev(id, "check", listOf(i, on)) }, enabled = en)
-                        Text(it.optString("text"), Modifier.padding(vertical = 8.dp), color = OS.Navy, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(I18n.t(it.optString("text")), Modifier.padding(vertical = 8.dp), color = OS.Navy, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     } }
             }
         }
         // QTreeView / QTableView over a QStandardItemModel: tap a row to select it, check boxes, tap an editable cell to edit
         "grid" -> {
             val cols = n.optJSONArray("cols") ?: JSONArray(); val rows = n.optJSONArray("rows") ?: JSONArray()
-            if (label.isNotEmpty()) Text(label, Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
+            if (label.isNotEmpty()) Text(I18n.t(label), Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
             Column(Modifier.fillMaxWidth().heightIn(max = 300.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).horizontalScroll(rememberScrollState())) {
                 if (cols.length() > 0 && (0 until cols.length()).any { cols.optString(it).isNotEmpty() })
-                    Row { for (c in 0 until cols.length()) Text(cols.optString(c), Modifier.width(110.dp).background(OS.Metal5).padding(4.dp), color = OS.Steel, fontSize = 12.sp, maxLines = 1) }
-                if (rows.length() == 0) Text("(empty)", Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
+                    Row { for (c in 0 until cols.length()) Text(I18n.t(cols.optString(c)), Modifier.width(110.dp).background(OS.Metal5).padding(4.dp), color = OS.Steel, fontSize = 12.sp, maxLines = 1) }
+                if (rows.length() == 0) Text(I18n.t("(empty)"), Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
                 var top = -1
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     for (r in 0 until rows.length()) { val row = rows.getJSONObject(r); val isTop = row.optBoolean("top", true); if (isTop) top++
@@ -214,9 +215,9 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
         }
         "table" -> {
             val cols = n.optJSONArray("cols") ?: JSONArray(); val cells = n.optJSONArray("cells") ?: JSONArray()
-            if (label.isNotEmpty()) Text(label, Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
+            if (label.isNotEmpty()) Text(I18n.t(label), Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
             Column(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).border(1.dp, OS.Metal4)) {
-                Row { for (c in 0 until cols.length()) Text(cols.optString(c), Modifier.width(110.dp).background(OS.Metal5).padding(4.dp), color = OS.Steel, fontSize = 12.sp, maxLines = 1) }
+                Row { for (c in 0 until cols.length()) Text(I18n.t(cols.optString(c)), Modifier.width(110.dp).background(OS.Metal5).padding(4.dp), color = OS.Steel, fontSize = 12.sp, maxLines = 1) }
                 for (r in 0 until cells.length()) Row { val row = cells.getJSONArray(r)
                     for (c in 0 until row.length()) Text(row.optString(c).ifEmpty { " " }, Modifier.width(110.dp).border(0.5.dp, OS.Metal4).clickable(enabled = en) {
                         app.textPrompt = TextPrompt("${cols.optString(c)} (row ${r + 1})", row.optString(c)) { s -> ev(id, "cell", listOf(r, c, s)) } }.padding(4.dp),

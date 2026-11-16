@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import app.mobilecad.freecad.AppState
 import app.mobilecad.freecad.TextPrompt
 import org.json.JSONObject
+import app.mobilecad.i18n.I18n
 
 private fun colName(n: Int): String { var i = n; var s = ""; while (true) { s = ('A' + i % 26) + s; i = i / 26 - 1; if (i < 0) return s } }
 
@@ -37,7 +38,7 @@ fun SheetView(app: AppState, modifier: Modifier = Modifier) {
         if (d == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (app.sheet == null) EmptyState("No spreadsheet yet", "Create spreadsheet") { app.run("Spreadsheet_CreateSheet") }
-                else Text("Loading…", color = OS.Steel) }
+                else Text(I18n.t("Loading…"), color = OS.Steel) }
             return@Column
         }
         val cells = d.getJSONObject("cells")
@@ -49,8 +50,8 @@ fun SheetView(app: AppState, modifier: Modifier = Modifier) {
             Text(app.sheetSel + (cur?.optString("alias")?.takeIf { it.isNotEmpty() }?.let { "  ($it)" } ?: ""), Modifier.width(150.dp), color = OS.Navy, fontWeight = FontWeight.Medium, fontSize = 14.sp)
             Text(cur?.optString("content") ?: "", Modifier.weight(1f), color = OS.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             TextButton({ val sh = app.sheet ?: return@TextButton
-                app.textPrompt = TextPrompt("Cell $selFirst  (text, number with unit, or =expression)", cur?.optString("content")?.removePrefix("'") ?: "") { t ->
-                    app.step("Edit cell", { call("sheet_set", mapOf("name" to sh, "cell" to selFirst, "text" to t)) }) } }) { Text("Edit") }
+                app.textPrompt = TextPrompt(I18n.tf("Cell %s  (text, number with unit, or =expression)", selFirst), cur?.optString("content")?.removePrefix("'") ?: "") { t ->
+                    app.step("Edit cell", { call("sheet_set", mapOf("name" to sh, "cell" to selFirst, "text" to t)) }) } }) { Text(I18n.t("Edit")) }
         }
         val rows = d.optInt("rows", 40); val cols = d.optInt("cols", 12)
         val widths = d.optJSONObject("widths") ?: JSONObject()

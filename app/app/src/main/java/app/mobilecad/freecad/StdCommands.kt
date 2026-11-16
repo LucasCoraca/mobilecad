@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import org.json.JSONArray
 import org.json.JSONObject
+import app.mobilecad.i18n.I18n
 
 /**
  * FreeCAD's Std_* commands (src/Gui/Command*.cpp) — the ones shared by every workbench.  Document operations go through
@@ -248,10 +249,12 @@ result = [list(n), list(c)]""", mapOf("o" to r.obj, "s" to r.sub)) as JSONArray 
             id == "Std_ExportDependencyGraph" -> s.fileRequest = AppState.FileRequest("graph", suggested = "${s.docName}.gv")
             id == "Std_CommandLine" || id == "Std_SendToPythonConsole" -> s.console()
             id == "Std_DlgMacroExecute" || id == "Std_DlgMacroExecuteDirect" -> s.fileRequest = AppState.FileRequest("macro")
-            id == "Std_DlgPreferences" -> s.choose("Preferences", listOf("units" to "Unit system", "theme" to "Theme (current: ${s.theme.replaceFirstChar { it.uppercase() }})") +
+            id == "Std_DlgPreferences" -> s.choose("Preferences", listOf("units" to "Unit system", "theme" to I18n.tf("Theme (current: %s)", I18n.t(s.theme.replaceFirstChar { it.uppercase() })),
+                    "language" to I18n.tf("Language (current: %s)", I18n.choiceLabel(s.interfaceLanguage()))) +
                     (if (s.updater.enabled) listOf("updates" to "Check for updates daily (${if (s.updater.auto) "on" else "off"})") else emptyList())) { page ->
                 if (page == "updates") { s.updater.auto = !s.updater.auto; s.message = "Daily update check ${if (s.updater.auto) "on" else "off"}" }
                 else if (page == "theme") s.choose("Theme", listOf("system" to "System (follow Android)", "light" to "Light", "dark" to "Dark")) { t -> s.setThemeMode(t) }
+                else if (page == "language") s.choose("Language", I18n.choices.map { it to I18n.choiceLabel(it) }) { code -> s.setInterfaceLanguage(code) }
                 else s.eng({ call("unit_schemas") as JSONObject }) { j -> val a = j.getJSONArray("schemas")
                     s.choose("Unit system (current: ${a.getString(j.getInt("current"))})", List(a.length()) { i -> i.toString() to a.getString(i) }) { i ->
                         s.eng({ call("set_unit_schema", mapOf("index" to i.toInt())) }) { s.message = "Units: ${a.getString(i.toInt())}" } } } }

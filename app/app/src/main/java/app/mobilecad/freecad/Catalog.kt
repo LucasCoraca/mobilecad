@@ -6,10 +6,14 @@ import android.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.caverock.androidsvg.SVG
+import app.mobilecad.i18n.I18n
 import org.json.JSONObject
 
-/** One FreeCAD command, as defined in FreeCAD's sources (see research/gen_catalog.py). */
-class FcCommand(val id: String, val label: String, val tip: String, val icon: String?, val group: List<String>) {
+/** One FreeCAD command, as defined in FreeCAD's sources (see research/gen_catalog.py).
+ *  [label] and [tip] are shown (translated when a catalog exists); [enLabel] and [enTip] keep FreeCAD's English
+ *  wording so the tool search finds a command by either language. */
+class FcCommand(val id: String, val label: String, val tip: String, val icon: String?, val group: List<String>,
+                val enLabel: String = label, val enTip: String = tip) {
     val workbench: String get() = id.substringBefore('_')
 }
 class FcToolbar(val name: String, val items: List<String>)
@@ -36,7 +40,8 @@ class Catalog private constructor(val source: String, val workbenches: List<FcWo
 
     fun search(q: String): List<FcCommand> {
         val s = q.trim().lowercase(); if (s.isEmpty()) return emptyList()
-        return commands.values.filter { it.group.isEmpty() && (it.label.lowercase().contains(s) || it.id.lowercase().contains(s) || it.tip.lowercase().contains(s)) }
+        return commands.values.filter { it.group.isEmpty() && (it.label.lowercase().contains(s) || it.enLabel.lowercase().contains(s) ||
+            it.id.lowercase().contains(s) || it.tip.lowercase().contains(s) || it.enTip.lowercase().contains(s)) }
             .sortedBy { if (it.label.lowercase().startsWith(s)) 0 else 1 }
     }
 
@@ -67,8 +72,9 @@ class Catalog private constructor(val source: String, val workbenches: List<FcWo
                 val raw = o.optString("label", k)
                 val label = if (raw == k || raw.isBlank()) k.substringAfter('_').removePrefix("Create").replace(Regex("([a-z])([A-Z])"), "$1 $2").let {
                     if (it.startsWith("Joint ")) it.removePrefix("Joint ") + " Joint" else it } else raw.replace("%1", "MobileCAD")   // "About %1"
-                cmds[k] = FcCommand(k, label, o.optString("tip"), if (o.isNull("icon")) null else o.optString("icon"),
-                    if (g == null) emptyList() else List(g.length()) { g.getString(it) })
+                val tip = o.optString("tip")
+                cmds[k] = FcCommand(k, I18n.t(label), I18n.t(tip), if (o.isNull("icon")) null else o.optString("icon"),
+                    if (g == null) emptyList() else List(g.length()) { g.getString(it) }, enLabel = label, enTip = tip)
             }
             val wa = j.getJSONArray("workbenches")
             val wbs = List(wa.length()) { i ->
