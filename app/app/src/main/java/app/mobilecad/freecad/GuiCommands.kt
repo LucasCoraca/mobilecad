@@ -1,5 +1,6 @@
 package app.mobilecad.freecad
 
+import app.mobilecad.i18n.tr
 import org.json.JSONObject
 
 /**
@@ -44,7 +45,7 @@ object GuiCommands {
         // View.addEventCallback (macros / examples that react to clicks): taps go to the callbacks until ✗
         if (r.optBoolean("events") && r.optJSONObject("point") == null) {
             s.refresh()
-            if (s.draft?.id != "GuiEvents") DraftTool("GuiEvents", label, listOf("Tap in the 3D view"), 0, -1) { _ ->
+            if (s.draft?.id != "GuiEvents") DraftTool("GuiEvents", label, listOf(tr("Tap in the 3D view")), 0, -1) { _ ->
                 s.eng({ call("gui_view_event", mapOf("kind" to "escape")) as JSONObject? }) { rr -> finish(s, rr) } }.also { t ->
                 t.onPoint = { p -> s.eng({ call("gui_view_event", mapOf("kind" to "tap", "point" to p.toList())) as JSONObject? }) { rr -> handle(s, label, rr) } }
                 t.onCancel = { s.eng({ call("gui_view_event", mapOf("kind" to "escape")) as JSONObject? }) { rr -> finish(s, rr) } }
@@ -55,12 +56,12 @@ object GuiCommands {
         val pt = r.optJSONObject("point")
         if (pt != null) {
             s.refresh()
-            val tool = s.draft?.takeIf { it.id == "GuiCmd" } ?: DraftTool("GuiCmd", label, listOf(pt.optString("title", "Pick point")), 0, -1) { _ ->
+            val tool = s.draft?.takeIf { it.id == "GuiCmd" } ?: DraftTool("GuiCmd", label, listOf(pt.optString("title", tr("Pick point"))), 0, -1) { _ ->
                 s.eng({ call("gui_point_cancel") as JSONObject? }) { rr -> finish(s, rr) } }.also { t ->
                 t.onPoint = { p -> s.eng({ call("gui_point", mapOf("x" to p[0], "y" to p[1], "z" to p[2])) as JSONObject? }) { rr -> handle(s, label, rr) } }
                 t.onCancel = { s.eng({ call("gui_point_cancel") as JSONObject? }) { rr -> finish(s, rr) } }
                 s.startDraft(t) }
-            tool.prompt2 = pt.optString("title", "Pick point")
+            tool.prompt2 = pt.optString("title", tr("Pick point"))
             return
         }
         finish(s, r)

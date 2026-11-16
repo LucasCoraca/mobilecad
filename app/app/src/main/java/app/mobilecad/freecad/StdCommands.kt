@@ -2,6 +2,8 @@ package app.mobilecad.freecad
 
 import android.content.Intent
 import android.net.Uri
+import app.mobilecad.i18n.Language
+import app.mobilecad.i18n.tr
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -64,21 +66,21 @@ object StdCommands {
         "Std_OpenMacrosFolder", "Std_RecentMacros", "Std_DlgMacroRecord", "Std_TreeCollapseDocument")
 
     private fun names(s: AppState) = s.selection.map { it.obj }.distinct()
-    private fun needSel(s: AppState, f: (List<String>) -> Unit) { val n = names(s); if (n.isEmpty()) s.message = "Select objects first" else f(n) }
+    private fun needSel(s: AppState, f: (List<String>) -> Unit) { val n = names(s); if (n.isEmpty()) s.message = tr("Select objects first") else f(n) }
 
     /** Material_Edit (MaterialsEditor): property list of a material; editing values and saving makes a User-library material. */
     private fun materialEditor(s: AppState, uuid: String, edits: MutableMap<String, String>) {
         s.eng({ call("material_info", mapOf("uuid" to uuid)) as JSONObject }) { m ->
             val props = mutableListOf<Pair<String, String>>()
-            if (edits.isNotEmpty()) props += "__save" to "Save as new material (${edits.size} change${if (edits.size > 1) "s" else ""})"
+            if (edits.isNotEmpty()) props += "__save" to (if (edits.size > 1) tr("Save as new material (%1 changes)", edits.size) else tr("Save as new material (%1 change)", edits.size))
             for (grp in listOf("physical", "appearance")) m.optJSONObject(grp)?.let { o -> o.keys().forEach { k -> props += k to "$k = ${edits[k] ?: o.getString(k)}" } }
-            props += "__info" to "About: ${m.optString("library")} / ${m.optString("author")}"
+            props += "__info" to tr("About: %1 / %2", m.optString("library"), m.optString("author"))
             s.choose(m.optString("name"), props) { k ->
                 when (k) {
-                    "__save" -> s.textPrompt = TextPrompt("Name of the new material", m.optString("name") + " (edited)") { nm ->
-                        s.eng({ call("material_save", mapOf("uuid" to uuid, "name" to nm, "values" to edits)) as String }) { s.message = "Saved $nm to the User library" } }
-                    "__info" -> s.info = m.optString("name") to listOf("Library: " + m.optString("library"), "Author: " + m.optString("author"), "License: " + m.optString("license"),
-                        "UUID: $uuid", "Parent: " + m.optString("parent"), "", m.optString("description")).joinToString("\n")
+                    "__save" -> s.textPrompt = TextPrompt(tr("Name of the new material"), m.optString("name") + " (edited)") { nm ->
+                        s.eng({ call("material_save", mapOf("uuid" to uuid, "name" to nm, "values" to edits)) as String }) { s.message = tr("Saved %1 to the User library", nm) } }
+                    "__info" -> s.info = m.optString("name") to listOf(tr("Library: %1", m.optString("library")), tr("Author: %1", m.optString("author")), tr("License: %1", m.optString("license")),
+                        "UUID: $uuid", tr("Parent: %1", m.optString("parent")), "", m.optString("description")).joinToString("\n")
                     else -> { val cur = edits[k] ?: m.optJSONObject("physical")?.optString(k)?.takeIf { it.isNotEmpty() } ?: m.optJSONObject("appearance")?.optString(k) ?: ""
                         s.textPrompt = TextPrompt(k, cur) { v -> edits[k] = v; materialEditor(s, uuid, edits) } }
                 }
@@ -101,26 +103,26 @@ object StdCommands {
             id == "Std_OrthographicCamera" -> v?.let { it.cam.orthographic = true; it.refresh() }
             id == "Std_PerspectiveCamera" -> v?.let { it.cam.orthographic = false; it.refresh() }
             id == "Std_AxisCross" -> { s.axisCross = !s.axisCross; v?.sync() }
-            id == "Std_DrawStyle" -> s.choose("Draw style", drawStyles.map { it to it }) { st -> s.drawStyle = st; v?.sync() }
+            id == "Std_DrawStyle" -> s.choose(tr("Draw style"), drawStyles.map { it to tr(it) }) { st -> s.drawStyle = st; v?.sync() }
             id == "Std_ToggleFreeze" -> needSel(s) { n -> s.step("Toggle freeze", { call("toggle_freeze", mapOf("names" to n)) }) }
             // Start page: new / open / recent documents
-            id == "Start_Start" -> s.choose("Start", listOf("new" to "New document", "open" to "Open a file…") + s.recentFiles().map { it.first to "Recent: ${it.second}" }) { k ->
+            id == "Start_Start" -> s.choose(tr("Start"), listOf("new" to tr("New document"), "open" to tr("Open a file…")) + s.recentFiles().map { it.first to tr("Recent: %1", it.second) }) { k ->
                 when (k) { "new" -> s.run("Std_New"); "open" -> s.run("Std_Open"); else -> s.reopen(Uri.parse(k)) } }
             id == "Materials_InspectMaterial" || id == "Materials_InspectAppearance" -> needSel(s) { n ->
                 s.eng({ call("material_inspect", mapOf("names" to n, "appearance" to (id == "Materials_InspectAppearance"))) as String }) { t ->
-                    s.info = (if (id == "Materials_InspectMaterial") "Material" else "Appearance") to t } }
+                    s.info = (if (id == "Materials_InspectMaterial") tr("Material") else tr("Appearance")) to t } }
             id == "Material_Edit" -> s.eng({ call("materials") as JSONArray }) { a ->
-                s.choose("Material editor", List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } }) { u -> materialEditor(s, u, mutableMapOf()) } }
+                s.choose(tr("Material editor"), List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } }) { u -> materialEditor(s, u, mutableMapOf()) } }
             // FEM's clipping planes (Coin SoClipPlane on the scene root) are the view's clipping plane here
             id == "FEM_ClippingPlaneRemoveAll" -> { s.clipPlane = null; v?.sync() }
             id == "Std_ToggleClipPlane" || id == "FEM_ClippingPlaneAdd" -> if (s.clipPlane != null && id == "Std_ToggleClipPlane") { s.clipPlane = null; v?.sync() } else
-                s.choose("Clipping plane", listOf("X" to "Normal X", "Y" to "Normal Y", "Z" to "Normal Z")) { ax ->
-                    s.askNumber("Clip offset along $ax", 0.0) { d -> val n = FloatArray(3).also { it["XYZ".indexOf(ax)] = 1f }
+                s.choose(tr("Clipping plane"), listOf("X" to tr("Normal X"), "Y" to tr("Normal Y"), "Z" to tr("Normal Z"))) { ax ->
+                    s.askNumber(tr("Clip offset along %1", ax), 0.0) { d -> val n = FloatArray(3).also { it["XYZ".indexOf(ax)] = 1f }
                         s.clipPlane = floatArrayOf(n[0], n[1], n[2], -d.toFloat()); v?.sync() } }
             id == "Std_ViewScreenShot" -> s.fileRequest = AppState.FileRequest("screenshot", suggested = "${s.docName}.png")
-            id == "Std_StoreWorkingView" || id == "Std_ViewSaveCamera" -> v?.let { s.savedViews["Working view"] = it.cameraState(); s.message = "View stored" }
-            id == "Std_RecallWorkingView" || id == "Std_ViewRestoreCamera" -> s.savedViews["Working view"]?.let { v?.restoreCamera(it) } ?: run { s.message = "No stored view" }
-            id == "Std_FreezeViews" -> s.choose("Frozen views", listOf("+" to "Freeze current view") + s.savedViews.keys.filter { it != "Working view" }.map { it to it }) { k ->
+            id == "Std_StoreWorkingView" || id == "Std_ViewSaveCamera" -> v?.let { s.savedViews["Working view"] = it.cameraState(); s.message = tr("View stored") }
+            id == "Std_RecallWorkingView" || id == "Std_ViewRestoreCamera" -> s.savedViews["Working view"]?.let { v?.restoreCamera(it) } ?: run { s.message = tr("No stored view") }
+            id == "Std_FreezeViews" -> s.choose(tr("Frozen views"), listOf("+" to tr("Freeze current view")) + s.savedViews.keys.filter { it != "Working view" }.map { it to it }) { k ->
                 if (k == "+") v?.let { s.savedViews["View ${s.savedViews.size + 1}"] = it.cameraState() } else s.savedViews[k]?.let { v?.restoreCamera(it) } }
             id == "Std_DemoMode" -> v?.let { it.turntable = !it.turntable }
             id == "Std_ViewFullscreen" || id == "Std_MainFullscreen" -> (v?.context as? android.app.Activity)?.window?.let { w ->
@@ -134,23 +136,23 @@ object StdCommands {
             id == "Std_SaveAs" -> s.fileRequest = AppState.FileRequest("save", suggested = "${s.docName}.FCStd")
             id == "Std_SaveCopy" -> s.fileRequest = AppState.FileRequest("savecopy", suggested = "${s.docName} copy.FCStd")
             id == "Std_MergeProjects" -> s.fileRequest = AppState.FileRequest("merge")
-            id == "Std_Revert" -> s.docUri?.let { u -> s.reopen(Uri.parse(u)) } ?: run { s.message = "The document has not been saved yet" }
-            id == "Std_RecentFiles" -> s.choose("Open recent", s.recentFiles()) { u -> s.reopen(Uri.parse(u)) }
+            id == "Std_Revert" -> s.docUri?.let { u -> s.reopen(Uri.parse(u)) } ?: run { s.message = tr("The document has not been saved yet") }
+            id == "Std_RecentFiles" -> s.choose(tr("Open recent"), s.recentFiles()) { u -> s.reopen(Uri.parse(u)) }
             id == "Std_Print" || id == "Std_PrintPdf" || id == "Std_PrintPreview" -> s.fileRequest = AppState.FileRequest("pdf", suggested = "${s.docName}.pdf")
             id == "Std_Quit" -> (v?.context as? android.app.Activity)?.finishAndRemoveTask()
             id == "Std_ProjectInfo" || id == "Std_ProjectUtil" -> s.eng({ call("doc_info") as JSONObject }) { j ->
-                s.choose("Document information", j.keys().asSequence().map { k -> k to "$k: ${j.optString(k)}" }.toList()) { k ->
+                s.choose(tr("Document information"), j.keys().asSequence().map { k -> k to "$k: ${j.optString(k)}" }.toList()) { k ->
                     if (k in setOf("Label", "CreatedBy", "LastModifiedBy", "Company", "License", "LicenseURL", "Comment"))
                         s.textPrompt = TextPrompt(k, j.optString(k)) { t -> s.step("Edit $k", { call("doc_set_info", mapOf("key" to k, "value" to t)) }) } } }
             id == "Std_Recompute" || id == "Std_Refresh" -> s.step("Recompute", { call("force_recompute", mapOf("names" to names(s).ifEmpty { null })) })
-            id == "Std_ToggleSkipRecompute" -> s.eng({ call("toggle_skip_recompute") }) { r -> s.message = if (r == true) "Recomputes skipped" else "Recomputes enabled" }
+            id == "Std_ToggleSkipRecompute" -> s.eng({ call("toggle_skip_recompute") }) { r -> s.message = if (r == true) tr("Recomputes skipped") else tr("Recomputes enabled") }
             id == "Std_ToggleSuppress" -> needSel(s) { n -> s.step("Toggle suppressed", { call("toggle_suppress", mapOf("names" to n)) }) }
 
             // ---- edit / selection
-            id == "Std_Copy" -> needSel(s) { n -> s.eng({ call("clip_copy", mapOf("names" to n)) }) { s.message = "Copied" } }
+            id == "Std_Copy" -> needSel(s) { n -> s.eng({ call("clip_copy", mapOf("names" to n)) }) { s.message = tr("Copied") } }
             id == "Std_Cut" -> needSel(s) { n -> s.selection.clear(); s.step("Cut", { call("clip_copy", mapOf("names" to n, "cut" to true)) }) }
             id == "Std_Paste" -> s.step("Paste", { call("clip_paste") })
-            id == "Std_DuplicateSelection" -> needSel(s) { n -> s.choose("Duplicate", listOf("no" to "Selection only (keep links to originals)", "deps" to "With dependencies")) { d ->
+            id == "Std_DuplicateSelection" -> needSel(s) { n -> s.choose(tr("Duplicate"), listOf("no" to tr("Selection only (keep links to originals)"), "deps" to tr("With dependencies"))) { d ->
                 s.step("Duplicate", { call("duplicate", mapOf("names" to n, "deps" to (d == "deps"))) }) } }
             id == "Std_SelectAll" -> { s.selection.clear(); s.meshes.keys.filter { it !in s.unselectable }.forEach { s.selection.add(SelRef(it)) }; s.recordSelection(); v?.sync() }
             id == "Std_SelectVisibleObjects" -> { s.selection.clear(); s.objects.filter { it.visible && it.name in s.meshes }.forEach { s.selection.add(SelRef(it.name)) }; s.recordSelection(); v?.sync() }
@@ -158,9 +160,9 @@ object StdCommands {
             id == "Std_SelForward" -> s.selStep(1)
             id == "Std_SelBoundingBox" -> { s.selBoundingBox = !s.selBoundingBox; v?.sync() }
             id == "Std_ClarifySelection" -> v?.pickAll()?.takeIf { it.isNotEmpty() }?.let { refs ->
-                s.choose("Select", refs.map { it.toString() to "${s.obj(it.obj)?.label ?: it.obj}  ${it.sub}" }) { k ->
+                s.choose(tr("Select"), refs.map { it.toString() to "${s.obj(it.obj)?.label ?: it.obj}  ${it.sub}" }) { k ->
                     refs.firstOrNull { it.toString() == k }?.let { r -> s.selection.clear(); s.selection.add(r); s.recordSelection(); v.sync() } } }
-                ?: run { s.message = "Tap the model first, then Clarify Selection lists everything under that point" }
+                ?: run { s.message = tr("Tap the model first, then Clarify Selection lists everything under that point") }
             id == "Std_BoxSelection" -> s.boxSelect = "objects"
             id == "Std_BoxElementSelection" -> s.boxSelect = "faces"
             id == "Std_ShowSelection" -> needSel(s) { n -> s.eng({ call("set_visibility", mapOf("names" to n, "visible" to true)) }) { s.refresh() } }
@@ -177,20 +179,20 @@ object StdCommands {
             id == "Part_ImportCurveNet" -> s.fileRequest = AppState.FileRequest("curvenet")
             // Part_ColorPerFace (TaskFaceAppearances): colour of the selected faces
             id == "Part_ColorPerFace" -> { val faces = s.selection.filter { it.sub.startsWith("Face") }.map { it.obj to it.sub.removePrefix("Face").toInt() }
-                if (faces.isEmpty()) s.message = "Select faces first" else
-                s.choose("Face colour", palette.map { (k, _) -> k to k } + ("Default" to "Default")) { c ->
+                if (faces.isEmpty()) s.message = tr("Select faces first") else
+                s.choose(tr("Face colour"), palette.map { (k, _) -> k to tr(k) } + ("Default" to tr("Default"))) { c ->
                     faces.forEach { f -> palette[c]?.let { s.faceColors[f] = it } ?: s.faceColors.remove(f) }; s.selection.clear(); v?.sync() } }
-            id == "Std_SetAppearance" -> needSel(s) { n -> s.choose("Appearance", palette.map { (k, _) -> k to k } + ("Default" to "Default")) { c ->
+            id == "Std_SetAppearance" -> needSel(s) { n -> s.choose(tr("Appearance"), palette.map { (k, _) -> k to tr(k) } + ("Default" to tr("Default"))) { c ->
                 n.forEach { o -> palette[c]?.let { s.colors[o] = it } ?: s.colors.remove(o) }; v?.sync() } }
             id == "Std_SetMaterial" -> needSel(s) { n -> s.eng({ call("materials") as JSONArray }) { a ->
-                s.choose("Material", List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } }) { u ->
+                s.choose(tr("Material"), List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } }) { u ->
                     s.step("Set material", { call("set_material", mapOf("names" to n, "uuid" to u)) }) { s.applyMaterialColors(n) } } } }
             id == "Std_Placement" || id == "Std_Transform" || id == "Std_TransformManip" || id == "Std_Edit" || id == "Std_Properties" ->
-                s.selection.firstOrNull()?.let { s.openEditor(it.obj) } ?: run { s.message = "Select an object first" }
+                s.selection.firstOrNull()?.let { s.openEditor(it.obj) } ?: run { s.message = tr("Select an object first") }
 
             // ---- links
             id == "Std_LinkMakeGroup" -> needSel(s) { n -> s.step("Make link group", { call("link_group", mapOf("names" to n)) }) }
-            id == "Std_LinkMakeRelative" -> if (s.selection.any { it.sub.isNotEmpty() }) s.step("Make sub-link", { call("link_relative", mapOf("sel" to s.selJson())) }) else s.message = "Select a face, edge or vertex"
+            id == "Std_LinkMakeRelative" -> if (s.selection.any { it.sub.isNotEmpty() }) s.step("Make sub-link", { call("link_relative", mapOf("sel" to s.selJson())) }) else s.message = tr("Select a face, edge or vertex")
             id == "Std_LinkReplace" -> needSel(s) { n -> s.step("Replace with link", { call("link_replace", mapOf("names" to n)) }) }
             id == "Std_LinkUnlink" -> needSel(s) { n -> s.step("Unlink", { call("link_unlink", mapOf("names" to n)) }) }
             id == "Std_LinkImport" -> needSel(s) { n -> s.step("Import links", { call("link_import", mapOf("names" to n)) }) }
@@ -217,54 +219,58 @@ else:
     n = App.Vector(0, 0, 1); c = e.Point
 result = [list(n), list(c)]""", mapOf("o" to r.obj, "s" to r.sub)) as JSONArray }) { a ->
                     fun vec(i: Int) = a.getJSONArray(i).let { x -> DoubleArray(3) { x.getDouble(it) } }
-                    v?.cam?.lookAlong(vec(0), vec(1)); v?.refresh() } } ?: run { s.message = "Select a face or an edge" }
+                    v?.cam?.lookAlong(vec(0), vec(1)); v?.refresh() } } ?: run { s.message = tr("Select a face or an edge") }
             // Std_Alignment (ManualAlignment): pick point pairs, first on the selected (moving) object, then on the fixed one
-            id == "Std_Alignment" -> needSel(s) { n -> s.choose("Alignment", listOf("1" to "1 point pair (translate)", "2" to "2 point pairs", "3" to "3 point pairs (full)")) { k ->
+            id == "Std_Alignment" -> needSel(s) { n -> s.choose(tr("Alignment"), listOf("1" to tr("1 point pair (translate)"), "2" to tr("2 point pairs"), "3" to tr("3 point pairs (full)"))) { k ->
                 val pairs = k.toInt()
-                s.startDraft(DraftTool("Alignment", "Alignment", List(pairs * 2) { i -> if (i % 2 == 0) "Point ${i / 2 + 1} on the moving object" else "Matching point ${i / 2 + 1} on the fixed object" },
+                s.startDraft(DraftTool("Alignment", tr("Alignment"), List(pairs * 2) { i -> if (i % 2 == 0) tr("Point %1 on the moving object", i / 2 + 1) else tr("Matching point %1 on the fixed object", i / 2 + 1) },
                     pairs * 2, pairs * 2) { p -> s.step("Alignment", { call("align_objects", mapOf("names" to n, "pts" to p.map { it.toList() })) }) }) } }
             // Std_AnnotationLabel: App::AnnotationLabel (BasePosition, TextPosition, LabelText)
-            id == "Std_AnnotationLabel" -> s.textPrompt = TextPrompt("Label text", "Label") { t ->
-                s.startDraft(DraftTool("AnnotationLabel", "Annotation label", listOf("Point the label refers to", "Label position"), 2, 2) { p ->
+            id == "Std_AnnotationLabel" -> s.textPrompt = TextPrompt(tr("Label text"), "Label") { t ->
+                s.startDraft(DraftTool("AnnotationLabel", tr("Annotation label"), listOf(tr("Point the label refers to"), tr("Label position")), 2, 2) { p ->
                     s.step("Annotation label", { run("o = doc.addObject('App::AnnotationLabel', 'Label'); o.LabelText = args['t'].split('\\n'); " +
                         "o.BasePosition = App.Vector(*args['p'][0]); o.TextPosition = App.Vector(*args['p'][1]); result = o.Name", mapOf("t" to t, "p" to p.map { it.toList() })) }) }) }
 
             // ---- tools
             id == "Std_MassProperties" -> needSel(s) { n -> s.eng({ call("mass_properties", mapOf("names" to n)) as JSONArray }) { a ->
                 fun f(d: Double) = "%.5g".format(d)
-                s.info = "Mass properties" to (0 until a.length()).joinToString("\n\n") { i -> val j = a.getJSONObject(i); buildString {
-                    appendLine(j.getString("label")); appendLine("Volume ${f(j.getDouble("volume"))} mm³   Area ${f(j.getDouble("area"))} mm²")
-                    if (j.has("mass")) appendLine("Density ${f(j.getDouble("density"))} kg/m³   Mass ${f(j.getDouble("mass"))} kg")
-                    j.optJSONArray("center")?.let { c -> appendLine("Center of mass (${f(c.getDouble(0))}, ${f(c.getDouble(1))}, ${f(c.getDouble(2))}) mm") }
-                    j.optJSONArray("inertia")?.let { m -> append("Inertia Ixx ${f(m.getDouble(0))}  Iyy ${f(m.getDouble(1))}  Izz ${f(m.getDouble(2))}  Ixy ${f(m.getDouble(3))}  Ixz ${f(m.getDouble(4))}  Iyz ${f(m.getDouble(5))}") }
+                s.info = tr("Mass properties") to (0 until a.length()).joinToString("\n\n") { i -> val j = a.getJSONObject(i); buildString {
+                    appendLine(j.getString("label")); appendLine(tr("Volume %1 mm³   Area %2 mm²", f(j.getDouble("volume")), f(j.getDouble("area"))))
+                    if (j.has("mass")) appendLine(tr("Density %1 kg/m³   Mass %2 kg", f(j.getDouble("density")), f(j.getDouble("mass"))))
+                    j.optJSONArray("center")?.let { c -> appendLine(tr("Center of mass (%1, %2, %3) mm", f(c.getDouble(0)), f(c.getDouble(1)), f(c.getDouble(2)))) }
+                    j.optJSONArray("inertia")?.let { m -> append(tr("Inertia Ixx %1  Iyy %2  Izz %3  Ixy %4  Ixz %5  Iyz %6", f(m.getDouble(0)), f(m.getDouble(1)), f(m.getDouble(2)), f(m.getDouble(3)), f(m.getDouble(4)), f(m.getDouble(5)))) }
                 } } } }
-            id == "Std_Measure" -> if (s.selection.isEmpty()) s.message = "Select one or two elements to measure" else
+            id == "Std_Measure" -> if (s.selection.isEmpty()) s.message = tr("Select one or two elements to measure") else
                 s.eng({ call("measure", mapOf("sel" to s.selJson())) as JSONArray }) { a ->
-                    s.info = "Measure" to (0 until a.length()).joinToString("\n") { i -> a.getJSONArray(i).let { "${it.getString(0)}: ${it.getString(1)}" } } }
-            id == "Std_UnitsCalculator" -> s.textPrompt = TextPrompt("Convert (e.g. 2 in to mm)", "1 in to mm") { t ->
+                    s.info = tr("Measure") to (0 until a.length()).joinToString("\n") { i -> a.getJSONArray(i).let { "${it.getString(0)}: ${it.getString(1)}" } } }
+            id == "Std_UnitsCalculator" -> s.textPrompt = TextPrompt(tr("Convert (e.g. 2 in to mm)"), "1 in to mm") { t ->
                 val (q, u) = t.split(Regex("\\s+to\\s+")).let { it[0] to it.getOrElse(1) { "mm" } }
-                s.eng({ call("convert_units", mapOf("text" to q, "unit" to u)) as String }) { r -> s.info = "Units converter" to r } }
-            id == "Std_DependencyGraph" -> s.eng({ (call("dependency_graph") as JSONObject).getString("text") }) { t -> s.info = "Dependency graph" to t }
+                s.eng({ call("convert_units", mapOf("text" to q, "unit" to u)) as String }) { r -> s.info = tr("Units converter") to r } }
+            id == "Std_DependencyGraph" -> s.eng({ (call("dependency_graph") as JSONObject).getString("text") }) { t -> s.info = tr("Dependency graph") to t }
             id == "Std_ExportDependencyGraph" -> s.fileRequest = AppState.FileRequest("graph", suggested = "${s.docName}.gv")
             id == "Std_CommandLine" || id == "Std_SendToPythonConsole" -> s.console()
             id == "Std_DlgMacroExecute" || id == "Std_DlgMacroExecuteDirect" -> s.fileRequest = AppState.FileRequest("macro")
-            id == "Std_DlgPreferences" -> s.choose("Preferences", listOf("units" to "Unit system", "theme" to "Theme (current: ${s.theme.replaceFirstChar { it.uppercase() }})") +
-                    (if (s.updater.enabled) listOf("updates" to "Check for updates daily (${if (s.updater.auto) "on" else "off"})") else emptyList())) { page ->
-                if (page == "updates") { s.updater.auto = !s.updater.auto; s.message = "Daily update check ${if (s.updater.auto) "on" else "off"}" }
-                else if (page == "theme") s.choose("Theme", listOf("system" to "System (follow Android)", "light" to "Light", "dark" to "Dark")) { t -> s.setThemeMode(t) }
+            id == "Std_DlgPreferences" -> s.choose(tr("Preferences"), listOf("units" to tr("Unit system"),
+                    "theme" to tr("Theme (current: %1)", tr(s.theme.replaceFirstChar { it.uppercase() }.let { if (it == "System") "System (follow Android)" else it })),
+                    "language" to tr("Language (current: %1)", s.languageChoice().let { if (it.isEmpty()) tr("System (follow Android)") else Language.name(it) })) +
+                    (if (s.updater.enabled) listOf("updates" to tr("Check for updates daily (%1)", tr(if (s.updater.auto) "on" else "off"))) else emptyList())) { page ->
+                // desktop: Preferences > General > Language, applied at once; each language is listed in its own name
+                if (page == "language") s.choose(tr("Language"), listOf("" to tr("System (follow Android): %1", Language.name(Language.system()))) + Language.available) { code -> s.setLanguage(code) }
+                else                 if (page == "updates") { s.updater.auto = !s.updater.auto; s.message = if (s.updater.auto) tr("Daily update check on") else tr("Daily update check off") }
+                else if (page == "theme") s.choose(tr("Theme"), listOf("system" to tr("System (follow Android)"), "light" to tr("Light"), "dark" to tr("Dark"))) { t -> s.setThemeMode(t) }
                 else s.eng({ call("unit_schemas") as JSONObject }) { j -> val a = j.getJSONArray("schemas")
-                    s.choose("Unit system (current: ${a.getString(j.getInt("current"))})", List(a.length()) { i -> i.toString() to a.getString(i) }) { i ->
-                        s.eng({ call("set_unit_schema", mapOf("index" to i.toInt())) }) { s.message = "Units: ${a.getString(i.toInt())}" } } } }
-            id == "Std_About" || id == "Std_AboutQt" -> s.choose("MobileCAD", listOf("about" to "About MobileCAD", "updates" to "Check for updates", "licenses" to "Open-source licenses")) { what ->
+                    s.choose(tr("Unit system (current: %1)", a.getString(j.getInt("current"))), List(a.length()) { i -> i.toString() to a.getString(i) }) { i ->
+                        s.eng({ call("set_unit_schema", mapOf("index" to i.toInt())) }) { s.message = tr("Units: %1", a.getString(i.toInt())) } } } }
+            id == "Std_About" || id == "Std_AboutQt" -> s.choose("MobileCAD", listOf("about" to tr("About MobileCAD"), "updates" to tr("Check for updates"), "licenses" to tr("Open-source licenses"))) { what ->
                 if (what == "licenses") s.showLicenses()
-                else if (what == "updates") { s.message = "Checking for updates…"; s.updater.check(manual = true) }
+                else if (what == "updates") { s.message = tr("Checking for updates…"); s.updater.check(manual = true) }
                 else s.eng({ run("import FreeCAD; result = ' '.join(FreeCAD.Version()[:4])") }) { ver ->
-                    s.info = "MobileCAD ${s.appVersion}" to ("CAD for Android, built on FreeCAD $ver (LGPL-2.1-or-later) with Open CASCADE, Qt 6 and Python 3.14.\n\n" +
+                    s.info = "MobileCAD ${s.appVersion}" to tr("CAD for Android, built on FreeCAD %1 (LGPL-2.1-or-later) with Open CASCADE, Qt 6 and Python 3.14.\n\n" +
                         "MobileCAD is an independent project. It is not affiliated with, sponsored or endorsed by the FreeCAD project or the " +
                         "FreeCAD Project Association. FreeCAD is a trademark of the FreeCAD Project Association.\n\n" +
                         "MobileCAD is free software under the GNU General Public License v3 or later: you may share and modify it, and its " +
-                        "source code is available from where you downloaded the app. See \"Open-source licenses\" for the components it includes.") } }
-            id == "Std_Workbench" -> s.choose("Workbench", Workspaces.main(s.catalog).map { it.id to it.label } + Workspaces.more) { w -> s.switchWorkspace(w) }
+                        "source code is available from where you downloaded the app. See \"Open-source licenses\" for the components it includes.", ver) } }
+            id == "Std_Workbench" -> s.choose(tr("Workbench"), Workspaces.main(s.catalog).map { it.id to it.label } + Workspaces.more) { w -> s.switchWorkspace(w) }
             else -> return false
         }
         return true

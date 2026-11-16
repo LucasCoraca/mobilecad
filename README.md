@@ -32,6 +32,20 @@ The corresponding source of every release is this repository plus the archives a
 | `release/` | License notices, source archives, website (`make_site.py`), screenshots (`shot.sh`) and launch video (`video/`) |
 | `docs/` | The website, served by GitHub Pages (generated: `python3 release/make_site.py --github`) |
 
+## Interface languages
+
+English and Simplified Chinese (简体中文). The app follows Android's language; *Preferences ▸ Language* picks one, and
+the change applies at once, as on the desktop. Each language is one asset, `app/app/src/main/assets/i18n/<code>.json`,
+built by `python3 -I research/gen_i18n.py <FreeCAD checkout> <code>` from:
+
+- FreeCAD's own Qt catalogs (`src/**/translations/*_<lang>.ts`, LGPL-2.1-or-later, by the FreeCAD translators), looked up
+  the way the desktop does it: commands by their C++ class or Python command name, property names in `App::Property`,
+  toolbars in `Workbench`, and the engine's Python task panels through `QCoreApplication.translate` / `.ui` forms;
+- MobileCAD's own strings, `app/i18n/<code>.json` (English text → translation). `python3 -I research/i18n_keys.py <code>`
+  lists the strings a language still lacks and checks that every placeholder (`%1`, `%s`) is kept.
+
+Thanks to [Toobe53](https://github.com/Toobe53) for proposing a Chinese interface (#21).
+
 ## Building
 
 Everything is built from upstream source (pinned with SHA-256 in `engine/sources.lock`), on Debian 13 with Android NDK 29;

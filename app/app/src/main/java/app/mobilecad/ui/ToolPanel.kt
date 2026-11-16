@@ -1,5 +1,7 @@
 package app.mobilecad.ui
 
+import app.mobilecad.i18n.tr
+import app.mobilecad.i18n.Language
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,18 +41,19 @@ import app.mobilecad.freecad.GuiCommands
 fun ToolPanel(cat: Catalog, toolset: ToolsetDef, isAvailable: (String) -> Boolean, onPick: (FcCommand) -> Unit, modifier: Modifier = Modifier,
               extras: List<String> = emptyList(), columns: Int = 5) {
     var query by remember(toolset) { mutableStateOf("") }
-    val sections: List<Pair<String, List<FcCommand>>> = remember(toolset, query, extras) {
-        if (query.isNotBlank()) cat.search(query).groupBy { it.workbench }.map { (wb, l) -> wb to l }
+    val sections: List<Pair<String, List<FcCommand>>> = remember(toolset, query, extras, Language.current) {
+        if (query.isNotBlank()) cat.search(query).groupBy { it.workbench }.map { (wb, l) -> (app.mobilecad.freecad.Workspaces.more.firstOrNull { it.first == wb }?.second ?: tr(wb)) to l }
         else toolset.groups.mapNotNull { (wb, tbName) ->
             val t = cat.wb(wb)?.toolbars?.firstOrNull { it.name == tbName } ?: return@mapNotNull null
-            prettify(wb, t.name) to cat.flatten(t.items).mapNotNull { cat.cmd(it) }
+            // FreeCAD's own toolbar translation ("Workbench" context) when it has one, else the app's for the short name
+            prettify(wb, t.name).let { short -> if (Language.current == "en") short else t.title.takeIf { it != t.name } ?: tr(short) } to cat.flatten(t.items).mapNotNull { cat.cmd(it) }
         } + listOfNotNull(extras.filter(isAvailable).mapNotNull { cat.cmd(it) }.takeIf { it.isNotEmpty() }?.let { "More tools" to it })
     }
     Column(modifier.then(Screen.panelWidth(412.dp)).heightIn(max = Screen.panelHeight(440.dp)).shadow(8.dp, RoundedCornerShape(6.dp)).background(OS.Surface, RoundedCornerShape(6.dp)).padding(12.dp)) {
         Row(Modifier.fillMaxWidth().height(36.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Search, null, tint = OS.Steel, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(8.dp))
             Box(Modifier.weight(1f)) {
-                if (query.isEmpty()) Text("Search all tools", color = OS.Aluminum, fontSize = 14.sp)
+                if (query.isEmpty()) Text(tr("Search all tools"), color = OS.Aluminum, fontSize = 14.sp)
                 BasicTextField(query, { query = it }, singleLine = true, textStyle = TextStyle(fontSize = 14.sp, color = OS.Navy), modifier = Modifier.fillMaxWidth())
             }
         }
@@ -63,7 +66,7 @@ fun ToolPanel(cat: Catalog, toolset: ToolsetDef, isAvailable: (String) -> Boolea
                 item(span = { GridItemSpan(columns) }) {
                     Row(Modifier.fillMaxWidth().then(if (foldable) Modifier.clickable { moreOpen = !moreOpen } else Modifier).padding(top = 10.dp, bottom = 4.dp),
                         verticalAlignment = Alignment.CenterVertically) {
-                        Text(if (foldable) "$title (${cmds.size})" else title, Modifier.weight(1f), color = if (foldable) OS.Primary else OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                        Text(if (foldable) tr("%1 (%2)", tr(title), cmds.size) else title, Modifier.weight(1f), color = if (foldable) OS.Primary else OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                         if (foldable) Icon(if (moreOpen) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = OS.Primary, modifier = Modifier.size(18.dp))
                     }
                 }

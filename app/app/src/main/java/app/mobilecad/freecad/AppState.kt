@@ -7,6 +7,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import app.mobilecad.i18n.Language
+import app.mobilecad.i18n.tr
 import app.mobilecad.sketch.SketchEditor
 import app.mobilecad.ui.DialogSpec
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +69,7 @@ class DraftTool(val id: String, val label: String, val prompts: List<String>, va
     var viewPlane = false
     var onCancel: (() -> Unit)? = null
     var prompt2 by mutableStateOf<String?>(null)
-    val prompt get() = prompt2 ?: prompts.getOrElse(pts.size) { prompts.lastOrNull() ?: "Pick point" }
+    val prompt get() = prompt2 ?: prompts.getOrElse(pts.size) { prompts.lastOrNull() ?: tr("Pick point") }
 }
 
 /** Free-text input (sketch text, labels). */
@@ -81,7 +83,7 @@ class AppState(private val ctx: Context) {
     val catalog = Catalog.get(ctx)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    var status by mutableStateOf("Starting the CAD engine…")
+    var status by mutableStateOf(tr("Starting the CAD engine…"))
     var ready by mutableStateOf(false)
     var docName by mutableStateOf("Unnamed")
     val objects = mutableStateListOf<FcObject>()
@@ -106,15 +108,15 @@ class AppState(private val ctx: Context) {
     class Choice(val title: String, val options: List<Pair<String, String>>, val onPick: (String) -> Unit)
     var choice by mutableStateOf<Choice?>(null)
     fun choose(title: String, options: List<Pair<String, String>>, onPick: (String) -> Unit) {
-        if (options.isEmpty()) { message = "Nothing to choose from"; return }
+        if (options.isEmpty()) { message = tr("Nothing to choose from"); return }
         choice = Choice(title, options) { v -> choice = null; onPick(v) }
     }
     /** Multi-select picker (TechDraw view sources, projection set ...). */
     class MultiChoice(val title: String, val options: List<Pair<String, String>>, val initial: Set<String>, val onDone: (List<String>) -> Unit)
     var multiChoice by mutableStateOf<MultiChoice?>(null)
     fun chooseMany(title: String, options: List<Pair<String, String>>, initial: Set<String> = emptySet(), onDone: (List<String>) -> Unit) {
-        if (options.isEmpty()) { message = "Nothing to choose from"; return }
-        multiChoice = MultiChoice(title, options, initial) { v -> multiChoice = null; if (v.isEmpty()) message = "Nothing selected" else onDone(v) }
+        if (options.isEmpty()) { message = tr("Nothing to choose from"); return }
+        multiChoice = MultiChoice(title, options, initial) { v -> multiChoice = null; if (v.isEmpty()) message = tr("Nothing selected") else onDone(v) }
     }
     val inAssembly get() = workspace.id == "Assembly"
     /** Part selection gate (Part_VertexSelection / EdgeSelection / FaceSelection): "Vertex", "Edge", "Face" or null. */
@@ -167,6 +169,10 @@ class AppState(private val ctx: Context) {
         .joinToString("\n") { "${it.first}\t${it.second}" }).apply()
     /** Preferences ▸ Theme: "system" (follow Android's dark theme), "light" or "dark". */
     var theme by mutableStateOf(prefs.getString("theme", "system") ?: "system")
+    /** Preferences > Language: the interface redraws in it at once and the engine's FreeCAD texts follow. */
+    fun setLanguage(code: String) { Language.choose(ctx, code); syncLanguage(); viewport?.refresh() }   // canvas texts (NaviCube faces, sketch hints) too
+    fun languageChoice() = Language.choice(ctx)
+    private fun syncLanguage() { if (ready) eng({ call("set_language", mapOf("path" to Language.engineCatalog(), "language" to Language.current)) }) {} }
     fun setThemeMode(t: String) { theme = t; prefs.edit().putString("theme", t).apply(); viewport?.sync() }
     var treeOpen by mutableStateOf(true)
     /** Containers folded in the feature tree (Std_TreeCollapse / Std_TreeExpand). */
@@ -244,7 +250,7 @@ class AppState(private val ctx: Context) {
     }
     fun finishDraft() {
         val t = draft ?: return
-        if (t.pts.size < t.minPts) { message = "${t.label}: ${t.prompt}"; return }
+        if (t.pts.size < t.minPts) { message = tr("%1: %2", t.label, t.prompt); return }
         draft = null; t.onDone(t.pts.toList()); viewport?.refresh()
     }
     fun cancelDraft() { val t = draft; draft = null; t?.onCancel?.invoke(); viewport?.refresh() }
@@ -268,7 +274,7 @@ class AppState(private val ctx: Context) {
         val ctx = viewport?.context ?: return
         val f = java.io.File(ctx.cacheDir, "open.FCStd")
         try { ctx.contentResolver.openInputStream(uri)?.use { i -> f.outputStream().use { i.copyTo(it) } } }
-        catch (e: Exception) { message = "Cannot open: ${e.message}"; return }
+        catch (e: Exception) { message = tr("Cannot open: %1", e.message); return }
         docUri = uri.toString(); open(f.absolutePath)
     }
 
@@ -288,11 +294,11 @@ class AppState(private val ctx: Context) {
 
     /** Std_CommandLine: FreeCAD's Python console (App, doc predefined); each entry is one undoable step. */
     val consoleLog = mutableStateListOf<String>()
-    fun console() { textPrompt = TextPrompt("Python console", "") { code ->
+    fun console() { textPrompt = TextPrompt(tr("Python console"), "") { code ->
         val mark = undoNames.size
         eng({ begin("Python"); try { val r = call("console", mapOf("code" to code)); recompute(); commit(); r } catch (e: Throwable) { abort(); throw e } }) { r ->
             consoleLog.add(">>> $code"); (r as? String)?.trimEnd()?.takeIf { it.isNotEmpty() }?.let { consoleLog.add(it) }
-            info = "Python console" to consoleLog.takeLast(30).joinToString("\n"); refresh() } } }
+            info = tr("Python console") to consoleLog.takeLast(30).joinToString("\n"); refresh() } } }
 
     /** Saved views (Std_StoreWorkingView, Std_ViewSaveCamera, Std_FreezeViews). */
     val savedViews = androidx.compose.runtime.mutableStateMapOf<String, FloatArray>()
@@ -300,7 +306,7 @@ class AppState(private val ctx: Context) {
     /** Numpad entry of a plain number (dialog values asked before a command runs, like the desktop's modal dialogs). */
     fun askNumber(title: String, initial: Double, units: List<String> = listOf("mm"), onValue: (Double) -> Unit) {
         numpad = NumpadRequest(title, initial.toString(), units) { v -> numpad = null
-            Regex("""-?\d+(\.\d+)?""").find(v)?.value?.toDoubleOrNull()?.let(onValue) ?: run { message = "Not a number: $v" } }
+            Regex("""-?\d+(\.\d+)?""").find(v)?.value?.toDoubleOrNull()?.let(onValue) ?: run { message = tr("Not a number: %1", v) } }
     }
     var message by mutableStateOf<String?>(null)
     /** New versions from the GitHub releases (release-signed builds only). */
@@ -346,21 +352,21 @@ class AppState(private val ctx: Context) {
         val time = meta?.optLong("time")?.takeIf { it > 0 }?.let { java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(it)) }
         open(copy.absolutePath, recovered = true) {
             docName = name; docUri = meta?.optString("uri")?.takeIf { it.isNotEmpty() && it != "null" }
-            message = "Recovered unsaved work${time?.let { " from $it" } ?: ""} (the app had closed unexpectedly). Save to keep it."
+            message = if (time != null) tr("Recovered unsaved work from %1 (the app had closed unexpectedly). Save to keep it.", time) else tr("Recovered unsaved work (the app had closed unexpectedly). Save to keep it.")
         }
     }
 
     val appVersion: String get() = try { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "" } catch (e: Exception) { "" }
     /** About ▸ Open-source licenses: the components in the APK (assets/licenses, made by release/gen_notices.py) and their texts. */
     fun showLicenses() {
-        val idx = try { org.json.JSONArray(ctx.assets.open("licenses/index.json").bufferedReader().readText()) } catch (e: Exception) { message = "No license notices in this build"; return }
+        val idx = try { org.json.JSONArray(ctx.assets.open("licenses/index.json").bufferedReader().readText()) } catch (e: Exception) { message = tr("No license notices in this build"); return }
         val items = List(idx.length()) { idx.getJSONObject(it) }
-        choose("Open-source licenses", items.mapIndexed { i, o -> i.toString() to "${o.getString("name")} — ${o.getString("license")}" }) { k ->
+        choose(tr("Open-source licenses"), items.mapIndexed { i, o -> i.toString() to "${o.getString("name")} — ${o.getString("license")}" }) { k ->
             val o = items[k.toInt()]; val texts = o.getJSONArray("texts")
-            fun show(t: org.json.JSONObject) { info = o.getString("name") to ("License: ${o.getString("license")}\nSource: ${o.getString("source")}\n\n" +
+            fun show(t: org.json.JSONObject) { info = o.getString("name") to (tr("License: %1\nSource: %2", o.getString("license"), o.getString("source")) + "\n\n" +
                 ctx.assets.open("licenses/" + t.getString("file")).bufferedReader().readText()) }
             when (texts.length()) {
-                0 -> info = o.getString("name") to "License: ${o.getString("license")}\nSource: ${o.getString("source")}"
+                0 -> info = o.getString("name") to tr("License: %1\nSource: %2", o.getString("license"), o.getString("source"))
                 1 -> show(texts.getJSONObject(0))
                 else -> choose(o.getString("name"), List(texts.length()) { it.toString() to texts.getJSONObject(it).getString("title") }) { j -> show(texts.getJSONObject(j.toInt())) }
             }
@@ -375,6 +381,7 @@ class AppState(private val ctx: Context) {
         MobileCommands.catalogRef = catalog
         try {
             engine.start { status = it }
+            withContext(engine.dispatcher) { engine.call("set_language", mapOf("path" to Language.engineCatalog(), "language" to Language.current)) }
             docName = withContext(engine.dispatcher) { engine.newDocument("Unnamed") }
             ready = true; status = ""
             refresh()
@@ -385,7 +392,7 @@ class AppState(private val ctx: Context) {
             readyCallbacks.forEach { it() }; readyCallbacks.clear()
             launch { while (true) { kotlinx.coroutines.delay(60_000); autosave() } }
         } catch (e: Throwable) {
-            status = "The CAD engine failed to start:\n" + (e.message ?: e.toString()); Log.e("AppState", "start", e)
+            status = tr("The CAD engine failed to start:") + "\n" + (e.message ?: e.toString()); Log.e("AppState", "start", e)
         }
     }
 
@@ -488,7 +495,7 @@ class AppState(private val ctx: Context) {
         recompute(); h
     }) { h -> setHistory(h); refresh() }
 
-    fun save(path: String) = eng({ saveDocument(path) }) { message = "Saved $it" }
+    fun save(path: String) = eng({ saveDocument(path) }) { message = tr("Saved %1", it) }
     /** Opens a document with the look the desktop saved for it (GuiDocument.xml: colours, transparency, per-face colours,
      *  what is hidden) and frames it.  Nothing of the previous document's look is kept. */
     fun open(path: String, recovered: Boolean = false, done: () -> Unit = {}): kotlinx.coroutines.Job { closeTools(); return eng({ val n = openDocument(path); n to call("view_data") as org.json.JSONObject? }) { (n, vd) ->
@@ -522,7 +529,7 @@ class AppState(private val ctx: Context) {
     fun openEditor(name: String, mark: Int? = null, attachment: Boolean = false) {
         val o = obj(name) ?: return
         if (o.type == "Sketcher::SketchObject" && !attachment) { editSketch(name, mark); return }
-        val e = if (attachment) EditState(name, DialogSpec.ATTACHMENT, "${o.label} attachment", false) else EditState(name, o.type, o.label, mark != null)
+        val e = if (attachment) EditState(name, DialogSpec.ATTACHMENT, tr("%1 attachment", o.label), false) else EditState(name, o.type, o.label, mark != null)
         e.undoMark = mark ?: undoPos
         enterEditHistory(mark)
         edit = e
@@ -546,7 +553,7 @@ class AppState(private val ctx: Context) {
             fun v(k: String) = j.getJSONArray(k).let { a -> FloatArray(3) { a.getDouble(it).toFloat() } }
             Manipulator(e.obj, j.getString("prop"), v("base"), v("dir"), j.getDouble("value"))
         }
-        e.error = objects.firstOrNull { it.name == e.obj }?.takeIf { it.invalid }?.let { it.error ?: "${it.label} failed to recompute" }
+        e.error = objects.firstOrNull { it.name == e.obj }?.takeIf { it.invalid }?.let { it.error ?: tr("%1 failed to recompute", it.label) }
     }
 
     fun setProp(e: EditState, p: FcProperty, value: Any?) = step("Edit ${p.name.removePrefix("@")}", { setProperty(e.obj, p.name, value) }) { reloadProps(e) }
@@ -570,13 +577,13 @@ class AppState(private val ctx: Context) {
         // a pick on the edited feature's own result means the same geometry of its base (dress-up features)
         if (ref.obj == e.obj && ref.sub.isNotEmpty()) {
             eng({ call("map_to_base", mapOf("feature" to e.obj, "sub" to ref.sub)) as? JSONArray }) { m ->
-                if (m == null) message = "That geometry does not exist on the base feature" else addToQuery(e, SelRef(m.getString(0), m.getString(1))) }
+                if (m == null) message = tr("That geometry does not exist on the base feature") else addToQuery(e, SelRef(m.getString(0), m.getString(1))) }
             return
         }
         // Part Fillet / Chamfer (DlgFilletEdges): a tapped edge of the base shape is added with the current radius, or removed
         if (p.type == "Part::PropertyFilletEdges") {
             val base = p.extra?.optString("base")
-            if (ref.sub.isEmpty() || ref.sub.startsWith("Vertex") || (base != null && ref.obj != base)) { message = "Pick an edge or face of ${base ?: "the base shape"}"; return }
+            if (ref.sub.isEmpty() || ref.sub.startsWith("Vertex") || (base != null && ref.obj != base)) { message = tr("Pick an edge or face of %1", base ?: tr("the base shape")); return }
             val rows = (p.value as? JSONArray)?.let { a -> (0 until a.length()).map { i -> a.getJSONArray(i).let { listOf(it.getString(0), it.getString(1), it.getString(2)) } } } ?: emptyList()
             val r = rows.firstOrNull()?.get(1) ?: "1 mm"
             // an edge toggles; a face toggles all its edges (all on unless every one already is)
@@ -605,7 +612,7 @@ class AppState(private val ctx: Context) {
 
     /** Joint connector re-pick (TaskAssemblyCreateJoint selection), keeping the other connector. */
     private fun repickJointRef(e: EditState, which: String, ref: SelRef) {
-        if (ref.sub.isEmpty()) { message = "Pick a face, edge or vertex"; return }
+        if (ref.sub.isEmpty()) { message = tr("Pick a face, edge or vertex"); return }
         fun current(name: String): List<Any?>? = (e.props.firstOrNull { it.name == name }?.value as? JSONArray)?.optJSONArray(0)?.let { x ->
             listOf(x.getString(0), x.optJSONArray(1)?.optString(0) ?: "", null) }
         val r1 = if (which == "Reference1") listOf(ref.obj, ref.sub, ref.point?.map { it.toDouble() }) else current("Reference1")
@@ -662,13 +669,13 @@ class AppState(private val ctx: Context) {
 
     // ------------------------------------------------------------------ assembly
     fun startMate(type: String) {
-        if (objects.none { it.type == "Assembly::AssemblyObject" }) { message = "Create an assembly first (Assembly ▸ Create Assembly)"; return }
+        if (objects.none { it.type == "Assembly::AssemblyObject" }) { message = tr("Create an assembly first (Assembly ▸ Create Assembly)"); return }
         selection.clear(); edit = null; mate = MateState(type)
     }
 
     private fun mateAdd(m: MateState, ref: SelRef) {
-        if (ref.sub.isEmpty()) { message = "Pick a face, edge or vertex"; return }
-        if (m.picks.any { it.obj == ref.obj }) { message = "Pick the second connector on a different component"; return }
+        if (ref.sub.isEmpty()) { message = tr("Pick a face, edge or vertex"); return }
+        if (m.picks.any { it.obj == ref.obj }) { message = tr("Pick the second connector on a different component"); return }
         m.picks.add(ref); selection.add(ref)
         if (m.picks.size == 2) {
             val refs = m.picks.map { listOf(it.obj, it.sub, it.point?.map { v -> v.toDouble() }) }
@@ -680,7 +687,7 @@ class AppState(private val ctx: Context) {
     fun cancelMate() { mate = null; selection.clear() }
 
     fun openPartPicker() = eng({ call("asm_parts") as org.json.JSONArray }) { a ->
-        if (objects.none { it.type == "Assembly::AssemblyObject" }) { message = "Create an assembly first"; return@eng }
+        if (objects.none { it.type == "Assembly::AssemblyObject" }) { message = tr("Create an assembly first"); return@eng }
         partPicker = List(a.length()) { i -> a.getJSONObject(i).let { it.getString("name") to it.getString("label") } }
     }
 
@@ -695,6 +702,6 @@ class AppState(private val ctx: Context) {
         openToolset = null
         val ok = MobileCommands.run(this, id)
         if (ok) recentByWorkspace[workspace.id] = (listOf(id) + recent.filter { it != id }).take(6)
-        else message = "${catalog.cmd(id)?.label ?: id} is not available on mobile yet"
+        else message = tr("%1 is not available on mobile yet", catalog.cmd(id)?.label ?: id)
     }
 }

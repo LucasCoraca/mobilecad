@@ -23,6 +23,7 @@ import kotlin.math.abs
 import kotlin.math.hypot
 import app.mobilecad.sketch.SkCons
 import app.mobilecad.ui.OS
+import app.mobilecad.i18n.tr
 
 /**
  * GL viewport + touch navigation over FreeCAD's document:
@@ -77,9 +78,9 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
         override fun dragOrbit(dx: Float, dy: Float) { cam.orbit(dx * 1.5f, dy * 1.5f); refresh() }
         override fun menu(anchor: View) {
             val pm = android.widget.PopupMenu(context, anchor)
-            pm.menu.add(0, 1, 0, "Orthographic").apply { isCheckable = true; isChecked = cam.orthographic }
-            pm.menu.add(0, 2, 1, "Perspective").apply { isCheckable = true; isChecked = !cam.orthographic }
-            pm.menu.add(0, 3, 2, "Isometric"); pm.menu.add(0, 4, 3, "Fit all")
+            pm.menu.add(0, 1, 0, tr("Orthographic")).apply { isCheckable = true; isChecked = cam.orthographic }
+            pm.menu.add(0, 2, 1, tr("Perspective")).apply { isCheckable = true; isChecked = !cam.orthographic }
+            pm.menu.add(0, 3, 2, tr("Isometric")); pm.menu.add(0, 4, 3, tr("Fit all"))
             pm.setOnMenuItemClickListener { when (it.itemId) { 1 -> cam.orthographic = true; 2 -> cam.orthographic = false
                 3 -> stdView("Isometric"); 4 -> fitAll() }; refresh(); true }
             pm.show()
@@ -652,7 +653,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
             val all = t.pts.toList() + listOfNotNull(t.hover)
             for (k in 1 until all.size) line(f(all[k - 1]), f(all[k]), ring)
             for (q in t.pts.toList()) dot(f(q), fill, 10f)
-            t.hover?.let { h -> dot(f(h), ring, 14f); t.snapKind?.let { k -> lb.add(f(h) to k) } }
+            t.hover?.let { h -> dot(f(h), ring, 14f); t.snapKind?.let { k -> lb.add(f(h) to tr(k)) } }
         }
         for (r in app.selection) if (r.sub.startsWith("Vertex")) r.point?.let { dot(it, 0x418FDE, 12f) }
         val hv = renderer.hover
@@ -729,7 +730,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                 for (q in sp.take(t.pts.size)) c.drawCircle(q[0], q[1], 5 * dp, arrowFill)
                 t.hover?.let { w -> cam.project(w[0].toFloat(), w[1].toFloat(), w[2].toFloat())?.let { q ->
                     c.drawCircle(q[0], q[1], 8 * dp, ring)
-                    t.snapKind?.let { k -> c.drawText(k, q[0] + 12 * dp, q[1] - 10 * dp, labelText) } } }
+                    t.snapKind?.let { k -> c.drawText(tr(k), q[0] + 12 * dp, q[1] - 10 * dp, labelText) } } }
             }
             // selected / hovered vertexes (the GL renderer highlights faces and edges)
             for (r in app.selection) if (r.sub.startsWith("Vertex")) r.point?.let { w -> cam.project(w[0], w[1], w[2])?.let { q ->

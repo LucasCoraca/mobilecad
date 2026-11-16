@@ -6,13 +6,21 @@ import android.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import com.caverock.androidsvg.SVG
+import app.mobilecad.i18n.Language
 import org.json.JSONObject
 
-/** One FreeCAD command, as defined in FreeCAD's sources (see research/gen_catalog.py). */
-class FcCommand(val id: String, val label: String, val tip: String, val icon: String?, val group: List<String>) {
+/** One FreeCAD command, as defined in FreeCAD's sources (see research/gen_catalog.py). [label] and [tip] are shown
+ *  in the interface language (as the desktop's applyCommandData translates them); [enLabel] / [enTip] are FreeCAD's
+ *  English texts. */
+class FcCommand(val id: String, val enLabel: String, val enTip: String, val icon: String?, val group: List<String>) {
     val workbench: String get() = id.substringBefore('_')
+    val label: String get() = Language.commandLabel(id, enLabel)
+    val tip: String get() = Language.commandTip(id, enTip)
 }
-class FcToolbar(val name: String, val items: List<String>)
+/** A toolbar; [title] is its name as the desktop shows it (translated in the "Workbench" context). */
+class FcToolbar(val name: String, val items: List<String>) {
+    val title: String get() = Language.inContext("Workbench", name)
+}
 class FcWorkbench(val id: String, val toolbars: List<FcToolbar>, val other: List<String>)
 
 /** FreeCAD's command catalog + toolbars for every workbench, generated from FreeCAD main. */
@@ -36,7 +44,9 @@ class Catalog private constructor(val source: String, val workbenches: List<FcWo
 
     fun search(q: String): List<FcCommand> {
         val s = q.trim().lowercase(); if (s.isEmpty()) return emptyList()
-        return commands.values.filter { it.group.isEmpty() && (it.label.lowercase().contains(s) || it.id.lowercase().contains(s) || it.tip.lowercase().contains(s)) }
+        // either language finds a command, as FreeCAD's command search matches the shown and the English text
+        return commands.values.filter { it.group.isEmpty() && (it.label.lowercase().contains(s) || it.enLabel.lowercase().contains(s) ||
+            it.id.lowercase().contains(s) || it.tip.lowercase().contains(s) || it.enTip.lowercase().contains(s)) }
             .sortedBy { if (it.label.lowercase().startsWith(s)) 0 else 1 }
     }
 

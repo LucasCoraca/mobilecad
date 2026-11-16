@@ -5,6 +5,7 @@ import math
 import FreeCAD as App
 from FreeCAD import Vector as V
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .partdesign import _sel
 
 def _objs(names):
@@ -96,7 +97,7 @@ def draft_make(tool, pts, wp=None, opts=None):
         f = Draft.make_shapestring(o.get('text', 'Text'), o.get('font', '/system/fonts/Roboto-Regular.ttf'), float(o.get('size', 10)))
         f.Placement = _pl(w, P[0])
     else:
-        raise RuntimeError('Unknown Draft tool ' + tool)
+        raise RuntimeError(_tr('Unknown Draft tool %s') % tool)
     _doc().recompute()
     return f.Name
 
@@ -105,7 +106,7 @@ def draft_make(tool, pts, wp=None, opts=None):
 def draft_modify(tool, names, pts=None, wp=None, opts=None):
     import Draft, DraftVecUtils, DraftGeomUtils
     o = opts or {}; P = _pts(pts or []); w = _wp(wp); objs = _objs(names); copy = bool(o.get('copy'))
-    if not objs: raise RuntimeError('Select objects first')
+    if not objs: raise RuntimeError(_tr('Select objects first'))
     if tool == 'Move':
         r = Draft.move(objs, P[1].sub(P[0]), copy=copy)
     elif tool == 'Rotate':                        # gui_rotate: centre, start direction, end direction (or typed angle)
@@ -138,7 +139,7 @@ def draft_modify(tool, names, pts=None, wp=None, opts=None):
             r = Draft.offset(obj, npts, copy=copy)
         else:
             dist = DraftGeomUtils.findPerpendicular(pt, sh.Edges)
-            if not dist: raise RuntimeError('Pick a point beside the wire')
+            if not dist: raise RuntimeError(_tr('Pick a point beside the wire'))
             d = dist[0].negative()
             v1 = DraftGeomUtils.getTangent(sh.Edges[0], pt); v2 = DraftGeomUtils.getTangent(sh.Edges[dist[1]], pt)
             dv = DraftVecUtils.rotate(d, -DraftVecUtils.angle(v1, v2, w.axis), w.axis)
@@ -173,11 +174,11 @@ def draft_modify(tool, names, pts=None, wp=None, opts=None):
             dvec = b.sub(a); dvec.normalize(); newp = a.add(dvec.multiply(P[0].sub(a).dot(dvec)))
             pts_[end] = newp; obj.Points = [g.inverse().multVec(p) for p in pts_]; r = obj
         else:
-            raise RuntimeError('Trimex works on Draft wires and on faces')
+            raise RuntimeError(_tr('Trimex works on Draft wires and on faces'))
     elif tool == 'Split':                         # gui_split: the edge picked on a wire and the point on it
         sub = o.get('sub', 'Edge1'); r = Draft.split(objs[0], P[0], int(sub[4:]))
     else:
-        raise RuntimeError('Unknown Draft modifier ' + tool)
+        raise RuntimeError(_tr('Unknown Draft modifier %s') % tool)
     _doc().recompute()
     if isinstance(r, (list, tuple)): r = r[0] if r else None
     return getattr(r, 'Name', None)
@@ -280,7 +281,7 @@ def draft_sel(tool, sel=None, opts=None):
     elif tool == 'WorkingPlaneProxy':
         r = Draft.make_working_plane_proxy(App.Placement(V(*o['pos']), App.Rotation(V(*o['u']), V(*o['v']), V(*o['w']), 'ZXY'))); name = r.Name
     else:
-        raise RuntimeError('Unknown Draft tool ' + tool)
+        raise RuntimeError(_tr('Unknown Draft tool %s') % tool)
     d.recompute()
     return name
 
@@ -300,7 +301,7 @@ def face_plane(obj, sub):
     """Draft_SelectPlane on a face: WorkingPlane.align_to_face."""
     import WorkingPlane
     p = WorkingPlane.PlaneBase()
-    if not p.align_to_face(_doc().getObject(obj).Shape.getElement(sub)): raise RuntimeError('Not a planar face')
+    if not p.align_to_face(_doc().getObject(obj).Shape.getElement(sub)): raise RuntimeError(_tr('Not a planar face'))
     return {'pos': list(p.position), 'u': list(p.u), 'v': list(p.v), 'w': list(p.axis)}
 
 # ------------------------------------------------------------------ snapping + annotation display

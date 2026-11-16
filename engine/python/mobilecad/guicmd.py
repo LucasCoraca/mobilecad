@@ -5,6 +5,7 @@ import importlib, importlib.util, os, sys
 import _gui_finder  # noqa: F401  (placeholder modules for PartGui, MeshGui ...)
 import FreeCAD as App
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .command_modules import MODULES
 
 class _GuiNames(importlib.abc.MetaPathFinder):
@@ -376,7 +377,7 @@ def gui_command(name, sel=None, view_dir=None, wp=None, page=None, colors=None):
             g.u, g.v, g.axis, g.position = App.Vector(*wp['u']), App.Vector(*wp['v']), App.Vector(*wp['w']), App.Vector(*wp['pos'])
         except Exception:
             pass
-    if not _ensure(name): raise RuntimeError('%s is not available' % name)
+    if not _ensure(name): raise RuntimeError(_tr('%s is not available') % name)
     _patch_gui_modules()
     if view_dir: G._view_dir = tuple(view_dir)
     _set_selection(sel)
@@ -404,7 +405,7 @@ def gui_command(name, sel=None, view_dir=None, wp=None, page=None, colors=None):
         if len(hits) == 1: active = True
     if active is False:                  # the desktop greys the tool out: say what it needs
         res = getattr(cmd, 'GetResources', lambda: {})()
-        raise RuntimeError('%s needs a different selection (%s)' % (str(res.get('MenuText', name)), str(res.get('ToolTip', '')).split('.')[0]))
+        raise RuntimeError(_tr('%s needs a different selection (%s)') % (str(res.get('MenuText', name)), str(res.get('ToolTip', '')).split('.')[0]))
     before = _snapshot()
     coop(lambda: G.runCommand(name))
     _doc().recompute()

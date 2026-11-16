@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 import FreeCAD as App
 from FreeCAD import Vector as V
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .partdesign import _sel
 
 SVG_NS = 'http://www.w3.org/2000/svg'
@@ -215,11 +216,11 @@ def td_dimension(kind, refs, x=None, y=None):
     if not ok.get(kind, True):
         need = {'Length': 'one edge, two vertexes or two edges', 'Radius': 'one circle or arc', 'Diameter': 'one circle or arc',
                 'ArcLength': 'one arc', 'Angle': 'two edges', '3PtAngle': 'three vertexes', 'Area': 'one face'}
-        raise RuntimeError('Incorrect selection: select %s' % need.get(kind if kind in need else 'Length'))
+        raise RuntimeError(_tr('Incorrect selection: select %s') % _tr(need.get(kind if kind in need else 'Length')))
     if kind in ('Radius', 'Diameter', 'ArcLength'):
         try: circ = hasattr(view.getEdgeByIndex(int(subs[0][4:])).Curve, 'Radius')
         except Exception: circ = True
-        if not circ: raise RuntimeError('Incorrect selection: select a circle or arc')
+        if not circ: raise RuntimeError(_tr('Incorrect selection: select a circle or arc'))
     dim = d.addObject('TechDraw::DrawViewDimension', 'Dimension')
     dim.Type = {'Length': 'Distance', 'Horizontal': 'DistanceX', 'Vertical': 'DistanceY', 'Radius': 'Radius', 'Diameter': 'Diameter',
                 'Angle': 'Angle', '3PtAngle': 'Angle3Pt', 'Area': 'Area', 'ArcLength': 'Distance'}[kind]
@@ -253,7 +254,7 @@ def td_dimension(kind, refs, x=None, y=None):
             pass
     d.recompute()
     if 'Invalid' in dim.State:
-        msg = dim.getStatusString(); d.removeObject(dim.Name); raise RuntimeError('Selection not valid for this dimension: ' + msg)
+        msg = dim.getStatusString(); d.removeObject(dim.Name); raise RuntimeError(_tr('Selection not valid for this dimension: %s') % msg)
     return dim.Name
 
 @op
@@ -602,7 +603,7 @@ def td_ext(kind, view, subs=None, names=None, opts=None):
     elif kind == 'HoleCircle':                            # execHoleCircle: bolt circle through 3+ hole centres
         import Part
         cs = [v.getEdgeBySelection(s).Curve for s in subs if hasattr(v.getEdgeBySelection(s).Curve, 'Radius')]
-        if len(cs) < 3: raise RuntimeError('Select three or more circles')
+        if len(cs) < 3: raise RuntimeError(_tr('Select three or more circles'))
         big = Part.Circle(cs[0].Center, cs[1].Center, cs[2].Center)
         v.makeCosmeticCircle(big.Center, big.Radius, 4, _ATTR['weight'])
         for c in cs:
@@ -611,7 +612,7 @@ def td_ext(kind, view, subs=None, names=None, opts=None):
     elif kind in ('ThreadHoleSide', 'ThreadBoltSide'):    # _createThreadLines, factor 1.176 / 0.85
         f = 1.176 if kind == 'ThreadHoleSide' else 0.85
         es = [v.getEdgeBySelection(s) for s in subs if s.startswith('Edge')][:2]
-        if len(es) < 2: raise RuntimeError('Select two parallel edges')
+        if len(es) < 2: raise RuntimeError(_tr('Select two parallel edges'))
         s0, e0 = es[0].Vertexes[0].Point, es[0].Vertexes[-1].Point; s1, e1 = es[1].Vertexes[0].Point, es[1].Vertexes[-1].Point
         if (e0 - s0).dot(e1 - s1) < 0: s1, e1 = e1, s1
         kd = (s1 - s0).Length; dv = (s1 - s0); dv.normalize(); dv = dv * ((kd * f - kd) / 2)
@@ -634,12 +635,12 @@ def td_ext(kind, view, subs=None, names=None, opts=None):
     elif kind == 'VertexAtIntersection':                  # cosmetic vertexes where two edges cross
         es = [v.getEdgeBySelection(s) for s in subs if s.startswith('Edge')][:2]
         dist, pts, _ = es[0].distToShape(es[1])
-        if dist > 1e-6: raise RuntimeError('The edges do not intersect')
+        if dist > 1e-6: raise RuntimeError(_tr('The edges do not intersect'))
         for p, _q in pts: v.makeCosmeticVertex(p)
     elif kind in ('CreateHorizChainDimension', 'CreateVertChainDimension', 'CreateObliqueChainDimension'):
         axis = 1 if 'Vert' in kind else 0; typ = {'Horiz': 'DistanceX', 'Vert': 'DistanceY', 'Oblique': 'Distance'}[kind[6:].split('Chain')[0]]
         vs = _sorted_vertexes(v, subs, axis)
-        if len(vs) < 2: raise RuntimeError('Select two or more vertexes')
+        if len(vs) < 2: raise RuntimeError(_tr('Select two or more vertexes'))
         y0 = None
         for (a, pa), (b, pb) in zip(vs, vs[1:]):
             dm = _lin_dim(v, a, b, typ); mid = (pa + pb) * (0.5 * sc)
@@ -657,7 +658,7 @@ def td_ext(kind, view, subs=None, names=None, opts=None):
             else: dm.Y = mid.y; dm.X = base[1].x * sc + 7.0 + n * _ATTR['cascade']
     elif kind in ('CascadeHorizDimension', 'CascadeVertDimension', 'CascadeObliqueDimension'):
         dims = sorted((_o(n) for n in (names or [])), key=lambda x: abs(_f(x.Y)) if 'Horiz' in kind else abs(_f(x.X)))
-        if not dims: raise RuntimeError('Select dimensions')
+        if not dims: raise RuntimeError(_tr('Select dimensions'))
         y0 = _f(dims[0].Y) if 'Horiz' in kind else _f(dims[0].X)
         for n, dm in enumerate(dims):
             if 'Horiz' in kind: dm.Y = y0 + n * _ATTR['cascade'] * (1 if y0 >= 0 else -1)
@@ -672,7 +673,7 @@ def td_ext(kind, view, subs=None, names=None, opts=None):
             for dm in dims: dm.X = x
     elif kind in ('CreateHorizChamferDimension', 'CreateVertChamferDimension'):   # length + "×45°" style text
         vs = [(s, v.getVertexBySelection(s).Point) for s in subs if s.startswith('Vertex')][:2]
-        if len(vs) < 2: raise RuntimeError('Select the two chamfer vertexes')
+        if len(vs) < 2: raise RuntimeError(_tr('Select the two chamfer vertexes'))
         dvec = vs[1][1] - vs[0][1]; ang = math.degrees(math.atan2(abs(dvec.y), abs(dvec.x)))
         typ = 'DistanceX' if 'Horiz' in kind else 'DistanceY'
         dm = _lin_dim(v, vs[0][0], vs[1][0], typ)
@@ -717,7 +718,7 @@ def td_ext(kind, view, subs=None, names=None, opts=None):
         p = v.getVertexBySelection(subs[0]).Point
         v.makeCosmeticVertex(V(p.x + float(o.get('dx', 0)), p.y + float(o.get('dy', 0)), 0))
     else:
-        raise RuntimeError('Unknown TechDraw extension ' + kind)
+        raise RuntimeError(_tr('Unknown TechDraw extension %s') % kind)
     d.recompute(); return True
 
 @op

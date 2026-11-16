@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.compose.runtime.getValue
+import app.mobilecad.i18n.tr
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
@@ -69,14 +70,14 @@ class Updater(private val ctx: Context, private val scope: CoroutineScope) {
     }
 
     fun check(manual: Boolean) {
-        if (!enabled) { if (manual) message = "Updates for this copy come from where it was installed (e.g. F-Droid)."; return }
+        if (!enabled) { if (manual) message = tr("Updates for this copy come from where it was installed (e.g. F-Droid)."); return }
         cleanup()
         scope.launch {
             val r = try { withContext(Dispatchers.IO) { latest() } } catch (e: Exception) {
-                if (manual) message = "Could not check for updates: ${e.message ?: e.javaClass.simpleName}"; return@launch }
+                if (manual) message = tr("Could not check for updates: %1", e.message ?: e.javaClass.simpleName); return@launch }
             when {
                 r != null && newer(r.version, version) -> offer = r
-                manual -> message = "MobileCAD $version is the latest version."
+                manual -> message = tr("MobileCAD %1 is the latest version.", version)
             }
         }
     }
@@ -117,13 +118,13 @@ class Updater(private val ctx: Context, private val scope: CoroutineScope) {
                     val sum = md.digest().joinToString("") { "%02x".format(it) }
                     val want = r.sumsUrl?.let { u -> get(u).lines().map { it.trim().split(Regex("\\s+")) }
                         .firstOrNull { it.size >= 2 && it.last().trimStart('*') == asset }?.first()?.lowercase() }
-                        ?: throw IllegalStateException("the release has no checksum for $asset")
-                    if (want != sum) throw IllegalStateException("the download is damaged (checksum mismatch), try again")
+                        ?: throw IllegalStateException(tr("the release has no checksum for %1", asset))
+                    if (want != sum) throw IllegalStateException(tr("the download is damaged (checksum mismatch), try again"))
                 }
                 progress = null; install(f)
             } catch (e: Exception) {
                 progress = null; f.delete()
-                if (e !is InterruptedException && e !is kotlinx.coroutines.CancellationException) message = "Update failed: ${e.message ?: e.javaClass.simpleName}"
+                if (e !is InterruptedException && e !is kotlinx.coroutines.CancellationException) message = tr("Update failed: %1", e.message ?: e.javaClass.simpleName)
             }
         }
     }
@@ -135,14 +136,14 @@ class Updater(private val ctx: Context, private val scope: CoroutineScope) {
     private fun install(f: File) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !ctx.packageManager.canRequestPackageInstalls()) {
             pending = f
-            message = "Allow MobileCAD to install updates, then come back."
+            message = tr("Allow MobileCAD to install updates, then come back.")
             ctx.startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:${ctx.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             // continue once it is allowed and MobileCAD is back in front (Android blocks the installer's confirmation
             // from the background); works for MobileCAD and MobileCAD XR's activity alike. Give up after 10 minutes.
             scope.launch { repeat(1200) { kotlinx.coroutines.delay(500)
                 if (pending !== f) return@launch
                 if (ctx.packageManager.canRequestPackageInstalls() && foreground()) { install(f); return@launch } }
-                if (pending === f) { pending = null; message = "Update not installed: MobileCAD may not install apps" } }
+                if (pending === f) { pending = null; message = tr("Update not installed: MobileCAD may not install apps") } }
             return
         }
         pending = null
@@ -161,8 +162,8 @@ class Updater(private val ctx: Context, private val scope: CoroutineScope) {
                         s.commit(PendingIntent.getBroadcast(ctx, id, Intent(ctx, UpdateReceiver::class.java), flags).intentSender)
                     }
                 }
-                message = "Installing the update…"
-            } catch (e: Exception) { message = "Update failed: ${e.message ?: e.javaClass.simpleName}" }
+                message = tr("Installing the update…")
+            } catch (e: Exception) { message = tr("Update failed: %1", e.message ?: e.javaClass.simpleName) }
         }
     }
 
@@ -196,7 +197,7 @@ class Updater(private val ctx: Context, private val scope: CoroutineScope) {
             if (code != 200) { c.disconnect(); throw IllegalStateException("HTTP $code") }
             return c
         }
-        throw IllegalStateException("too many redirects")
+        throw IllegalStateException(tr("too many redirects"))
     }
     private fun get(u: String): String = open(u).let { c -> try { c.inputStream.bufferedReader().readText() } finally { c.disconnect() } }
 
@@ -222,8 +223,8 @@ class UpdateReceiver : BroadcastReceiver() {
                 Updater.current?.confirm(confirm) ?: ctx.startActivity(confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             }
             PackageInstaller.STATUS_SUCCESS -> Updater.current?.message = null
-            else -> Updater.current?.message = "Update not installed" + (intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-                ?.let { ": $it" } ?: if (st == PackageInstaller.STATUS_FAILURE_ABORTED) " (cancelled)" else "")
+            else -> Updater.current?.message = tr("Update not installed") + (intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
+                ?.let { ": $it" } ?: if (st == PackageInstaller.STATUS_FAILURE_ABORTED) tr(" (cancelled)") else "")
         }
     }
 }

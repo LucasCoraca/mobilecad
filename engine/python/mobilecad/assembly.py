@@ -3,6 +3,7 @@ the same objects (Assembly::AssemblyObject, Assembly::JointGroup, App::Link, Joi
 same reference format ([component, ['Link.Face3', 'Link.Vertex2']]) built with FreeCAD's own UtilsAssembly helpers."""
 import FreeCAD as App
 from .bridge import op, _doc, _assembly_of
+from _i18n import tr as _tr
 
 def _asm(name=None):
     d = _doc()
@@ -52,7 +53,7 @@ def _ref(asm, obj, sub, point):
     root = asm.Document.getObject(obj) if obj != asm.Name else asm
     sub_name = sub if root == asm else '%s.%s' % (obj, sub)
     comp, new_sub = UtilsAssembly.getComponentReference(asm, asm, sub_name)
-    if not comp: raise RuntimeError('%s.%s is not part of the assembly' % (obj, sub))
+    if not comp: raise RuntimeError(_tr('%s.%s is not part of the assembly') % (obj, sub))
     ref = [comp, [new_sub]]
     if point is None:
         # keep an existing connector: its vertex sub-name is the element itself (as for faces on desktop)
@@ -122,7 +123,7 @@ def asm_select(kind, sel=None):
     LinkSelectLinked (Assembly/Gui/Commands.cpp): object names to select, from the last solve's diagnostics."""
     d = _doc()
     asm = next((o for o in d.Objects if o.TypeId == 'Assembly::AssemblyObject'), None)
-    if asm is None: raise RuntimeError('No assembly')
+    if asm is None: raise RuntimeError(_tr('No assembly'))
     def joints():
         jg = next((o for o in asm.Group if o.TypeId == 'Assembly::JointGroup'), None)
         return list(jg.Group) if jg else []

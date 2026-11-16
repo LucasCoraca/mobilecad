@@ -2,6 +2,7 @@ package app.mobilecad.freecad
 
 import org.json.JSONArray
 import org.json.JSONObject
+import app.mobilecad.i18n.tr
 
 /**
  * Draft workbench (src/Mod/Draft/draftguitools).  Point tools collect their points with the touch Snapper
@@ -63,21 +64,21 @@ object DraftCommands {
         when {
             n in groups -> s.choose(s.catalog.cmd(id)?.label ?: n, groups.getValue(n).map { "Draft_$it" to (s.catalog.cmd("Draft_$it")?.label ?: it) }) { c -> run(s, c) }
             n in makers -> { val (prompts, mn, mx) = makers.getValue(n)
-                fun start(opts: Map<String, Any?>) = s.startDraft(DraftTool(n, s.catalog.cmd(id)?.label ?: n, prompts, mn, mx) { p ->
+                fun start(opts: Map<String, Any?>) = s.startDraft(DraftTool(n, s.catalog.cmd(id)?.label ?: n, prompts.map { tr(it) }, mn, mx) { p ->
                     s.draftStep(n) { call("draft_make", mapOf("tool" to n, "pts" to pts(p), "wp" to wp, "opts" to opts)) } })
                 when (n) {
-                    "Polygon" -> s.askNumber("Number of sides", 6.0, emptyList()) { k -> start(mapOf("sides" to k.toInt().coerceAtLeast(3))) }
-                    "Text" -> s.textPrompt = TextPrompt("Text (new line = \\n)", "Text") { t -> start(mapOf("text" to t.replace("\\n", "\n"))) }
-                    "ShapeString" -> s.textPrompt = TextPrompt("Shape string text", "Text") { t -> s.askNumber("Height", 10.0) { h -> start(mapOf("text" to t, "size" to h)) } }
-                    "Label" -> s.textPrompt = TextPrompt("Label text", "Label") { t ->
+                    "Polygon" -> s.askNumber(tr("Number of sides"), 6.0, emptyList()) { k -> start(mapOf("sides" to k.toInt().coerceAtLeast(3))) }
+                    "Text" -> s.textPrompt = TextPrompt(tr("Text (new line = \\n)"), "Text") { t -> start(mapOf("text" to t.replace("\\n", "\n"))) }
+                    "ShapeString" -> s.textPrompt = TextPrompt(tr("Shape string text"), "Text") { t -> s.askNumber(tr("Height"), 10.0) { h -> start(mapOf("text" to t, "size" to h)) } }
+                    "Label" -> s.textPrompt = TextPrompt(tr("Label text"), "Label") { t ->
                         start(mapOf("text" to t, "target" to s.selection.firstOrNull()?.let { listOf(it.obj, it.sub) })) }
                     else -> start(emptyMap())
                 }
             }
             n in modifiers -> { val sel = names(s)
-                if (sel.isEmpty()) { s.message = "Select objects first"; return true }
+                if (sel.isEmpty()) { s.message = tr("Select objects first"); return true }
                 val (prompts, k) = modifiers.getValue(n); val sub = s.selection.firstOrNull { it.sub.isNotEmpty() }?.sub
-                val tool = DraftTool(n, s.catalog.cmd(id)?.label ?: n, prompts, k, k, modifier = true) { p ->
+                val tool = DraftTool(n, s.catalog.cmd(id)?.label ?: n, prompts.map { tr(it) }, k, k, modifier = true) { p ->
                     val t = s.draft
                     fun go(opts: Map<String, Any?>) = s.draftStep(n) {
                         if (n == "Edit") run("""
@@ -87,61 +88,61 @@ P[i] = App.Vector(*args['p'][1]); o.Points = [g.inverse().multVec(p) for p in P]
                         else call("draft_modify", mapOf("tool" to n, "names" to sel, "pts" to pts(p), "wp" to wp, "opts" to opts)) }
                     val copy = mapOf("copy" to (t?.copy == true), "sub" to sub)
                     when (n) {
-                        "Scale" -> s.askNumber("Scale factor", 2.0, emptyList()) { f -> go(copy + ("factor" to f)) }
+                        "Scale" -> s.askNumber(tr("Scale factor"), 2.0, emptyList()) { f -> go(copy + ("factor" to f)) }
                         else -> go(copy)
                     }
                 }
                 if (n == "Edit") s.startDraft(tool).also { s.draftSnaps.let { if ("Endpoint" !in it) it.add("Endpoint") } } else s.startDraft(tool)
             }
-            n in selTools -> if (s.selection.isEmpty() && n != "UpdateShape2DView" && n != "Heal") s.message = "Select objects first"
+            n in selTools -> if (s.selection.isEmpty() && n != "UpdateShape2DView" && n != "Heal") s.message = tr("Select objects first")
                 else s.draftStep(n) { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson())) }
-            n == "OrthoArray" -> need(s) { s.askNumber("Copies along X", 2.0, emptyList()) { nx -> s.askNumber("Copies along Y", 2.0, emptyList()) { ny ->
-                s.askNumber("Interval", 100.0) { iv -> s.draftStep("Array") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(),
+            n == "OrthoArray" -> need(s) { s.askNumber(tr("Copies along X"), 2.0, emptyList()) { nx -> s.askNumber(tr("Copies along Y"), 2.0, emptyList()) { ny ->
+                s.askNumber(tr("Interval"), 100.0) { iv -> s.draftStep("Array") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(),
                     "opts" to mapOf("n" to listOf(nx.toInt(), ny.toInt(), 1), "interval" to listOf(iv, iv, iv)))) } } } } }
-            n == "PolarArray" -> need(s) { s.askNumber("Number of elements", 5.0, emptyList()) { k -> s.askNumber("Polar angle", 360.0, listOf("°")) { a ->
+            n == "PolarArray" -> need(s) { s.askNumber(tr("Number of elements"), 5.0, emptyList()) { k -> s.askNumber(tr("Polar angle"), 360.0, listOf("°")) { a ->
                 s.draftStep("Polar array") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("n" to k.toInt(), "angle" to a))) } } } }
-            n == "CircularArray" -> need(s) { s.askNumber("Radial distance", 100.0) { r -> s.askNumber("Tangential distance", 50.0) { t -> s.askNumber("Number of circular layers", 3.0, emptyList()) { c ->
+            n == "CircularArray" -> need(s) { s.askNumber(tr("Radial distance"), 100.0) { r -> s.askNumber(tr("Tangential distance"), 50.0) { t -> s.askNumber(tr("Number of circular layers"), 3.0, emptyList()) { c ->
                 s.draftStep("Circular array") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("r" to r, "t" to t, "rings" to c.toInt()))) } } } } }
-            n == "Fillet" -> need(s) { s.askNumber("Fillet radius", 1.0) { r -> s.choose("Fillet", listOf("f" to "Fillet", "c" to "Chamfer")) { c ->
+            n == "Fillet" -> need(s) { s.askNumber(tr("Fillet radius"), 1.0) { r -> s.choose(tr("Fillet"), listOf("f" to tr("Fillet"), "c" to tr("Chamfer"))) { c ->
                 s.draftStep("Fillet") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("radius" to r, "chamfer" to (c == "c")))) } } } }
-            n == "Hatch" -> need(s) { s.choose("Hatch pattern", listOf("Diagonal4", "Diagonal1", "Diagonal2", "Square", "Brick", "Steel", "Cross", "Diamond").map { it to it }) { pat ->
-                s.askNumber("Pattern scale", 10.0, emptyList()) { k -> s.draftStep("Hatch") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("pattern" to pat, "scale" to k))) } } } }
-            n == "Layer" -> s.textPrompt = TextPrompt("New layer", "Layer") { t -> s.draftStep("New layer") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("name" to t))) } }
+            n == "Hatch" -> need(s) { s.choose(tr("Hatch pattern"), listOf("Diagonal4", "Diagonal1", "Diagonal2", "Square", "Brick", "Steel", "Cross", "Diamond").map { it to it }) { pat ->
+                s.askNumber(tr("Pattern scale"), 10.0, emptyList()) { k -> s.draftStep("Hatch") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("pattern" to pat, "scale" to k))) } } } }
+            n == "Layer" -> s.textPrompt = TextPrompt(tr("New layer"), "Layer") { t -> s.draftStep("New layer") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("name" to t))) } }
             n == "AddToLayer" || n == "AutoGroup" || n == "LayerManager" -> s.eng({ call("draft_groups") as JSONObject }) { j ->
                 val ls = j.getJSONArray("layers").let { a -> List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } } }
                 when (n) {
-                    "AddToLayer" -> need(s) { s.choose("Move to layer", ls) { l -> s.draftStep("Add to layer") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("layer" to l))) } } }
-                    "AutoGroup" -> s.choose("Put new objects in", listOf("" to "None") + ls) { l -> s.autoGroup = l.ifEmpty { null } }
-                    else -> s.choose("Layers (tap to show / hide)", ls) { l -> s.obj(l)?.let { o -> s.eng({ call("set_visibility", mapOf("names" to listOf(l), "visible" to !o.visible)) }) { s.refresh() } } }
+                    "AddToLayer" -> need(s) { s.choose(tr("Move to layer"), ls) { l -> s.draftStep("Add to layer") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("layer" to l))) } } }
+                    "AutoGroup" -> s.choose(tr("Put new objects in"), listOf("" to tr("None")) + ls) { l -> s.autoGroup = l.ifEmpty { null } }
+                    else -> s.choose(tr("Layers (tap to show / hide)"), ls) { l -> s.obj(l)?.let { o -> s.eng({ call("set_visibility", mapOf("names" to listOf(l), "visible" to !o.visible)) }) { s.refresh() } } }
                 } }
             n == "AddToGroup" || n == "SelectGroup" -> s.eng({ call("draft_groups") as JSONObject }) { j ->
                 val gs = j.getJSONArray("groups").let { a -> List(a.length()) { i -> a.getJSONArray(i).let { it.getString(0) to it.getString(1) } } }
-                if (n == "AddToGroup") need(s) { s.choose("Add to group", listOf("" to "Ungroup") + gs) { g ->
+                if (n == "AddToGroup") need(s) { s.choose(tr("Add to group"), listOf("" to tr("Ungroup")) + gs) { g ->
                     s.draftStep("Add to group") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("group" to g.ifEmpty { null }))) } } }
-                else s.choose("Select group", gs) { g -> s.eng({ call("group_members", mapOf("name" to g)) as JSONArray }) { a ->
+                else s.choose(tr("Select group"), gs) { g -> s.eng({ call("group_members", mapOf("name" to g)) as JSONArray }) { a ->
                     s.selection.clear(); for (i in 0 until a.length()) s.selection.add(SelRef(a.getString(i))); s.recordSelection(); s.viewport?.sync() } } }
-            n == "SelectPlane" -> s.choose("Working plane", listOf("XY" to "Top (XY)", "XZ" to "Front (XZ)", "YZ" to "Side (YZ)", "face" to "Selected face", "view" to "Current view")) { p ->
+            n == "SelectPlane" -> s.choose(tr("Working plane"), listOf("XY" to tr("Top (XY)"), "XZ" to tr("Front (XZ)"), "YZ" to tr("Side (YZ)"), "face" to tr("Selected face"), "view" to tr("Current view"))) { p ->
                 when (p) {
                     "XY" -> s.workPlane = WorkPlane.XY; "XZ" -> s.workPlane = WorkPlane.XZ; "YZ" -> s.workPlane = WorkPlane.YZ
                     "face" -> s.selection.firstOrNull { it.sub.startsWith("Face") }?.let { f -> s.eng({ call("face_plane", mapOf("obj" to f.obj, "sub" to f.sub)) as JSONObject }) { j ->
                         fun v(k: String) = j.getJSONArray(k).let { a -> DoubleArray(3) { a.getDouble(it) } }
-                        s.workPlane = WorkPlane(v("pos"), v("u"), v("v"), v("w")); s.message = "Working plane: face" } } ?: run { s.message = "Select a planar face first" }
+                        s.workPlane = WorkPlane(v("pos"), v("u"), v("v"), v("w")); s.message = tr("Working plane: face") } } ?: run { s.message = tr("Select a planar face first") }
                     "view" -> s.viewport?.cam?.let { c -> val (r, u) = c.basis(); val e = c.eye()
                         val w = doubleArrayOf((e[0] - c.tx).toDouble(), (e[1] - c.ty).toDouble(), (e[2] - c.tz).toDouble()).let { a -> val l = Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]); DoubleArray(3) { a[it] / l } }
                         s.workPlane = WorkPlane(doubleArrayOf(c.tx.toDouble(), c.ty.toDouble(), c.tz.toDouble()), DoubleArray(3) { r[it].toDouble() }, DoubleArray(3) { u[it].toDouble() }, w) }
                 } }
             n == "WorkingPlaneProxy" -> s.draftStep("Working plane proxy") { call("draft_sel", mapOf("tool" to n, "opts" to wp)) }
-            n == "ToggleConstructionMode" -> { s.constructionMode = !s.constructionMode; s.message = "Construction mode ${if (s.constructionMode) "on" else "off"}" }
+            n == "ToggleConstructionMode" -> { s.constructionMode = !s.constructionMode; s.message = tr(if (s.constructionMode) "Construction mode on" else "Construction mode off") }
             n == "ToggleGrid" -> { s.showGrid = !s.showGrid; s.viewport?.sync() }
             n == "ToggleDisplayMode" -> { s.drawStyle = if (s.drawStyle == "Wireframe") "As Is" else "Wireframe"; s.viewport?.sync() }
             n.startsWith("Snap_") -> n.removePrefix("Snap_").let { k -> if (k in s.draftSnaps) s.draftSnaps.remove(k) else s.draftSnaps.add(k)
-                s.message = "$k snap ${if (k in s.draftSnaps) "on" else "off"}" }
-            n == "ShowSnapBar" -> s.choose("Snaps (tap to toggle)", snaps.map { it to "${if (it in s.draftSnaps) "✓" else "  "}  $it" }) { k ->
+                s.message = if (k in s.draftSnaps) tr("%1 snap on", tr(k)) else tr("%1 snap off", tr(k)) }
+            n == "ShowSnapBar" -> s.choose(tr("Snaps (tap to toggle)"), snaps.map { it to "${if (it in s.draftSnaps) "✓" else "  "}  ${tr(it)}" }) { k ->
                 if (k in s.draftSnaps) s.draftSnaps.remove(k) else s.draftSnaps.add(k); run(s, id) }
-            n == "Slope" -> need(s) { s.askNumber("Slope", 0.0, listOf("%")) { p -> s.draftStep("Slope") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("slope" to p))) } } }
+            n == "Slope" -> need(s) { s.askNumber(tr("Slope"), 0.0, listOf("%")) { p -> s.draftStep("Slope") { call("draft_sel", mapOf("tool" to n, "sel" to s.selJson(), "opts" to mapOf("slope" to p))) } } }
             n == "Hyperlink" -> need(s) { s.eng({ run("result = [l for o in [doc.getObject(n) for n in args['n']] for t in getattr(o, 'Text', []) for l in t.split() if '://' in l]", mapOf("n" to names(s))) }) { r ->
                 (r as? JSONArray)?.optString(0)?.takeIf { it.isNotEmpty() }?.let { u -> s.viewport?.context?.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u)).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)) }
-                    ?: run { s.message = "No links in the selected texts" } } }
+                    ?: run { s.message = tr("No links in the selected texts") } } }
             n == "SetStyle" || n == "ApplyStyle" || n == "AnnotationStyleEditor" -> StdCommands.run(s, "Std_SetAppearance")
             n == "SubelementHighlight" -> { s.selBoundingBox = !s.selBoundingBox; s.viewport?.sync() }
             else -> return false
@@ -149,5 +150,5 @@ P[i] = App.Vector(*args['p'][1]); o.Points = [g.inverse().multVec(p) for p in P]
         return true
     }
 
-    private fun need(s: AppState, f: () -> Unit) { if (s.selection.isEmpty()) s.message = "Select objects first" else f() }
+    private fun need(s: AppState, f: () -> Unit) { if (s.selection.isEmpty()) s.message = tr("Select objects first") else f() }
 }

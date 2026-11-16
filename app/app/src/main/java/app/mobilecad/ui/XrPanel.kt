@@ -1,5 +1,6 @@
 package app.mobilecad.ui
 
+import app.mobilecad.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -33,16 +34,16 @@ fun XrContextPanel(app: AppState, modifier: Modifier = Modifier) {
     // what you are doing, and the tools for it (as the context menu)
     val title: String; val hint: String; val actions = mutableListOf<String>()
     when {
-        sk != null -> { title = "Editing ${app.obj(sk.name)?.label ?: sk.name}"; hint = "Draw in the room with the trigger; the sketch's tools are below" }
+        sk != null -> { title = tr("Editing %1", app.obj(sk.name)?.label ?: sk.name); hint = tr("Draw in the room with the trigger; the sketch's tools are below") }
         sel.isEmpty() -> {
-            title = "Nothing selected"; hint = "Point at a face, an edge or a feature and pull the trigger, or start with a tool"
+            title = tr("Nothing selected"); hint = tr("Point at a face, an edge or a feature and pull the trigger, or start with a tool")
             actions += app.recent
         }
         else -> {
             title = if (objs.size == 1) objs[0].label + sel.filter { it.obj == objs[0].name && it.sub.isNotEmpty() }.let { s ->
                 if (s.isEmpty()) "" else ": " + s.take(4).joinToString(", ") { it.sub } + if (s.size > 4) " +${s.size - 4}" else "" }
-                else "${objs.size} objects selected"
-            hint = "Tools for the selection"
+                else tr("%1 objects selected", objs.size)
+            hint = tr("Tools for the selection")
             if (app.inAssembly) actions += listOf("Assembly_CreateJointFixed", "Assembly_CreateJointRevolute", "Assembly_CreateJointSlider", "Assembly_ToggleGrounded")
             if (faces.size == 1 && !app.inAssembly) actions += listOf("PartDesign_NewSketch", "PartDesign_Pad", "PartDesign_Pocket", "PartDesign_Plane")
             if (sketches.isNotEmpty()) actions += listOf("PartDesign_Pad", "PartDesign_Pocket", "PartDesign_Revolution", "PartDesign_Groove", "Sketcher_EditSketch")
@@ -59,13 +60,13 @@ fun XrContextPanel(app: AppState, modifier: Modifier = Modifier) {
         Column(Modifier.fillMaxWidth().background(OS.Metal6, RoundedCornerShape(6.dp)).padding(horizontal = 12.dp, vertical = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(title, Modifier.weight(1f), color = OS.Navy, fontSize = 15.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                objs.singleOrNull()?.takeIf { sk == null }?.let { o -> PanelButton("Edit") { app.openEditor(o.name) } }
-                if (sel.isNotEmpty() && sk == null) PanelButton("Clear") { app.clearSelection(); app.refresh() }
+                objs.singleOrNull()?.takeIf { sk == null }?.let { o -> PanelButton(tr("Edit")) { app.openEditor(o.name) } }
+                if (sel.isNotEmpty() && sk == null) PanelButton(tr("Clear")) { app.clearSelection(); app.refresh() }
             }
             Text(hint, color = OS.Steel, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             val cmds = actions.distinct().filter { MobileCommands.available(it) }.mapNotNull { app.catalog.cmd(it) }
             if (cmds.isNotEmpty()) {
-                if (sel.isEmpty()) Text("Recent", Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+                if (sel.isEmpty()) Text(tr("Recent"), Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 12.sp, fontWeight = FontWeight.Medium)
                 LazyRow(Modifier.fillMaxWidth().padding(top = 4.dp)) { items(cmds, key = { it.id }) { c -> ToolTile(app.catalog, c, true) { app.run(c.id) } } }
             }
         }

@@ -75,7 +75,8 @@ class QStandardPaths:
 class QCoreApplication:
     @staticmethod
     def translate(context, text, *args, **kwargs):
-        return text
+        import _i18n
+        return _i18n.translate(context, text, *args, **kwargs)
 
     @staticmethod
     def instance():

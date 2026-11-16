@@ -1,5 +1,6 @@
 package app.mobilecad.ui
 
+import app.mobilecad.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,10 +70,10 @@ fun Numpad(title: String, initial: String, units: List<String>, onAccept: (Strin
             Key("(", Modifier.weight(1f), keyH, accent = true) { type("(") }; Key(")", Modifier.weight(1f), keyH, accent = true) { type(")") }
             Key("C", Modifier.weight(1f), keyH, accent = true) { text = ""; fresh = false }
             Box(Modifier.weight(1f).height(keyH).padding(3.dp).background(OS.Metal5, RoundedCornerShape(6.dp)).clickable(onClick = onCancel), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.Close, "Cancel", tint = OS.Steel)
+                Icon(Icons.Default.Close, tr("Cancel"), tint = OS.Steel)
             }
             Box(Modifier.weight(1f).height(keyH).padding(3.dp).background(OS.Primary, RoundedCornerShape(6.dp)).clickable { onAccept(result()) }, contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.Check, "Accept", tint = Color.White)
+                Icon(Icons.Default.Check, tr("Accept"), tint = Color.White)
             }
         }
     }
@@ -82,7 +83,7 @@ fun Numpad(title: String, initial: String, units: List<String>, onAccept: (Strin
 private fun Key(label: String, modifier: Modifier, h: androidx.compose.ui.unit.Dp = 52.dp, accent: Boolean = false, icon: Boolean = false, onClick: () -> Unit) {
     Box(modifier.height(h).padding(3.dp).background(if (accent) OS.ToolbarBg else OS.Metal6, RoundedCornerShape(6.dp)).clickable(onClick = onClick),
         contentAlignment = Alignment.Center) {
-        if (icon) Icon(Icons.AutoMirrored.Filled.Backspace, "Backspace", tint = OS.Steel)
+        if (icon) Icon(Icons.AutoMirrored.Filled.Backspace, tr("Backspace"), tint = OS.Steel)
         else Text(label, fontSize = 20.sp, color = if (accent) OS.Primary else OS.Navy)
     }
 }

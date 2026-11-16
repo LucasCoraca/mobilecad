@@ -7,6 +7,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.view.MotionEvent
 import android.view.View
+import app.mobilecad.i18n.Language
 import kotlin.math.abs
 import kotlin.math.hypot
 import kotlin.math.sqrt
@@ -90,8 +91,9 @@ class NaviCube(ctx: Context, private val cam: Camera, private val host: Host) : 
             val m = Matrix(); m.setPolyToPoly(floatArrayOf(0f, 0f, 100f, 0f, 0f, -100f), 0,
                 floatArrayOf(cx + o[0], cy + o[1], cx + ax[0], cy + ax[1], cx + bx[0], cy + bx[1]), 0, 3)
             c.save(); c.concat(m); text.color = textCol; text.textSize = 32f
-            text.textScaleX = 1f; text.textScaleX = minOf(1f, 108f / text.measureText(fc.label))      // fits the inner square
-            c.drawText(fc.label, 0f, 10f, text); c.restore()
+            val label = Language.inContext("NaviCubeSettings", fc.label)
+            text.textScaleX = 1f; text.textScaleX = minOf(1f, 108f / text.measureText(label))      // fits the inner square
+            c.drawText(label, 0f, 10f, text); c.restore()
         }
         // orbit arrows, roll arrows, menu
         fill.color = if (dark) 0xFF8AB4F8.toInt() else 0xFF2A6FC9.toInt()

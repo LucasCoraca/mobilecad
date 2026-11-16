@@ -1,11 +1,18 @@
 package app.mobilecad.freecad
 
+import app.mobilecad.i18n.tr
+
 /**
  * Element tabs ⇐ FreeCAD workbenches.
  * A toolset is a strip button; its tool panel shows the listed FreeCAD toolbars as groups.
  */
-class ToolsetDef(val label: String, val icon: String, val groups: List<Pair<String, String>>)   // (workbench, toolbar name)
-class WorkspaceDef(val id: String, val label: String, val toolsets: List<ToolsetDef>, val sketchToolsets: List<ToolsetDef> = emptyList())
+class ToolsetDef(private val text: String, val icon: String, val groups: List<Pair<String, String>>) {   // (workbench, toolbar name)
+    /** Strip label in the interface language (read at draw time, so a language change redraws it). */
+    val label get() = tr(text)
+}
+class WorkspaceDef(val id: String, private val text: String, val toolsets: List<ToolsetDef>, val sketchToolsets: List<ToolsetDef> = emptyList()) {
+    val label get() = tr(text)
+}
 
 object Workspaces {
     private fun tb(wb: String, vararg names: String) = names.map { wb to it }
@@ -61,7 +68,7 @@ object Workspaces {
         forWorkbench(c, "Spreadsheet", "Variables"),
     )
 
-    val more = listOf("BIM" to "BIM", "Fem" to "FEM", "CAM" to "CAM", "Mesh" to "Mesh", "MeshPart" to "Mesh Part", "Points" to "Points",
-        "ReverseEngineering" to "Reverse Engineering", "Robot" to "Robot", "OpenSCAD" to "OpenSCAD", "Inspection" to "Inspection",
-        "Material" to "Material", "Draft" to "Draft", "Part" to "Part", "PartDesign" to "Part Design", "Sketcher" to "Sketcher", "Surface" to "Surface")
+    val more get() = listOf("BIM" to tr("BIM"), "Fem" to tr("FEM"), "CAM" to tr("CAM"), "Mesh" to tr("Mesh"), "MeshPart" to tr("Mesh Part"), "Points" to tr("Points"),
+        "ReverseEngineering" to tr("Reverse Engineering"), "Robot" to tr("Robot"), "OpenSCAD" to tr("OpenSCAD"), "Inspection" to tr("Inspection"),
+        "Material" to tr("Material"), "Draft" to tr("Draft"), "Part" to tr("Part"), "PartDesign" to tr("Part Design"), "Sketcher" to tr("Sketcher"), "Surface" to tr("Surface"))
 }

@@ -4,6 +4,7 @@ import math
 import FreeCAD as App
 import Part, Sketcher
 from .bridge import op, _doc
+from _i18n import tr as _tr
 
 V = App.Vector
 # PointPos ids as stored in FreeCAD: none=0 start=1 end=2 mid=3
@@ -394,7 +395,7 @@ def sketch_ellipse(name, center, major, minor_pt, construction=False):
     """Sketcher_CreateEllipseByCenter: center, end of major axis, a point fixing the minor radius."""
     sk = _sk(name); c = V(*center, 0); a = V(*major, 0)
     ax = a - c; R = ax.Length
-    if R < 1e-9: raise ValueError('degenerate ellipse')
+    if R < 1e-9: raise ValueError(_tr('degenerate ellipse'))
     d = ax.normalize(); p = V(*minor_pt, 0) - c
     r = abs(-d.y * p.x + d.x * p.y)
     if r < 1e-9 or r >= R: r = min(max(r, R * 0.1), R * 0.999)
@@ -593,9 +594,9 @@ def _add_external(sk, obj, sub, defining=False, intersection=False):
             if m:
                 sk.addExternal(solids[-1].Name, m, bool(defining), bool(intersection)); return solids[-1].Name, m
         if src.Name in deps:
-            raise ValueError('This %s exists only on %s, which is built from this Body, so a sketch inside the Body cannot use it '
+            raise ValueError(_tr('This %s exists only on %s, which is built from this Body, so a sketch inside the Body cannot use it '
                              '(it would be circular). Use PartDesign features (e.g. PartDesign Fillet) inside the Body, or pick an '
-                             'edge that also exists on %s.' % (sub.rstrip('0123456789').lower(), src.Label, solids[-1].Label if solids else 'the Body')) from err
+                             'edge that also exists on %s.') % (sub.rstrip('0123456789').lower(), src.Label, solids[-1].Label if solids else _tr('the Body'))) from err
         b = body.newObject('PartDesign::SubShapeBinder', 'Binder')
         b.Support = [(src, (sub,))]; b.Visibility = False
         # keep it before the sketch so the sketch may use it
@@ -714,7 +715,7 @@ def sketch_knot_multiplicity(name, point_geo, delta):
             knots = bs.getKnots()
             k = min(range(len(knots)), key=lambda i: (bs.value(knots[i]) - pv).Length)   # knot index by position (1-based below)
             sk.modifyBSplineKnotMultiplicity(c.Second, k + 1, int(delta)); return _commit(sk)
-    raise ValueError('Select a B-spline knot point')
+    raise ValueError(_tr('Select a B-spline knot point'))
 
 _clip = []
 @op
@@ -734,7 +735,7 @@ def sketch_clipboard(name, action, geometry=(), dx=0.0, dy=0.0):
 def sketch_group(name, geometry):
     """Sketcher_ConstrainGroup: construction frame line along the selection bounding box + 'Group' constraint (as CmdSketcherConstrainGroup)."""
     sk = _sk(name); geometry = [g for g in geometry if g >= 0]
-    if len(geometry) < 2: raise ValueError('Select at least two geometries')
+    if len(geometry) < 2: raise ValueError(_tr('Select at least two geometries'))
     bb = None
     for g in geometry:
         b = sk.Geometry[g].toShape().BoundBox

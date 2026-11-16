@@ -5,6 +5,7 @@ import math
 import FreeCAD as App
 from FreeCAD import Vector as V
 from .bridge import op, _doc
+from _i18n import tr as _tr
 
 # Robot6Axis.cpp KukaIR500: a, alpha, d, theta, rotDir
 KUKA_IR500 = [(500, -90, 1045, 0, -1), (1300, 0, 0, 0, 1), (55, 90, 0, -90, 1), (0, -90, -1025, 0, 1), (0, 90, 0, 0, 1), (0, 180, -300, 0, 1)]
@@ -37,14 +38,14 @@ def _robot(names):
     d = _doc()
     r = next((d.getObject(n) for n in (names or []) if d.getObject(n) is not None and d.getObject(n).TypeId == 'Robot::RobotObject'), None)
     r = r or next((o for o in d.Objects if o.TypeId == 'Robot::RobotObject'), None)
-    if r is None: raise RuntimeError('Create a robot first')
+    if r is None: raise RuntimeError(_tr('Create a robot first'))
     return r
 
 def _traj(names):
     d = _doc()
     t = next((d.getObject(n) for n in (names or []) if d.getObject(n) is not None and 'Trajectory' in d.getObject(n).TypeId), None)
     t = t or next((o for o in reversed(d.Objects) if o.TypeId == 'Robot::TrajectoryObject'), None)
-    if t is None: raise RuntimeError('Create a trajectory first')
+    if t is None: raise RuntimeError(_tr('Create a trajectory first'))
     return t
 
 @op
@@ -83,7 +84,7 @@ def robot_cmd(kind, names=None, pts=None, opts=None):
         d.recompute(); return True
     if kind == 'AddToolShape':
         r = _robot(names); tool = next((d.getObject(n) for n in names if d.getObject(n) is not None and d.getObject(n) is not r), None)
-        if tool is None: raise RuntimeError('Select the robot and the tool shape')
+        if tool is None: raise RuntimeError(_tr('Select the robot and the tool shape'))
         r.ToolShape = tool; d.recompute(); return True
     if kind in ('ExportKukaCompact', 'ExportKukaFull'):
         import KukaExporter

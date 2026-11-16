@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.mobilecad.freecad.FcProperty
+import app.mobilecad.i18n.Language
+import app.mobilecad.i18n.tr
 import org.json.JSONArray
 
 /** The dialog's value editors, provided by the shell: the numpad (numbers with units or =expressions), a text box,
@@ -168,8 +170,8 @@ object DialogSpec {
 }
 
 fun linkSummary(v: Any?): String = when (v) {
-    null -> "None"
-    is String -> if (v.isEmpty()) "None" else v
+    null -> tr("None")
+    is String -> if (v.isEmpty()) tr("None") else v
     is JSONArray -> {
         // [[object, [sub, ...]], ...]: "Pad · Edge3, Edge7" for one object, "3 objects · 5 elements" otherwise
         val items = ArrayList<Pair<String, List<String>>>()
@@ -182,10 +184,10 @@ fun linkSummary(v: Any?): String = when (v) {
         }
         val subs = items.sumOf { it.second.size.coerceAtLeast(1) }
         when {
-            items.isEmpty() -> "None"
+            items.isEmpty() -> tr("None")
             items.size == 1 && items[0].second.isEmpty() -> items[0].first
-            items.size == 1 -> items[0].first + " · " + (if (items[0].second.size <= 3) items[0].second.joinToString(", ") else "${items[0].second.size} elements")
-            else -> "${items.size} objects · $subs elements"
+            items.size == 1 -> items[0].first + " · " + (if (items[0].second.size <= 3) items[0].second.joinToString(", ") else tr("%1 elements", items[0].second.size))
+            else -> tr("%1 objects · %2 elements", items.size, subs)
         }
     }
     else -> v.toString()
@@ -205,17 +207,17 @@ fun FeatureDialog(
     Column(modifier.then(Screen.panelWidth(300.dp)).shadow(8.dp, RoundedCornerShape(6.dp)).background(OS.Surface, RoundedCornerShape(6.dp))) {
         Row(Modifier.fillMaxWidth().height(44.dp).background(OS.Metal5, RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)).clickable { collapsed = !collapsed }.padding(start = 10.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            Icon(if (collapsed) Icons.Default.ExpandMore else Icons.Default.ExpandLess, if (collapsed) "Expand" else "Collapse", tint = OS.Steel, modifier = Modifier.size(20.dp))
+            Icon(if (collapsed) Icons.Default.ExpandMore else Icons.Default.ExpandLess, if (collapsed) tr("Expand") else tr("Collapse"), tint = OS.Steel, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(6.dp))
             Text(title, Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy, fontSize = 15.sp, maxLines = 1)
-            OkCancel("OK", "Cancel", onOk, onCancel)
+            OkCancel(tr("OK"), tr("Cancel"), onOk, onCancel)
         }
         if (error != null) Text(error, Modifier.fillMaxWidth().background(OS.ErrBg).padding(horizontal = 10.dp, vertical = 6.dp), color = OS.Red, fontSize = 12.sp)
         if (!collapsed) Column(Modifier.heightIn(max = Screen.panelHeight(420.dp)).verticalScroll(rememberScrollState()).padding(horizontal = 10.dp, vertical = 4.dp)) {
             main.filter { DialogSpec.visible(type, it.name, values) }.forEach { PropRow(it, activeQuery, onQueryFocus, onSet, onNumpad, editors, onSetPart) }
             if (rest.isNotEmpty()) {
                 Row(Modifier.fillMaxWidth().clickable { more = !more }.padding(vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Text(if (more) "Fewer options" else "More options (${rest.size})", Modifier.weight(1f), color = OS.Primary, fontSize = 13.sp)
+                    Text(if (more) tr("Fewer options") else tr("More options (%1)", rest.size), Modifier.weight(1f), color = OS.Primary, fontSize = 13.sp)
                     Icon(if (more) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null, tint = OS.Primary)
                 }
                 if (more) rest.forEach { PropRow(it, activeQuery, onQueryFocus, onSet, onNumpad, editors, onSetPart) }
@@ -227,7 +229,7 @@ fun FeatureDialog(
 @Composable
 private fun PropRow(p: FcProperty, activeQuery: String?, onQueryFocus: (String) -> Unit, onSet: (FcProperty, Any?) -> Unit, onNumpad: (FcProperty) -> Unit,
                     ed: DialogEditors?, onSetPart: (String, String) -> Unit) {
-    val label = p.name.removePrefix("@").replace(Regex("([a-z])([A-Z0-9])"), "$1 $2")
+    val label = Language.property(p.name.removePrefix("@"))
     Column(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
         when {
             p.kind == "parts" && ed != null -> {
@@ -251,7 +253,7 @@ private fun PropRow(p: FcProperty, activeQuery: String?, onQueryFocus: (String) 
                 }
             }
             p.kind == "color" && ed != null -> Row(Modifier.fillMaxWidth().height(36.dp).clickable {
-                ed.choose(label, PALETTE.map { it.second to it.first } + ("custom" to "Custom (#rrggbb)…")) { c ->
+                ed.choose(label, PALETTE.map { it.second to tr(it.first) } + ("custom" to tr("Custom (#rrggbb)…"))) { c ->
                     if (c == "custom") ed.text("$label (#rrggbb)", p.value?.toString() ?: "", false) { t -> onSet(p, t) } else onSet(p, c) }
             }, verticalAlignment = Alignment.CenterVertically) {
                 Text(label, Modifier.weight(1f), color = OS.Navy, fontSize = 13.sp)
@@ -260,8 +262,8 @@ private fun PropRow(p: FcProperty, activeQuery: String?, onQueryFocus: (String) 
             }
             (p.kind == "text" || p.kind == "list" || p.kind == "file") && ed != null -> {
                 val shown = when (p.kind) {
-                    "list" -> p.extra?.optInt("count")?.let { n -> if (n == 0) "Empty" else p.extra.optString("text").lines().let { l -> if (n == 1) l[0] else "$n items" } } ?: ""
-                    "file" -> p.value?.toString()?.substringAfterLast('/')?.ifEmpty { "None" } ?: "None"
+                    "list" -> p.extra?.optInt("count")?.let { n -> if (n == 0) tr("Empty") else p.extra.optString("text").lines().let { l -> if (n == 1) l[0] else tr("%1 items", n) } } ?: ""
+                    "file" -> p.value?.toString()?.substringAfterLast('/')?.ifEmpty { tr("None") } ?: tr("None")
                     else -> p.value?.toString() ?: ""
                 }
                 Row(Modifier.fillMaxWidth().heightIn(min = 36.dp).clickable {
@@ -309,7 +311,7 @@ private fun PropRow(p: FcProperty, activeQuery: String?, onQueryFocus: (String) 
                     .border(if (active) 2.dp else 1.dp, if (active) OS.BlueMed else OS.Metal4, RoundedCornerShape(4.dp)).clickable { onQueryFocus(p.name) }.padding(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Text(linkSummary(p.value), Modifier.weight(1f), color = OS.Navy, fontSize = 14.sp, maxLines = 1)
-                    if (active) Text("Tap geometry", color = OS.Primary, fontSize = 11.sp)
+                    if (active) Text(tr("Tap geometry"), color = OS.Primary, fontSize = 11.sp)
                 }
             }
             DialogSpec.isQuantity(p.type) -> Row(Modifier.fillMaxWidth().height(36.dp).clickable { onNumpad(p) }, verticalAlignment = Alignment.CenterVertically) {
@@ -333,20 +335,20 @@ private val PALETTE = listOf("Gray" to "#cccccc", "White" to "#ffffff", "Black" 
 @Composable
 private fun EdgesEditor(p: FcProperty, label: String, active: Boolean, onFocus: () -> Unit, onSet: (List<List<String>>) -> Unit, ed: DialogEditors) {
     val rows = (p.value as? JSONArray)?.let { a -> (0 until a.length()).map { i -> a.getJSONArray(i).let { listOf(it.getString(0), it.getString(1), it.getString(2)) } } } ?: emptyList()
-    val word = if (p.extra?.optBoolean("chamfer") == true) "Size" else "Radius"
+    val word = if (p.extra?.optBoolean("chamfer") == true) tr("Size") else tr("Radius")
     val nEdges = p.extra?.optInt("nedges") ?: 0
     Text(label, fontSize = 11.sp, color = OS.Steel)
     Row(Modifier.padding(top = 2.dp).fillMaxWidth().height(34.dp).background(if (active) OS.Cloud.copy(alpha = .35f) else OS.Surface, RoundedCornerShape(4.dp))
         .border(if (active) 2.dp else 1.dp, if (active) OS.BlueMed else OS.Metal4, RoundedCornerShape(4.dp)).clickable(onClick = onFocus).padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Text(if (rows.isEmpty()) "No edges" else "${rows.size} edge${if (rows.size == 1) "" else "s"}", Modifier.weight(1f), color = OS.Navy, fontSize = 14.sp)
-        Text(if (active) "Tap edges" else "Tap to pick", color = OS.Primary, fontSize = 11.sp)
+        Text(if (rows.isEmpty()) tr("No edges") else if (rows.size == 1) tr("%1 edge", rows.size) else tr("%1 edges", rows.size), Modifier.weight(1f), color = OS.Navy, fontSize = 14.sp)
+        Text(if (active) tr("Tap edges") else tr("Tap to pick"), color = OS.Primary, fontSize = 11.sp)
     }
     Row(Modifier.padding(top = 4.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         val fallback = rows.firstOrNull()?.get(1) ?: "1 mm"
-        Chip("$word for all") { ed.number("$word for all edges", fallback, LENGTH_UNITS) { v -> onSet(rows.map { listOf(it[0], v, v) }) } }
-        if (nEdges > 0) Chip("All") { onSet((1..nEdges).map { i -> rows.firstOrNull { it[0] == "Edge$i" } ?: listOf("Edge$i", fallback, fallback) }) }
-        if (rows.isNotEmpty()) Chip("None") { onSet(emptyList()) }
+        Chip(tr("%1 for all", word)) { ed.number(tr("%1 for all edges", word), fallback, LENGTH_UNITS) { v -> onSet(rows.map { listOf(it[0], v, v) }) } }
+        if (nEdges > 0) Chip(tr("All")) { onSet((1..nEdges).map { i -> rows.firstOrNull { it[0] == "Edge$i" } ?: listOf("Edge$i", fallback, fallback) }) }
+        if (rows.isNotEmpty()) Chip(tr("None")) { onSet(emptyList()) }
     }
     rows.forEachIndexed { i, r ->
         Row(Modifier.fillMaxWidth().height(32.dp), verticalAlignment = Alignment.CenterVertically) {

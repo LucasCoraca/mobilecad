@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.compose.ui.graphics.toArgb
 import app.mobilecad.freecad.AppState
+import app.mobilecad.i18n.Language
 import app.mobilecad.ui.Shell
 import app.mobilecad.ui.OS
 
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, true)
         org.qtproject.qt.android.QtHostAccess.attach(this)
+        Language.init(this)          // the interface language, before anything is drawn
         app = AppState(this)
         app.start()
         devScript(intent)

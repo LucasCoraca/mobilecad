@@ -2,6 +2,7 @@
 implemented on FreeCAD's App API.  View/selection-only commands live in the Kotlin UI."""
 import FreeCAD as App
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .partdesign import _sel
 
 def _objs(names):
@@ -25,7 +26,7 @@ def _clip_doc(reset=False):
 @op
 def clip_copy(names, cut=False):
     objs = _objs(names)
-    if not objs: raise RuntimeError('Select objects to copy')
+    if not objs: raise RuntimeError(_tr('Select objects to copy'))
     c = _clip_doc(reset=True)
     c.copyObject(objs, True)
     if cut:
@@ -38,7 +39,7 @@ def clip_copy(names, cut=False):
 @op
 def clip_paste():
     c = App.listDocuments().get(_CLIP)
-    if c is None or not c.Objects: raise RuntimeError('Nothing to paste')
+    if c is None or not c.Objects: raise RuntimeError(_tr('Nothing to paste'))
     roots = [o for o in c.Objects if not o.InList]
     new = _doc().copyObject(roots, True)
     new = list(new) if isinstance(new, (list, tuple)) else [new]
@@ -115,7 +116,7 @@ def toggle_suppress(names):
     for o in _objs(names):
         if 'Suppressed' in o.PropertiesList and 'Hidden' not in o.getPropertyStatus('Suppressed'):
             o.Suppressed = not o.Suppressed; n += 1
-    if not n: raise RuntimeError('The selection cannot be suppressed')
+    if not n: raise RuntimeError(_tr('The selection cannot be suppressed'))
     _doc().recompute(); return n
 
 # ------------------------------------------------------------------ links (CommandLink.cpp)
@@ -176,7 +177,7 @@ def linked(name, final=False):
     o = _doc().getObject(name)
     t = o.getLinkedObject(bool(final)) if final else getattr(o, 'LinkedObject', None)
     if isinstance(t, tuple): t = t[0]
-    if t is None or t is o: raise RuntimeError('Not a link')
+    if t is None or t is o: raise RuntimeError(_tr('Not a link'))
     return t.Name
 
 @op
@@ -216,28 +217,28 @@ def measure(sel):
     for o, subs in _sel(sel):
         for x in (subs or ['']):
             s.append((o, x, o.Shape.getElement(x) if x else o.Shape))
-    if not s: raise RuntimeError('Select elements to measure')
+    if not s: raise RuntimeError(_tr('Select elements to measure'))
     res = []
     if len(s) == 1:
         o, x, e = s[0]
         t = e.ShapeType
-        if t == 'Vertex': res.append(('Position', '(%.4f, %.4f, %.4f) mm' % (e.X, e.Y, e.Z)))
+        if t == 'Vertex': res.append((_tr('Position'), '(%.4f, %.4f, %.4f) mm' % (e.X, e.Y, e.Z)))
         elif t == 'Edge':
-            res.append(('Length', '%.4f mm' % e.Length))
+            res.append((_tr('Length'), '%.4f mm' % e.Length))
             c = e.Curve
-            if hasattr(c, 'Radius'): res.append(('Radius', '%.4f mm' % c.Radius)); res.append(('Diameter', '%.4f mm' % (2 * c.Radius)))
+            if hasattr(c, 'Radius'): res.append((_tr('Radius'), '%.4f mm' % c.Radius)); res.append((_tr('Diameter'), '%.4f mm' % (2 * c.Radius)))
         elif t == 'Face':
-            res.append(('Area', '%.4f mm²' % e.Area))
-            if hasattr(e.Surface, 'Radius'): res.append(('Radius', '%.4f mm' % e.Surface.Radius))
+            res.append((_tr('Area'), '%.4f mm²' % e.Area))
+            if hasattr(e.Surface, 'Radius'): res.append((_tr('Radius'), '%.4f mm' % e.Surface.Radius))
         else:
-            res.append(('Volume', '%.4f mm³' % e.Volume)); res.append(('Area', '%.4f mm²' % e.Area))
+            res.append((_tr('Volume'), '%.4f mm³' % e.Volume)); res.append((_tr('Area'), '%.4f mm²' % e.Area))
     else:
         (o1, x1, a), (o2, x2, b) = s[0], s[1]
         dist, pairs, _ = a.distToShape(b)
-        res.append(('Distance', '%.4f mm' % dist))
+        res.append((_tr('Distance'), '%.4f mm' % dist))
         if pairs:
             p, q = pairs[0]
-            res.append(('ΔX ΔY ΔZ', '%.4f  %.4f  %.4f mm' % (q.x - p.x, q.y - p.y, q.z - p.z)))
+            res.append((_tr('ΔX ΔY ΔZ'), '%.4f  %.4f  %.4f mm' % (q.x - p.x, q.y - p.y, q.z - p.z)))
         def direction(e):
             if e.ShapeType == 'Edge' and e.Curve.TypeId == 'Part::GeomLine': return e.Curve.Direction
             if e.ShapeType == 'Face' and e.Surface.TypeId == 'Part::GeomPlane': return e.normalAt(0, 0)
@@ -245,7 +246,7 @@ def measure(sel):
         da, db = direction(a), direction(b)
         if da is not None and db is not None:
             import math
-            res.append(('Angle', '%.4f°' % math.degrees(da.getAngle(db))))
+            res.append((_tr('Angle'), '%.4f°' % math.degrees(da.getAngle(db))))
     return [[k, v] for k, v in res]
 
 # ------------------------------------------------------------------ appearance / material / preferences
@@ -263,7 +264,7 @@ def set_material(names, uuid):
     n = 0
     for o in _objs(names):
         if 'ShapeMaterial' in o.PropertiesList: o.ShapeMaterial = m; n += 1
-    if not n: raise RuntimeError('The selection has no material')
+    if not n: raise RuntimeError(_tr('The selection has no material'))
     return m.Name
 
 def _mat_dict(m):
@@ -297,10 +298,10 @@ def material_inspect(names, appearance=False):
     out = []
     for o in _objs(names):
         m = getattr(o, 'ShapeMaterial', None)
-        if m is None: out.append('%s: no material' % o.Label); continue
+        if m is None: out.append(_tr('%s: no material') % o.Label); continue
         d = _mat_dict(m)
-        props = d['appearance'] if appearance else dict(d['physical'], **{'(appearance) ' + k: v for k, v in d['appearance'].items()})
-        out.append('%s — %s\nLibrary: %s  UUID: %s\n%s' % (o.Label, d['name'], d['library'], d['uuid'],
+        props = d['appearance'] if appearance else dict(d['physical'], **{_tr('(appearance) ') + k: v for k, v in d['appearance'].items()})
+        out.append(_tr('%s — %s\nLibrary: %s  UUID: %s\n%s') % (o.Label, d['name'], d['library'], d['uuid'],
                    '\n'.join('  %s = %s' % kv for kv in sorted(props.items()))))
     return '\n\n'.join(out)
 

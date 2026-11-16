@@ -3,6 +3,7 @@
 same use of the selection.  Selection arrives as [[objName, [sub, ...]], ...]."""
 import FreeCAD as App
 from .bridge import op, _doc
+from _i18n import tr as _tr
 
 def _sel(sel):
     d = _doc()
@@ -48,13 +49,13 @@ def _into_body(body, o, subs):
     if o is None or o == body or body.hasObject(o) or o in body.Origin.OutList or o == body.Origin: return o, subs
     if _depends_on(o, body):
         tip = _body_tip_before(body)
-        if tip is None: raise RuntimeError('%s is built from %s, which has no solid yet' % (o.Label, body.Label))
+        if tip is None: raise RuntimeError(_tr('%s is built from %s, which has no solid yet') % (o.Label, body.Label))
         mapped = [same_element(o, s, tip) if s else '' for s in subs]
         bad = [s for s, m in zip(subs, mapped) if m is None]
         if bad:
-            raise RuntimeError('%s only exists on %s, which is built from %s - a feature inside %s cannot use it (it would be '
+            raise RuntimeError(_tr('%s only exists on %s, which is built from %s - a feature inside %s cannot use it (it would be '
                                'circular). Pick geometry that also exists on %s, or use PartDesign features inside the Body '
-                               'instead of Part ones.' % (', '.join(bad), o.Label, body.Label, body.Label, tip.Label))
+                               'instead of Part ones.') % (', '.join(bad), o.Label, body.Label, body.Label, tip.Label))
         return tip, mapped
     b = body.newObject('PartDesign::SubShapeBinder', 'Binder')
     b.Support = [(o, tuple(subs))] if subs and subs != [''] else [(o, ())]
@@ -115,7 +116,7 @@ def pd_toggle_active_body(name):
 def _origin(body, role):
     for o in body.Origin.OutList:
         if getattr(o, 'Role', None) == role: return o
-    raise RuntimeError('origin feature %s not found' % role)
+    raise RuntimeError(_tr('origin feature %s not found') % role)
 
 @op
 def pd_body():
@@ -157,7 +158,7 @@ def _profile(sel, body=None):
         if subs and subs[0].startswith('Face'): return (o, subs)
     for o in reversed(_doc().Objects):          # desktop falls back to asking; we use the last visible sketch
         if o.TypeId == 'Sketcher::SketchObject': return o
-    raise RuntimeError('Select a sketch or a planar face first')
+    raise RuntimeError(_tr('Select a sketch or a planar face first'))
 
 @op
 def pd_profile_feature(kind, sel=None):
@@ -204,7 +205,7 @@ def pd_dressup(kind, sel=None):
         # nothing selected (dressupGetSelected noSelection): on the body's Tip with no references yet; the dialog
         # then waits for edge / face taps like the desktop task panel's selection mode
         base = _active_body(sel).Tip
-        if base is None: raise RuntimeError('The body has no solid yet: make a Pad or another feature first')
+        if base is None: raise RuntimeError(_tr('The body has no solid yet: make a Pad or another feature first'))
         subs, all_edges = [], False
     body = _body_of(base) or _active_body(sel)
     f = body.newObject('PartDesign::' + kind, kind)
@@ -275,7 +276,12 @@ def pd_set_tip(name):
 @op
 def part_primitive(kind):
     """Part_Box/Cylinder/Sphere/Cone/Torus/Tube/Prism/Wedge."""
-    f = _doc().addObject('Part::' + kind, kind); _doc().recompute(); return f.Name
+    if kind == 'Tube':      # CommandShapes.CommandTube: a Python feature (BasicShapes.Shapes.TubeFeature), no C++ type
+        from BasicShapes import Shapes
+        f = _doc().addObject('Part::FeaturePython', 'Tube'); Shapes.TubeFeature(f)
+    else:
+        f = _doc().addObject('Part::' + kind, kind)
+    _doc().recompute(); return f.Name
 
 @op
 def part_boolean(kind, sel=None):
@@ -283,7 +289,7 @@ def part_boolean(kind, sel=None):
     objs = []
     for o, _ in _sel(sel):
         if o not in objs: objs.append(o)
-    if len(objs) < 2: raise RuntimeError('Select at least two shapes')
+    if len(objs) < 2: raise RuntimeError(_tr('Select at least two shapes'))
     d = _doc()
     if kind == 'Cut':
         f = d.addObject('Part::Cut', 'Cut'); f.Base = objs[0]; f.Tool = objs[1]
@@ -442,7 +448,7 @@ def pd_absorb_dressup(name):
     kind = 'Fillet' if f.isDerivedFrom('Part::Fillet') else 'Chamfer' if f.isDerivedFrom('Part::Chamfer') else None
     base = getattr(f, 'Base', None)
     body = base if base is not None and base.isDerivedFrom('PartDesign::Body') else _body_of(base)
-    if kind is None or body is None: raise RuntimeError('%s is not a Part fillet / chamfer of a Body' % f.Label)
+    if kind is None or body is None: raise RuntimeError(_tr('%s is not a Part fillet / chamfer of a Body') % f.Label)
     feats = [o for o in body.Group if o.isDerivedFrom('PartDesign::Feature') and not o.isDerivedFrom('Sketcher::SketchObject')
              and not o.isDerivedFrom('PartDesign::SubShapeBinder')]
     older = [o for o in feats if o.ID < f.ID]
@@ -452,7 +458,7 @@ def pd_absorb_dressup(name):
     groups = {}
     for e, r1, r2 in f.Edges:
         m = same_element(src, 'Edge%d' % e, after)
-        if m is None: raise RuntimeError('Edge%d of %s no longer exists at %s' % (e, f.Label, after.Label))
+        if m is None: raise RuntimeError(_tr('Edge%d of %s no longer exists at %s') % (e, f.Label, after.Label))
         groups.setdefault(round(r1, 9), []).append(m)
     made = []; prev = after
     for r, edges in groups.items():

@@ -64,6 +64,8 @@ import app.mobilecad.sketch.SketchTool
 import app.mobilecad.viewport.ViewportView
 import java.io.File
 import app.mobilecad.R
+import app.mobilecad.i18n.Language
+import app.mobilecad.i18n.tr
 import app.mobilecad.freecad.DraftTool
 import app.mobilecad.freecad.NumpadRequest
 import app.mobilecad.freecad.TextPrompt
@@ -116,7 +118,7 @@ fun Shell(app: AppState) {
     fun cacheFile(uri: Uri, fallback: String) = File(ctx.cacheDir, displayName(ctx, uri) ?: fallback)
     fun writeBack(uri: Uri, f: File) { ctx.contentResolver.openOutputStream(uri, "wt")?.use { o -> f.inputStream().use { it.copyTo(o) } } }
     fun saveTo(uri: Uri) { val f = cacheFile(uri, "${app.docName}.FCStd")
-        app.eng({ saveDocument(f.absolutePath) }) { writeBack(uri, f); app.docUri = uri.toString(); app.docName = f.nameWithoutExtension; app.message = "Saved ${f.name}"; app.markSaved() } }   // saveAs names the document after its file
+        app.eng({ saveDocument(f.absolutePath) }) { writeBack(uri, f); app.docUri = uri.toString(); app.docName = f.nameWithoutExtension; app.message = tr("Saved %1", f.name); app.markSaved() } }   // saveAs names the document after its file
     val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         val r = pending ?: return@rememberLauncherForActivityResult; pending = null
         if (uri == null) { if (r.kind == "panelopen") GuiCommands.panelFile(app, null); return@rememberLauncherForActivityResult }
@@ -129,7 +131,7 @@ fun Shell(app: AppState) {
                 val o = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }; android.graphics.BitmapFactory.decodeFile(f.absolutePath, o)
                 var sample = 1; while (maxOf(o.outWidth, o.outHeight) / sample > (if (r.kind == "texture") 1024 else 2048)) sample *= 2
                 val bmp = android.graphics.BitmapFactory.decodeFile(f.absolutePath, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample })
-                if (bmp == null) app.message = "Not an image: ${f.name}"
+                if (bmp == null) app.message = tr("Not an image: %1", f.name)
                 else if (r.kind == "texture") { r.names.forEach { app.textures[it] = bmp }; view?.sync() } else app.imageView = bmp }
             "open" -> { runCatching { ctx.contentResolver.takePersistableUriPermission(uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION) }
                 app.open(f.absolutePath); app.docUri = uri.toString(); app.addRecent(uri.toString(), f.name) }
@@ -148,28 +150,28 @@ fun Shell(app: AppState) {
         if (uri == null) { if (r.kind == "panelsave") GuiCommands.panelFile(app, null); return@rememberLauncherForActivityResult }
         val f = cacheFile(uri, r.suggested)
         when (r.kind) {
-            "panelsave" -> { f.delete(); GuiCommands.panelFile(app, f.absolutePath) { if (f.exists()) { writeBack(uri, f); app.message = "Saved ${f.name}" } } }
+            "panelsave" -> { f.delete(); GuiCommands.panelFile(app, f.absolutePath) { if (f.exists()) { writeBack(uri, f); app.message = tr("Saved %1", f.name) } } }
             "save" -> saveTo(uri)
-            "savecopy" -> app.eng({ call("save_copy", mapOf("path" to f.absolutePath)) }) { writeBack(uri, f); app.message = "Saved a copy" }
-            "export" -> app.eng({ call("export_file", mapOf("names" to r.names, "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = "Exported ${f.name}" }
+            "savecopy" -> app.eng({ call("save_copy", mapOf("path" to f.absolutePath)) }) { writeBack(uri, f); app.message = tr("Saved a copy") }
+            "export" -> app.eng({ call("export_file", mapOf("names" to r.names, "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = tr("Exported %1", f.name) }
             "robotexport_ExportKukaCompact", "robotexport_ExportKukaFull" -> app.eng({ call("robot_cmd", mapOf("kind" to r.kind.removePrefix("robotexport_"), "names" to r.names, "opts" to mapOf("path" to f.absolutePath))) }) {
-                writeBack(uri, f); app.message = "Exported ${f.name}" }
-            "sheetexport" -> app.eng({ call("sheet_export", mapOf("name" to r.names.first(), "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = "Exported ${f.name}" }
-            "pagesvg" -> app.eng({ call("td_export_svg", mapOf("page" to r.names.first(), "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = "Exported ${f.name}" }
-            "pagedxf" -> app.eng({ call("td_export_dxf", mapOf("page" to r.names.first(), "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = "Exported ${f.name}" }
+                writeBack(uri, f); app.message = tr("Exported %1", f.name) }
+            "sheetexport" -> app.eng({ call("sheet_export", mapOf("name" to r.names.first(), "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = tr("Exported %1", f.name) }
+            "pagesvg" -> app.eng({ call("td_export_svg", mapOf("page" to r.names.first(), "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = tr("Exported %1", f.name) }
+            "pagedxf" -> app.eng({ call("td_export_dxf", mapOf("page" to r.names.first(), "path" to f.absolutePath)) }) { writeBack(uri, f); app.message = tr("Exported %1", f.name) }
             "pagepdf" -> app.pageView?.let { pv -> val pdf = android.graphics.pdf.PdfDocument()
                 val wmm = app.pageRender?.optDouble("width", 297.0) ?: 297.0; val hmm = app.pageRender?.optDouble("height", 210.0) ?: 210.0
                 val pg = pdf.startPage(android.graphics.pdf.PdfDocument.PageInfo.Builder((wmm / 25.4 * 72).toInt(), (hmm / 25.4 * 72).toInt(), 1).create())
                 pv.drawPage(pg.canvas, (72 / 25.4).toFloat()); pdf.finishPage(pg)
-                ctx.contentResolver.openOutputStream(uri, "wt")?.use { pdf.writeTo(it) }; pdf.close(); app.message = "Exported ${displayName(ctx, uri) ?: "PDF"}" }
-            "graph" -> app.eng({ (call("dependency_graph") as org.json.JSONObject).getString("dot") }) { dot -> f.writeText(dot); writeBack(uri, f); app.message = "Exported ${f.name}" }
+                ctx.contentResolver.openOutputStream(uri, "wt")?.use { pdf.writeTo(it) }; pdf.close(); app.message = tr("Exported %1", displayName(ctx, uri) ?: "PDF") }
+            "graph" -> app.eng({ (call("dependency_graph") as org.json.JSONObject).getString("dot") }) { dot -> f.writeText(dot); writeBack(uri, f); app.message = tr("Exported %1", f.name) }
             "screenshot", "pdf" -> view?.screenshot { bmp ->
                 if (r.kind == "screenshot") ctx.contentResolver.openOutputStream(uri, "wt")?.use { bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, it) }
                 else { val pdf = android.graphics.pdf.PdfDocument()
                     val page = pdf.startPage(android.graphics.pdf.PdfDocument.PageInfo.Builder(bmp.width, bmp.height, 1).create())
                     page.canvas.drawBitmap(bmp, 0f, 0f, null); pdf.finishPage(page)
                     ctx.contentResolver.openOutputStream(uri, "wt")?.use { pdf.writeTo(it) }; pdf.close() }
-                app.message = "Saved ${displayName(ctx, uri) ?: ""}" }
+                app.message = tr("Saved %1", displayName(ctx, uri) ?: "") }
         }
     }
     LaunchedEffect(app.fileRequest) { app.fileRequest?.let { r -> app.fileRequest = null
@@ -192,7 +194,7 @@ fun Shell(app: AppState) {
     // the feature list's collapsed tab: tapping it opens the list
     val treeTab: @Composable () -> Unit = {
         Column(Modifier.width(40.dp).fillMaxHeight().background(OS.Surface).clickable { app.treeOpen = true }, horizontalAlignment = Alignment.CenterHorizontally) {
-            Spacer(Modifier.height(8.dp)); Icon(Icons.Default.ChevronRight, "Show features", tint = OS.Primary, modifier = Modifier.size(28.dp))
+            Spacer(Modifier.height(8.dp)); Icon(Icons.Default.ChevronRight, tr("Show features"), tint = OS.Primary, modifier = Modifier.size(28.dp))
             Icon(Icons.Default.AccountTree, null, tint = OS.Steel, modifier = Modifier.padding(top = 8.dp).size(20.dp))
         }
     }
@@ -220,9 +222,9 @@ fun Shell(app: AppState) {
         }
         // empty element tabs: the first step as a button (empty-state call to action)
         if (stage) if (app.inDrawing && app.page == null && app.objects.none { it.type == "TechDraw::DrawPage" })
-            EmptyState("No drawing yet", "New drawing page", Modifier.align(Alignment.Center)) { app.run("TechDraw_PageDefault") }
+            EmptyState(tr("No drawing yet"), tr("New drawing page"), Modifier.align(Alignment.Center)) { app.run("TechDraw_PageDefault") }
         if (stage) if (app.inAssembly && app.objects.none { it.type == "Assembly::AssemblyObject" })
-            EmptyState("No assembly yet", "Create assembly", Modifier.align(Alignment.Center)) { app.run("Assembly_CreateAssembly") }
+            EmptyState(tr("No assembly yet"), tr("Create assembly"), Modifier.align(Alignment.Center)) { app.run("Assembly_CreateAssembly") }
         // MobileCAD XR (the view itself is in the room): with nothing open here, the context panel (XrPanel.kt)
         if (stage && app.xr && app.edit == null && app.taskPanel == null && app.openToolset == null && !app.inSheet && !app.inDrawing)
             XrContextPanel(app, Modifier.fillMaxSize().padding(start = 6.dp, top = 6.dp, end = 6.dp, bottom = if (sk != null) 120.dp else 6.dp))
@@ -239,7 +241,7 @@ fun Shell(app: AppState) {
             FeatureDialog(e.title, e.type, e.props, e.error, e.activeQuery,
                 onQueryFocus = { q -> e.activeQuery = if (e.activeQuery == q) null else q },
                 onSet = { p, v -> app.setProp(e, p, v) },
-                onNumpad = { p -> app.numpad = NumpadRequest(p.name, p.expression?.let { "=$it" } ?: (p.value?.toString() ?: ""), DialogSpec.units(p.type, p.value)) { v -> app.numpad = null; app.setExpr(e, p, v.removePrefix("=")) } },
+                onNumpad = { p -> app.numpad = NumpadRequest(Language.property(p.name), p.expression?.let { "=$it" } ?: (p.value?.toString() ?: ""), DialogSpec.units(p.type, p.value)) { v -> app.numpad = null; app.setExpr(e, p, v.removePrefix("=")) } },
                 onOk = { app.commitEdit() }, onCancel = { app.cancelEdit() }, modifier = panelPad.align(panelAlign),
                 editors = DialogEditors(
                     number = { t, init, units, ok -> app.numpad = NumpadRequest(t, init, units) { v -> app.numpad = null; ok(v) } },
@@ -249,7 +251,7 @@ fun Shell(app: AppState) {
                 onSetPart = { path, v -> app.setPart(e, path, v.removePrefix("=")) })
         }
         if (side) app.taskPanel?.let { p -> TaskPanelView(app, p, panelPad.align(panelAlign)) }
-        if (stage) if (app.inDrawing) Text("Fit", Modifier.align(Alignment.TopEnd).padding(8.dp).background(OS.Surface.copy(alpha = .92f), RoundedCornerShape(6.dp))
+        if (stage) if (app.inDrawing) Text(tr("Fit"), Modifier.align(Alignment.TopEnd).padding(8.dp).background(OS.Surface.copy(alpha = .92f), RoundedCornerShape(6.dp))
             .clickable { app.pageView?.fit() }.padding(horizontal = 16.dp, vertical = 10.dp), color = OS.Primary, fontSize = 12.sp)
         if (stage) if (sk == null && app.openToolset == null && app.selection.isNotEmpty() && (if (app.xr) app.edit != null || app.taskPanel != null   // (XR: else the context panel shows it)
             else !((compact || Screen.height < 560.dp) && (app.edit != null || app.taskPanel != null)))) SelectionChips(app, Modifier.align(Alignment.BottomStart).padding(8.dp))
@@ -259,39 +261,39 @@ fun Shell(app: AppState) {
         if (stage) app.textPrompt?.let { tp -> var txt by remember(tp) { mutableStateOf(tp.initial) }
             AppDialog(onDismissRequest = { app.textPrompt = null }, title = { Text(tp.title) },
                 text = { OutlinedTextField(txt, { txt = it }, singleLine = !tp.multiline, minLines = if (tp.multiline) 4 else 1, maxLines = if (tp.multiline) 10 else 1) },
-                confirmButton = { TextButton({ app.textPrompt = null; tp.onAccept(txt) }) { Text("OK") } },
-                dismissButton = { TextButton({ app.textPrompt = null }) { Text("Cancel") } }) }
-        if (stage) app.imageView?.let { bmp -> AppDialog(onDismissRequest = { app.imageView = null }, confirmButton = { TextButton({ app.imageView = null }) { Text("Close") } },
-            title = { Text("Image ${bmp.width}×${bmp.height}") },
+                confirmButton = { TextButton({ app.textPrompt = null; tp.onAccept(txt) }) { Text(tr("OK")) } },
+                dismissButton = { TextButton({ app.textPrompt = null }) { Text(tr("Cancel")) } }) }
+        if (stage) app.imageView?.let { bmp -> AppDialog(onDismissRequest = { app.imageView = null }, confirmButton = { TextButton({ app.imageView = null }) { Text(tr("Close")) } },
+            title = { Text(tr("Image %1×%2", bmp.width, bmp.height)) },
             text = { var sc by remember(bmp) { mutableStateOf(1f) }; var off by remember(bmp) { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
                 androidx.compose.foundation.Image(bmp.asImageBitmap(), null, Modifier.fillMaxWidth().heightIn(max = 480.dp).clipToBounds()
                     .pointerInput(bmp) { detectTransformGestures { _, pan, zoom, _ -> sc = (sc * zoom).coerceIn(1f, 12f); off += pan } }
                     .graphicsLayer { scaleX = sc; scaleY = sc; translationX = off.x; translationY = off.y }) }) }
         if (stage) app.updater.offer?.let { r -> AppDialog(onDismissRequest = { app.updater.offer = null },
-            title = { Text("MobileCAD ${r.version} is available") },
+            title = { Text(tr("MobileCAD %1 is available", r.version)) },
             text = { Column(Modifier.verticalScroll(rememberScrollState())) {
-                Text("You have ${app.updater.version}. The update is a ${"%.0f".format(r.size / 1e6)} MB download. Android closes MobileCAD to install it: " +
-                    "save your work first.", fontSize = 13.sp)
+                Text(tr("You have %1. The update is a %2 MB download. Android closes MobileCAD to install it: " +
+                    "save your work first.", app.updater.version, "%.0f".format(r.size / 1e6)), fontSize = 13.sp)
                 if (r.notes.isNotBlank()) { Spacer(Modifier.height(12.dp)); Text(r.notes.replace("**", "").trim(), fontSize = 13.sp, color = OS.Steel) } } },
-            confirmButton = { TextButton({ app.updater.download(r) }) { Text("Update") } },
-            dismissButton = { TextButton({ app.updater.offer = null }) { Text("Later") } }) }
+            confirmButton = { TextButton({ app.updater.download(r) }) { Text(tr("Update")) } },
+            dismissButton = { TextButton({ app.updater.offer = null }) { Text(tr("Later")) } }) }
         if (stage) app.updater.progress?.let { p -> AppDialog(onDismissRequest = {},
-            title = { Text("Downloading the update") },
+            title = { Text(tr("Downloading the update")) },
             text = { Column { LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth()); Spacer(Modifier.height(8.dp))
                 Text("${(p * 100).toInt()} %", fontSize = 13.sp, color = OS.Steel) } },
-            confirmButton = {}, dismissButton = { TextButton({ app.updater.cancel() }) { Text("Cancel") } }) }
+            confirmButton = {}, dismissButton = { TextButton({ app.updater.cancel() }) { Text(tr("Cancel")) } }) }
         if (stage) app.info?.let { (t, body) -> AppDialog(onDismissRequest = { app.info = null }, title = { Text(t) },
             text = { Text(body, fontSize = 13.sp, modifier = Modifier.verticalScroll(rememberScrollState())) },
-            confirmButton = { TextButton({ app.info = null }) { Text("Close") } }) }
+            confirmButton = { TextButton({ app.info = null }) { Text(tr("Close")) } }) }
         if (stage) if (sk == null && (app.selFilter != null || app.boxSelect != null)) FilterBanner(app, Modifier.align(Alignment.BottomEnd).padding(10.dp))
         if (stage) app.multiChoice?.let { mc -> val picked = remember(mc) { mutableStateListOf<String>().apply { addAll(mc.initial) } }
             AppDialog(onDismissRequest = { app.multiChoice = null }, title = { Text(mc.title) },
                 text = { LazyColumn(Modifier.heightIn(max = 420.dp)) { items(mc.options) { (id, l) ->
                     Row(Modifier.fillMaxWidth().clickable { if (id in picked) picked.remove(id) else picked.add(id) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(id in picked, { if (it) picked.add(id) else picked.remove(id) }); Text(l, color = OS.Navy) } } } },
-                confirmButton = { TextButton({ mc.onDone(picked.toList()) }) { Text("OK") } },
-                dismissButton = { TextButton({ app.multiChoice = null }) { Text("Cancel") } }) }
-        if (stage) app.choice?.let { ch -> AppDialog(onDismissRequest = { app.choice = null }, confirmButton = {}, dismissButton = { TextButton({ app.choice = null }) { Text("Cancel") } },
+                confirmButton = { TextButton({ mc.onDone(picked.toList()) }) { Text(tr("OK")) } },
+                dismissButton = { TextButton({ app.multiChoice = null }) { Text(tr("Cancel")) } }) }
+        if (stage) app.choice?.let { ch -> AppDialog(onDismissRequest = { app.choice = null }, confirmButton = {}, dismissButton = { TextButton({ app.choice = null }) { Text(tr("Cancel")) } },
             title = { Text(ch.title) }, text = { Column { ch.options.forEach { (id, l) ->
                 Text(l, Modifier.fillMaxWidth().clickable { ch.onPick(id) }.padding(vertical = 12.dp), color = OS.Navy) } } }) }
         if (stage) sk?.let { s -> SketchStatus(s.status, s.fully, s.conflicting.isNotEmpty(),
@@ -399,17 +401,17 @@ private fun DraftBanner(app: AppState, t: DraftTool, modifier: Modifier) {
             Text(t.prompt, color = OS.Steel, fontSize = 12.sp)
         }
         // typed coordinates: "x, y, z" (global) or "@dx, dy, dz" (relative to the last point), like the Draft task panel
-        TextButton({ app.textPrompt = TextPrompt("Point: x, y, z  or  @dx, dy, dz", "") { txt ->
+        TextButton({ app.textPrompt = TextPrompt(tr("Point: x, y, z  or  @dx, dy, dz"), "") { txt ->
             val rel = txt.trim().startsWith("@"); val v = txt.removePrefix("@").split(Regex("[,;\\s]+")).mapNotNull { it.toDoubleOrNull() }
-            if (v.size < 2) app.message = "Enter two or three numbers" else {
+            if (v.size < 2) app.message = tr("Enter two or three numbers") else {
                 val wp = app.workPlane; val loc = doubleArrayOf(v[0], v[1], v.getOrElse(2) { 0.0 })
                 val base = if (rel) t.pts.lastOrNull() else null
-                app.draftPoint(if (base != null) DoubleArray(3) { base[it] + wp.u[it] * loc[0] + wp.v[it] * loc[1] + wp.w[it] * loc[2] } else wp.global(loc)) } } }) { Text("Type") }
-        if (t.pts.isNotEmpty()) TextButton({ t.pts.removeAt(t.pts.size - 1); app.viewport?.refresh() }) { Text("Undo") }
-        if (t.maxPts < 0 && t.id == "Wire" && t.pts.size >= 2) TextButton({ app.draftPoint(t.pts.first()); app.finishDraft() }) { Text("Close") }
-        if (t.maxPts < 0 && t.pts.size >= t.minPts) TextButton({ app.finishDraft() }) { Text("Finish") }
-        if (t.modifier) Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(t.copy, { t.copy = it }); Text("Copy", fontSize = 13.sp) }
-        IconButton({ app.cancelDraft() }, Modifier.size(36.dp)) { Icon(Icons.Default.Close, "Cancel", tint = OS.Red) }
+                app.draftPoint(if (base != null) DoubleArray(3) { base[it] + wp.u[it] * loc[0] + wp.v[it] * loc[1] + wp.w[it] * loc[2] } else wp.global(loc)) } } }) { Text(tr("Type")) }
+        if (t.pts.isNotEmpty()) TextButton({ t.pts.removeAt(t.pts.size - 1); app.viewport?.refresh() }) { Text(tr("Undo")) }
+        if (t.maxPts < 0 && t.id == "Wire" && t.pts.size >= 2) TextButton({ app.draftPoint(t.pts.first()); app.finishDraft() }) { Text(tr("Close")) }
+        if (t.maxPts < 0 && t.pts.size >= t.minPts) TextButton({ app.finishDraft() }) { Text(tr("Finish")) }
+        if (t.modifier) Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(t.copy, { t.copy = it }); Text(tr("Copy"), fontSize = 13.sp) }
+        IconButton({ app.cancelDraft() }, Modifier.size(36.dp)) { Icon(Icons.Default.Close, tr("Cancel"), tint = OS.Red) }
     }
 }
 
@@ -421,9 +423,10 @@ private fun displayName(ctx: android.content.Context, uri: Uri): String? =
 @Composable
 private fun FilterBanner(app: AppState, modifier: Modifier) {
     Row(modifier.background(OS.Navy, RoundedCornerShape(16.dp)).padding(start = 12.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(when (app.boxSelect) { "faces" -> "Drag a box to select faces"; "objects" -> "Drag a box to select objects"; "zoom" -> "Drag a box to zoom"
-            else -> "Selecting ${app.selFilter?.lowercase()}s only" }, color = Color.White, fontSize = 13.sp)
-        IconButton({ app.boxSelect = null; app.selFilter = null }, Modifier.size(32.dp)) { Icon(Icons.Default.Close, "Clear filter", tint = Color.White, modifier = Modifier.size(18.dp)) }
+        Text(when (app.boxSelect) { "faces" -> tr("Drag a box to select faces"); "objects" -> tr("Drag a box to select objects"); "zoom" -> tr("Drag a box to zoom")
+            else -> when (app.selFilter) { "Edge" -> tr("Selecting edges only"); "Face" -> tr("Selecting faces only"); "Vertex" -> tr("Selecting vertices only")
+                else -> tr("Selecting %1 only", app.selFilter ?: "") } }, color = Color.White, fontSize = 13.sp)
+        IconButton({ app.boxSelect = null; app.selFilter = null }, Modifier.size(32.dp)) { Icon(Icons.Default.Close, tr("Clear filter"), tint = Color.White, modifier = Modifier.size(18.dp)) }
     }
 }
 
@@ -438,7 +441,7 @@ private fun Splash(status: String) {
             Spacer(Modifier.height(20.dp))
             if (!status.startsWith("The CAD engine failed")) CircularProgressIndicator(color = OS.Primary, strokeWidth = 3.dp, modifier = Modifier.size(32.dp))
             Spacer(Modifier.height(16.dp))
-            Text(status, color = if (status.startsWith("The CAD engine failed")) OS.Red else OS.Steel, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 32.dp))
+            Text(tr(status), color = if (status.startsWith("The CAD engine failed")) OS.Red else OS.Steel, fontSize = 14.sp, modifier = Modifier.padding(horizontal = 32.dp))
         }
     }
 }
@@ -451,19 +454,19 @@ private fun TopBar(app: AppState, onOpen: () -> Unit, onSave: () -> Unit, onFit:
         drawLine(OS.Metal4, androidx.compose.ui.geometry.Offset(0f, size.height - 1f), androidx.compose.ui.geometry.Offset(size.width, size.height - 1f), 1f) }
         .padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
         Box {
-            IconBtn(Icons.Default.Menu, "Document", OS.Navy) { docMenu = true }
+            IconBtn(Icons.Default.Menu, tr("Document"), OS.Navy) { docMenu = true }
             MainMenuDropdown(app, docMenu) { docMenu = false }
         }
         // phones: the feature list opens from here (it is a drawer)
-        if (Screen.compact) IconBtn(Icons.Default.AccountTree, "Features", OS.Navy) { app.treeOpen = !app.treeOpen }
+        if (Screen.compact) IconBtn(Icons.Default.AccountTree, tr("Features"), OS.Navy) { app.treeOpen = !app.treeOpen }
         androidx.compose.foundation.Image(androidx.compose.ui.res.painterResource(R.drawable.app_logo), "MobileCAD",
             Modifier.padding(start = 4.dp).size(30.dp))
         Column(Modifier.weight(1f).padding(start = 10.dp)) {
             Text(app.docName, color = OS.Navy, fontSize = 18.sp, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text("${app.workspace.label} · based on FreeCAD ${app.catalog.source.removePrefix("FreeCAD ")}", color = OS.Steel, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(tr("%1 · based on FreeCAD %2", tr(app.workspace.label), app.catalog.source.removePrefix("FreeCAD ")), color = OS.Steel, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
-        IconBtn(Icons.Default.Undo, app.undoNames.firstOrNull()?.let { "Undo $it" } ?: "Undo", OS.Primary, app.canUndo) { app.undo() }
-        IconBtn(Icons.Default.Redo, app.redoNames.firstOrNull()?.let { "Redo $it" } ?: "Redo", OS.Primary, app.canRedo) { app.redo() }
+        IconBtn(Icons.Default.Undo, app.undoNames.firstOrNull()?.let { tr("Undo %1", it) } ?: tr("Undo"), OS.Primary, app.canUndo) { app.undo() }
+        IconBtn(Icons.Default.Redo, app.redoNames.firstOrNull()?.let { tr("Redo %1", it) } ?: tr("Redo"), OS.Primary, app.canRedo) { app.redo() }
     }
 }
 
@@ -502,9 +505,9 @@ private fun ToolsetButton(app: AppState, ts: ToolsetDef, open: Boolean, onClick:
         // the toolset's own icon, else its first tool's (like a FreeCAD toolbar shows its first button)
         val img = app.catalog.icon(app.catalog.cmd(ts.icon)?.icon ?: ts.icon) ?: ts.groups.firstNotNullOfOrNull { (wb, tb) ->
             app.catalog.wb(wb)?.toolbars?.firstOrNull { it.name == tb }?.let { t -> app.catalog.flatten(t.items).firstNotNullOfOrNull { app.catalog.icon(app.catalog.cmd(it)?.icon) } } }
-        if (img != null) Image(img, ts.label, Modifier.size(26.dp)) else Icon(Icons.Default.Build, null, tint = OS.Primary)
+        if (img != null) Image(img, tr(ts.label), Modifier.size(26.dp)) else Icon(Icons.Default.Build, null, tint = OS.Primary)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(ts.label, fontSize = 10.sp, color = OS.Navy, maxLines = 1, softWrap = false); Icon(Icons.Default.ArrowDropDown, null, tint = OS.Steel, modifier = Modifier.size(14.dp))
+            Text(tr(ts.label), fontSize = 10.sp, color = OS.Navy, maxLines = 1, softWrap = false); Icon(Icons.Default.ArrowDropDown, null, tint = OS.Steel, modifier = Modifier.size(14.dp))
         }
     }
 }
@@ -529,18 +532,18 @@ private fun SketchStrip(app: AppState) {
             Workspaces.sketch.forEach { ts -> ToolsetButton(app, ts, app.openToolset == ts) { app.openToolset = if (app.openToolset == ts) null else ts } }
             Box(Modifier.padding(horizontal = 6.dp).width(1.dp).height(34.dp).background(OS.ToolbarDiv))
             // Sketcher_ToggleConstruction: with curves selected it converts them, otherwise it switches the creation mode
-            StripTool(app, "Sketcher_ToggleConstruction", if (sk.construction) "Construction: on" else "Construction: off", sk.construction) { sk.toggleConstruction() }
-            StripTool(app, null, "Constraints", sk.consList != null, Icons.Default.List) { sk.consList = if (sk.consList == null) "all" else null }
+            StripTool(app, "Sketcher_ToggleConstruction", if (sk.construction) tr("Construction: on") else tr("Construction: off"), sk.construction) { sk.toggleConstruction() }
+            StripTool(app, null, tr("Constraints"), sk.consList != null, Icons.Default.List) { sk.consList = if (sk.consList == null) "all" else null }
             listOf("Sketcher_CreatePolyline" to SketchTool.POLYLINE, "Sketcher_CreateRectangle" to SketchTool.RECTANGLE, "Sketcher_CreateCircle" to SketchTool.CIRCLE,
                 "Sketcher_Create3PointArc" to SketchTool.ARC3, "Sketcher_Dimension" to SketchTool.DIMENSION, "Sketcher_Trimming" to SketchTool.TRIM).forEach { (id, t) ->
-                app.catalog.cmd(id)?.let { c -> StripTool(app, c.icon, t.label, sk.tool == t) { sk.selectTool(if (sk.tool == t) SketchTool.SELECT else t) } }
+                app.catalog.cmd(id)?.let { c -> StripTool(app, c.icon, tr(t.label), sk.tool == t) { sk.selectTool(if (sk.tool == t) SketchTool.SELECT else t) } }
             }
-            StripTool(app, null, "Select", sk.tool == SketchTool.SELECT, Icons.Default.NearMe) { sk.selectTool(SketchTool.SELECT) }
-            StripTool(app, null, "Delete", fallback = Icons.Default.Delete) { sk.deleteSelected() }
-            StripTool(app, null, "Finish", fallback = Icons.Default.Done) { sk.finishShape() }
+            StripTool(app, null, tr("Select"), sk.tool == SketchTool.SELECT, Icons.Default.NearMe) { sk.selectTool(SketchTool.SELECT) }
+            StripTool(app, null, tr("Delete"), fallback = Icons.Default.Delete) { sk.deleteSelected() }
+            StripTool(app, null, tr("Finish"), fallback = Icons.Default.Done) { sk.finishShape() }
         }
         Box(Modifier.width(1.dp).height(34.dp).background(OS.ToolbarDiv))
-        OkCancel("Leave sketch", "Cancel sketch", { app.leaveSketch(true) }) { app.leaveSketch(false) }
+        OkCancel(tr("Leave sketch"), tr("Cancel sketch"), { app.leaveSketch(true) }) { app.leaveSketch(false) }
     }
     Box(Modifier.fillMaxWidth().height(1.dp).background(OS.ToolbarDiv))
 }
@@ -553,21 +556,21 @@ private fun MateBanner(app: AppState, type: String, picked: Int, modifier: Modif
         if (img != null) Image(img, null, Modifier.size(24.dp))
         Spacer(Modifier.width(10.dp))
         Column {
-            Text("$type joint", fontWeight = FontWeight.Medium, color = OS.Navy)
-            Text("Tap a face, edge or vertex for connector ${picked + 1} of 2", color = OS.Steel, fontSize = 12.sp)
+            Text(tr("%1 joint", type), fontWeight = FontWeight.Medium, color = OS.Navy)
+            Text(tr("Tap a face, edge or vertex for connector %1 of 2", picked + 1), color = OS.Steel, fontSize = 12.sp)
         }
         Spacer(Modifier.width(8.dp))
-        IconBtn(Icons.Default.Close, "Cancel", OS.Red) { app.cancelMate() }
+        IconBtn(Icons.Default.Close, tr("Cancel"), OS.Red) { app.cancelMate() }
     }
 }
 
 /** Assembly_InsertLink part list. */
 @Composable
 private fun PartPicker(app: AppState, parts: List<Pair<String, String>>) {
-    AppDialog(onDismissRequest = { app.partPicker = null }, confirmButton = {}, dismissButton = { TextButton({ app.partPicker = null }) { Text("Cancel") } },
-        title = { Text("Insert part") },
+    AppDialog(onDismissRequest = { app.partPicker = null }, confirmButton = {}, dismissButton = { TextButton({ app.partPicker = null }) { Text(tr("Cancel")) } },
+        title = { Text(tr("Insert part")) },
         text = {
-            if (parts.isEmpty()) Text("No parts yet. Model a Body in the Part tab first.")
+            if (parts.isEmpty()) Text(tr("No parts yet. Model a Body in the Part tab first."))
             else Column { parts.forEach { (n, l) ->
                 Row(Modifier.fillMaxWidth().clickable { app.insertPart(n) }.padding(vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                     val img = app.catalog.icon(app.catalog.cmd("PartDesign_Body")?.icon); if (img != null) Image(img, null, Modifier.size(22.dp))
@@ -585,17 +588,17 @@ private fun SketchSelectionBar(sk: SketchEditor, modifier: Modifier) {
     Row(modifier.shadow(6.dp, RoundedCornerShape(24.dp)).background(OS.Surface, RoundedCornerShape(24.dp)).padding(horizontal = 6.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically) {
         val n = curves.size + sk.selected.count { it.pos != 0 || it.geo !in curves } + sk.selectedCons.size
-        Text("$n selected", Modifier.padding(horizontal = 10.dp), color = OS.Steel, fontSize = 13.sp)
+        Text(tr("%1 selected", n), Modifier.padding(horizontal = 10.dp), color = OS.Steel, fontSize = 13.sp)
         if (curves.isNotEmpty()) {
             val on = sk.selectionIsConstruction()
             Row(Modifier.clickable { sk.toggleConstruction() }.background(if (on) OS.SelBg else Color.Transparent, RoundedCornerShape(18.dp)).padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically) {
                 Switch(on, { sk.toggleConstruction() }, Modifier.scale(0.7f).height(20.dp))
-                Spacer(Modifier.width(4.dp)); Text("Construction", color = OS.Navy, fontSize = 14.sp)
+                Spacer(Modifier.width(4.dp)); Text(tr("Construction"), color = OS.Navy, fontSize = 14.sp)
             }
         }
         Row(Modifier.clickable { sk.deleteSelected() }.padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Delete, null, tint = OS.Red, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text("Delete", color = OS.Red, fontSize = 14.sp)
+            Icon(Icons.Default.Delete, null, tint = OS.Red, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(4.dp)); Text(tr("Delete"), color = OS.Red, fontSize = 14.sp)
         }
     }
 }
@@ -607,10 +610,10 @@ private fun ToolExit(app: AppState, modifier: Modifier) {
     // a constraint tool waiting for its elements (constraint first, then geometry) has the constraint colour
     val armed = sk?.armed
     val (label, exit) = when {
-        sk != null && armed != null -> constraintLabel(armed) to { sk.selectTool(SketchTool.SELECT) }
-        sk != null && sk.tool != SketchTool.SELECT -> sk.tool.label to { sk.selectTool(SketchTool.SELECT) }
-        app.draft != null -> (app.draft?.label ?: "Tool") to { app.cancelDraft() }
-        app.mate != null -> "Joint" to { app.cancelMate() }
+        sk != null && armed != null -> tr(constraintLabel(armed)) to { sk.selectTool(SketchTool.SELECT) }
+        sk != null && sk.tool != SketchTool.SELECT -> tr(sk.tool.label) to { sk.selectTool(SketchTool.SELECT) }
+        app.draft != null -> (app.draft?.label ?: tr("Tool")) to { app.cancelDraft() }
+        app.mate != null -> tr("Joint") to { app.cancelMate() }
         else -> return
     }
     val bg = if (armed != null) OS.Red else OS.Primary
@@ -619,7 +622,7 @@ private fun ToolExit(app: AppState, modifier: Modifier) {
         Text(label, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         Spacer(Modifier.width(10.dp))
         Box(Modifier.size(28.dp).background(OS.Surface.copy(alpha = 0.22f), androidx.compose.foundation.shape.CircleShape), contentAlignment = Alignment.Center) {
-            Icon(Icons.Default.Close, "Exit ${label}", tint = Color.White, modifier = Modifier.size(18.dp)) }
+            Icon(Icons.Default.Close, tr("Exit %1", label), tint = Color.White, modifier = Modifier.size(18.dp)) }
     }
 }
 
@@ -634,9 +637,9 @@ private fun SketchInputs(sk: SketchEditor, modifier: Modifier) {
     val ins = sk.inputs(); if (ins.isEmpty()) return
     Row(modifier.background(OS.ToolbarBg, RoundedCornerShape(6.dp)).border(1.dp, OS.Metal4, RoundedCornerShape(6.dp)).padding(horizontal = 6.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically) {
-        Text("Type:", color = OS.Steel, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 6.dp))
+        Text(tr("Type:"), color = OS.Steel, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 6.dp))
         ins.forEach { n -> OutlinedButton({ sk.enterValue(n) }, Modifier.padding(horizontal = 3.dp).height(34.dp), shape = RoundedCornerShape(4.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp)) { Text(n, fontSize = 13.sp, color = OS.Primary) } }
+            contentPadding = PaddingValues(horizontal = 12.dp)) { Text(tr(n), fontSize = 13.sp, color = OS.Primary) } }
     }
 }
 
@@ -659,15 +662,15 @@ private fun ConstraintList(app: AppState, sk: SketchEditor, modifier: Modifier) 
     Column(modifier.then(Screen.panelWidth(330.dp)).heightIn(max = Screen.panelHeight(520.dp)).shadow(8.dp, RoundedCornerShape(6.dp)).background(OS.Surface, RoundedCornerShape(6.dp))) {
         Row(Modifier.fillMaxWidth().height(44.dp).background(OS.Metal5, RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)).padding(start = 12.dp),
             verticalAlignment = Alignment.CenterVertically) {
-            Text("Constraints (${all.size})", Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy, fontSize = 15.sp)
-            IconBtn(Icons.Default.Close, "Close", OS.Steel) { sk.consList = null }
+            Text(tr("Constraints (%1)", all.size), Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy, fontSize = 15.sp)
+            IconBtn(Icons.Default.Close, tr("Close"), OS.Steel) { sk.consList = null }
         }
         Row(Modifier.padding(horizontal = 8.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf("all" to "All", "problems" to "Conflicts / redundant").forEach { (k, l) ->
+            listOf("all" to tr("All"), "problems" to tr("Conflicts / redundant")).forEach { (k, l) ->
                 Text(l, Modifier.background(if (filter == k) OS.SelBg else Color.Transparent, RoundedCornerShape(14.dp)).border(1.dp, OS.Metal4, RoundedCornerShape(14.dp))
                     .clickable { sk.consList = k }.padding(horizontal = 12.dp, vertical = 5.dp), color = OS.Navy, fontSize = 13.sp) }
         }
-        if (shown.isEmpty()) Text(if (filter == "problems") "No conflicting or redundant constraints" else "No constraints",
+        if (shown.isEmpty()) Text(if (filter == "problems") tr("No conflicting or redundant constraints") else tr("No constraints"),
             Modifier.padding(14.dp), color = OS.Green, fontSize = 13.sp)
         LazyColumn(Modifier.weight(1f, fill = false)) {
             items(shown.size) { idx ->
@@ -681,20 +684,20 @@ private fun ConstraintList(app: AppState, sk: SketchEditor, modifier: Modifier) 
                         Text("#${k.i + 1}", Modifier.width(34.dp), color = OS.Steel, fontSize = 12.sp)
                         Column(Modifier.weight(1f)) {
                             val v = if (k.type in dims) "  " + (if (k.type == "Diameter") "⌀" else if (k.type == "Radius") "R" else "") + k.label else ""
-                            Text((k.cname.ifEmpty { k.type.replace(Regex("([a-z])([A-Z])"), "$1 $2") }) + v + (if (!k.driving) "  (reference)" else "") +
-                                (if (!k.active) "  (off)" else ""), color = col, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text((if (conf) "Conflicting · " else if (red) "Redundant · " else "") + sk.describe(k), color = if (conf || red) col else OS.Steel,
+                            Text((k.cname.ifEmpty { tr(k.type.replace(Regex("([a-z])([A-Z])"), "$1 $2")) }) + v + (if (!k.driving) "  " + tr("(reference)") else "") +
+                                (if (!k.active) "  " + tr("(off)") else ""), color = col, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Text((if (conf) tr("Conflicting") + " · " else if (red) tr("Redundant") + " · " else "") + sk.describe(k), color = if (conf || red) col else OS.Steel,
                                 fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         }
-                        if (k.type in dims) IconBtn(Icons.Default.Edit, "Edit value", OS.Primary) { sk.editDimension(k) }
-                        IconBtn(Icons.Default.MoreVert, "More", OS.Steel) { menu = true }
+                        if (k.type in dims) IconBtn(Icons.Default.Edit, tr("Edit value"), OS.Primary) { sk.editDimension(k) }
+                        IconBtn(Icons.Default.MoreVert, tr("More"), OS.Steel) { menu = true }
                     }
                     DropdownMenu(menu, { menu = false }) {
-                        DropdownMenuItem({ Text(if (k.active) "Deactivate" else "Activate") }, { menu = false; sk.toggleActive(k) })
-                        if (k.type in dims) DropdownMenuItem({ Text(if (k.driving) "Make reference (driven)" else "Make driving") }, { menu = false; sk.toggleDriving(k) })
-                        DropdownMenuItem({ Text("Rename") }, { menu = false
-                            app.textPrompt = TextPrompt("Name of constraint #${k.i + 1}", k.cname) { t -> sk.renameConstraint(k, t.trim()) } })
-                        DropdownMenuItem({ Text("Delete", color = OS.Red) }, { menu = false; sk.deleteConstraint(k) })
+                        DropdownMenuItem({ Text(if (k.active) tr("Deactivate") else tr("Activate")) }, { menu = false; sk.toggleActive(k) })
+                        if (k.type in dims) DropdownMenuItem({ Text(if (k.driving) tr("Make reference (driven)") else tr("Make driving")) }, { menu = false; sk.toggleDriving(k) })
+                        DropdownMenuItem({ Text(tr("Rename")) }, { menu = false
+                            app.textPrompt = TextPrompt(tr("Name of constraint #%1", k.i + 1), k.cname) { t -> sk.renameConstraint(k, t.trim()) } })
+                        DropdownMenuItem({ Text(tr("Delete"), color = OS.Red) }, { menu = false; sk.deleteConstraint(k) })
                     }
                 }
             }
@@ -762,10 +765,10 @@ private fun FeatureTree(app: AppState, modifier: Modifier, onCollapse: () -> Uni
     }
     Column(modifier.background(OS.Surface)) {
         Row(Modifier.fillMaxWidth().height(44.dp).background(OS.Metal5).padding(start = 12.dp, end = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(if (app.inAssembly) "Components & joints" else "Features", Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy)
+            Text(if (app.inAssembly) tr("Components & joints") else tr("Features"), Modifier.weight(1f), fontWeight = FontWeight.Medium, color = OS.Navy)
             Text("${rows.size}", color = OS.Steel, fontSize = 12.sp)
             Box(Modifier.size(32.dp).clickable(onClick = onCollapse), contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.ChevronLeft, "Hide features", tint = OS.Primary, modifier = Modifier.size(22.dp)) }
+                Icon(Icons.Default.ChevronLeft, tr("Hide features"), tint = OS.Primary, modifier = Modifier.size(22.dp)) }
         }
         LazyColumn(Modifier.weight(1f)) {
             items(rows.size) { i ->
@@ -785,7 +788,7 @@ private fun FeatureTree(app: AppState, modifier: Modifier, onCollapse: () -> Uni
 private fun RollbackBar() {
     Row(Modifier.fillMaxWidth().padding(start = 28.dp, end = 8.dp).height(14.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.weight(1f).height(3.dp).background(OS.BlueMed))
-        Text(" Tip", fontSize = 10.sp, color = OS.BlueMed)
+        Text(" " + tr("Tip"), fontSize = 10.sp, color = OS.BlueMed)
     }
 }
 
@@ -808,45 +811,45 @@ private fun TreeRow(app: AppState, o: FcObject, depth: Int, menuOpen: Boolean, h
             Box(Modifier.size(24.dp).then(if (hasKids) Modifier.clickable {
                 if (open) { app.expanded.remove(o.name); if (o.name !in app.collapsed) app.collapsed.add(o.name) }
                 else { app.collapsed.remove(o.name); if (o.name !in app.expanded) app.expanded.add(o.name) } } else Modifier), contentAlignment = Alignment.Center) {
-                if (hasKids) Icon(if (open) Icons.Default.ExpandMore else Icons.Default.ChevronRight, if (open) "Collapse" else "Expand", tint = OS.Steel, modifier = Modifier.size(18.dp))
+                if (hasKids) Icon(if (open) Icons.Default.ExpandMore else Icons.Default.ChevronRight, if (open) tr("Collapse") else tr("Expand"), tint = OS.Steel, modifier = Modifier.size(18.dp))
             }
             val img = app.catalog.icon(typeIcon(app, o))
             Box(Modifier.size(22.dp)) {
                 if (img != null) Image(img, null, Modifier.size(22.dp).alpha(if (o.visible) 1f else 0.4f)) else Icon(Icons.Default.Category, null, tint = OS.Primary, modifier = Modifier.size(22.dp))
                 // FreeCAD's suppressed overlay (ViewProviderSuppressibleExtension) and struck-out label (Tree.cpp)
-                if (o.suppressed) app.catalog.icon("feature_suppressed")?.let { Image(it, "Suppressed", Modifier.size(14.dp).align(Alignment.TopStart)) }
+                if (o.suppressed) app.catalog.icon("feature_suppressed")?.let { Image(it, tr("Suppressed"), Modifier.size(14.dp).align(Alignment.TopStart)) }
             }
             Spacer(Modifier.width(10.dp))
             Text(o.label, Modifier.weight(1f), color = if (o.invalid) OS.Red else if (o.visible) OS.Navy else OS.Aluminum, fontSize = 14.sp, maxLines = 1,
                 textDecoration = if (o.suppressed) TextDecoration.LineThrough else null, fontWeight = if (o.active) FontWeight.Bold else null)
-            if (o.invalid) Icon(Icons.Default.Error, "Error", tint = OS.Red, modifier = Modifier.size(18.dp))
+            if (o.invalid) Icon(Icons.Default.Error, tr("Error"), tint = OS.Red, modifier = Modifier.size(18.dp))
             // desktop's recompute marker on touched objects (they change on the next Recompute)
-            else if (o.touched) Icon(Icons.Default.Refresh, "Needs recompute", tint = OS.BlueMed, modifier = Modifier.size(18.dp))
+            else if (o.touched) Icon(Icons.Default.Refresh, tr("Needs recompute"), tint = OS.BlueMed, modifier = Modifier.size(18.dp))
         }
         DropdownMenu(menuOpen, { setMenu(false) }) {
-            DropdownMenuItem({ Text("Edit ${o.label}") }, { setMenu(false); app.openEditor(o.name) })
-            if (o.attachable) DropdownMenuItem({ Text("Edit Attachment") }, { setMenu(false); app.openEditor(o.name, attachment = true) })
-            if (o.type == "PartDesign::Body") DropdownMenuItem({ Text("Toggle active body") }, { setMenu(false); toggleActiveBody(app, o) })
-            DropdownMenuItem({ Text("Rename") }, { setMenu(false)
-                app.textPrompt = TextPrompt("Rename ${o.label}", o.label) { t -> if (t.isNotBlank())
+            DropdownMenuItem({ Text(tr("Edit %1", o.label)) }, { setMenu(false); app.openEditor(o.name) })
+            if (o.attachable) DropdownMenuItem({ Text(tr("Edit Attachment")) }, { setMenu(false); app.openEditor(o.name, attachment = true) })
+            if (o.type == "PartDesign::Body") DropdownMenuItem({ Text(tr("Toggle active body")) }, { setMenu(false); toggleActiveBody(app, o) })
+            DropdownMenuItem({ Text(tr("Rename")) }, { setMenu(false)
+                app.textPrompt = TextPrompt(tr("Rename %1", o.label), o.label) { t -> if (t.isNotBlank())
                     app.step("Rename", { setProperty(o.name, "Label", t.trim()) }) } })
-            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text(if (o.suppressed) "Unsuppress" else "Suppress") }, { setMenu(false)
+            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text(if (o.suppressed) tr("Unsuppress") else tr("Suppress")) }, { setMenu(false)
                 app.select(SelRef(o.name), additive = false); app.run("Std_ToggleSuppress") })
             // a Part Fillet / Chamfer made on a Body: move it into the Body's history where it was created
             if ((o.type == "Part::Fillet" || o.type == "Part::Chamfer") && o.claims.any { c -> app.obj(c)?.type == "PartDesign::Body" })
-                DropdownMenuItem({ Text("Move into Body") }, { setMenu(false)
+                DropdownMenuItem({ Text(tr("Move into Body")) }, { setMenu(false)
                     app.step("Move ${o.label} into Body", { call("pd_absorb_dressup", mapOf("name" to o.name)) }) { app.selection.clear() } })
-            DropdownMenuItem({ Text("Duplicate") }, { setMenu(false); app.select(SelRef(o.name), additive = false); app.run("Std_DuplicateSelection") })
+            DropdownMenuItem({ Text(tr("Duplicate")) }, { setMenu(false); app.select(SelRef(o.name), additive = false); app.run("Std_DuplicateSelection") })
             // Tree.cpp context menu: "Mark to Recompute" (enforceRecompute) and "Recompute Object" (Std_Recompute)
-            DropdownMenuItem({ Text("Mark to recompute") }, { setMenu(false)
+            DropdownMenuItem({ Text(tr("Mark to recompute")) }, { setMenu(false)
                 app.eng({ call("mark_recompute", mapOf("names" to listOf(o.name))) }) { app.refresh() } })
-            DropdownMenuItem({ Text("Recompute object") }, { setMenu(false)
+            DropdownMenuItem({ Text(tr("Recompute object")) }, { setMenu(false)
                 app.step("Recompute", { call("force_recompute", mapOf("names" to listOf(o.name))) }) })
-            DropdownMenuItem({ Text(if (o.visible) "Hide ${o.label}" else "Show ${o.label}") }, { setMenu(false)
+            DropdownMenuItem({ Text(if (o.visible) tr("Hide %1", o.label) else tr("Show %1", o.label)) }, { setMenu(false)
                 app.eng({ call("set_visibility", mapOf("names" to listOf(o.name), "visible" to !o.visible)) }) { app.refresh() } })
-            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text("Roll tip to here") }, { setMenu(false)
+            if (o.parents.any { p -> app.obj(p)?.type == "PartDesign::Body" }) DropdownMenuItem({ Text(tr("Roll tip to here")) }, { setMenu(false)
                 app.eng({ begin("Set tip"); call("pd_set_tip", mapOf("name" to o.name)); commit() }) { app.refresh() } })
-            DropdownMenuItem({ Text("Delete ${o.label}", color = OS.Red) }, { setMenu(false)
+            DropdownMenuItem({ Text(tr("Delete %1", o.label), color = OS.Red) }, { setMenu(false)
                 app.eng({ begin("Delete"); call("delete_objects", mapOf("names" to listOf(o.name))); commit() }) { app.selection.clear(); app.refresh() } })
         }
     }
@@ -860,26 +863,26 @@ private fun ContextMenu(app: AppState, view: ViewportView?, dismiss: () -> Unit)
     DropdownMenu(true, dismiss) {
         @Composable fun item(label: String, id: String) = DropdownMenuItem({ Text(label) }, { dismiss(); app.run(id) })
         if (app.inAssembly) {
-            item("Fixed joint", "Assembly_CreateJointFixed"); item("Revolute joint", "Assembly_CreateJointRevolute")
-            item("Slider joint", "Assembly_CreateJointSlider"); item("Insert part…", "Assembly_InsertLink")
-            if (app.selection.isNotEmpty()) item("Toggle grounded", "Assembly_ToggleGrounded")
-            item("Solve assembly", "Assembly_SolveAssembly"); HorizontalDivider()
+            item(tr("Fixed joint"), "Assembly_CreateJointFixed"); item(tr("Revolute joint"), "Assembly_CreateJointRevolute")
+            item(tr("Slider joint"), "Assembly_CreateJointSlider"); item(tr("Insert part…"), "Assembly_InsertLink")
+            if (app.selection.isNotEmpty()) item(tr("Toggle grounded"), "Assembly_ToggleGrounded")
+            item(tr("Solve assembly"), "Assembly_SolveAssembly"); HorizontalDivider()
         }
-        if (faces.size == 1 && !app.inAssembly) { item("Sketch", "PartDesign_NewSketch"); item("Extrude (Pad)", "PartDesign_Pad"); item("Plane", "PartDesign_Plane") }
-        if (sketches.isNotEmpty()) { item("Extrude (Pad)", "PartDesign_Pad"); item("Revolve", "PartDesign_Revolution"); item("Pocket", "PartDesign_Pocket"); item("Edit sketch", "Sketcher_EditSketch") }
-        if (edges.isNotEmpty()) { item("Fillet", "PartDesign_Fillet"); item("Chamfer", "PartDesign_Chamfer") }
+        if (faces.size == 1 && !app.inAssembly) { item(tr("Sketch"), "PartDesign_NewSketch"); item(tr("Extrude (Pad)"), "PartDesign_Pad"); item(tr("Plane"), "PartDesign_Plane") }
+        if (sketches.isNotEmpty()) { item(tr("Extrude (Pad)"), "PartDesign_Pad"); item(tr("Revolve"), "PartDesign_Revolution"); item(tr("Pocket"), "PartDesign_Pocket"); item(tr("Edit sketch"), "Sketcher_EditSketch") }
+        if (edges.isNotEmpty()) { item(tr("Fillet"), "PartDesign_Fillet"); item(tr("Chamfer"), "PartDesign_Chamfer") }
         if (app.selection.isNotEmpty()) {
             HorizontalDivider()
-            item("Hide / show", "Std_ToggleVisibility")
-            DropdownMenuItem({ Text("Delete ${app.selection.map { it.obj }.distinct().size}", color = OS.Red) }, { dismiss(); app.run("Std_Delete") })
-            DropdownMenuItem({ Text("Clear selection") }, { dismiss(); app.clearSelection(); app.refresh() })
+            item(tr("Hide / show"), "Std_ToggleVisibility")
+            DropdownMenuItem({ Text(tr("Delete %1", app.selection.map { it.obj }.distinct().size), color = OS.Red) }, { dismiss(); app.run("Std_Delete") })
+            DropdownMenuItem({ Text(tr("Clear selection")) }, { dismiss(); app.clearSelection(); app.refresh() })
         }
         HorizontalDivider()
-        DropdownMenuItem({ Text("Zoom to fit") }, { dismiss(); view?.fitAll() })
-        DropdownMenuItem({ Text("Isometric") }, { dismiss(); view?.setView(-0.785f, 0.6155f) })
-        DropdownMenuItem({ Text("Top") }, { dismiss(); view?.setView(-1.5708f, 1.5f) })
-        DropdownMenuItem({ Text("Front") }, { dismiss(); view?.setView(-1.5708f, 0f) })
-        DropdownMenuItem({ Text("Right") }, { dismiss(); view?.setView(0f, 0f) })
+        DropdownMenuItem({ Text(tr("Zoom to fit")) }, { dismiss(); view?.fitAll() })
+        DropdownMenuItem({ Text(tr("Isometric")) }, { dismiss(); view?.setView(-0.785f, 0.6155f) })
+        DropdownMenuItem({ Text(tr("Top")) }, { dismiss(); view?.setView(-1.5708f, 1.5f) })
+        DropdownMenuItem({ Text(tr("Front")) }, { dismiss(); view?.setView(-1.5708f, 0f) })
+        DropdownMenuItem({ Text(tr("Right")) }, { dismiss(); view?.setView(0f, 0f) })
     }
 }
 
@@ -892,7 +895,7 @@ private fun SelectionChips(app: AppState, modifier: Modifier) {
             Row(Modifier.padding(end = 6.dp).background(OS.Surface.copy(alpha = .94f), RoundedCornerShape(14.dp)).padding(start = 10.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("${app.obj(s.obj)?.label ?: s.obj}${if (s.sub.isNotEmpty()) "." + s.sub else ""}", color = OS.Navy, fontSize = 12.sp)
                 Box(Modifier.size(28.dp).clickable { app.selection.remove(s); app.refresh() }, contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Close, "Deselect", tint = OS.Steel, modifier = Modifier.size(14.dp)) }
+                    Icon(Icons.Default.Close, tr("Deselect"), tint = OS.Steel, modifier = Modifier.size(14.dp)) }
             }
         }
         if (app.selection.size > 6) Text("+${app.selection.size - 6}", color = OS.Steel, fontSize = 12.sp)
@@ -905,14 +908,14 @@ private fun ElementTabs(app: AppState) {
     val tabs = remember { Workspaces.main(app.catalog) }
     var more by remember { mutableStateOf(false) }
     Row(Modifier.fillMaxWidth().height(40.dp).background(OS.TabInactive)) {
-        tabs.forEach { w -> Tab(w.label, app.workspace.id == w.id) { app.switchWorkspace(w.id) } }
+        tabs.forEach { w -> Tab(tr(w.label), app.workspace.id == w.id) { app.switchWorkspace(w.id) } }
         Box {
             // the active "More" workbench names the tab (BIM ▾, FEM ▾ ...)
             val moreActive = Workspaces.more.any { it.first == app.workspace.id }
-            Tab(if (moreActive) "${app.workspace.label} ▾" else "More ▾", moreActive) { more = true }
+            Tab(if (moreActive) "${tr(app.workspace.label)} ▾" else tr("More") + " ▾", moreActive) { more = true }
             DropdownMenu(more, { more = false }) {
                 Workspaces.more.forEach { (id, label) ->
-                    DropdownMenuItem({ Text(label) }, { more = false; app.switchWorkspace(id) })
+                    DropdownMenuItem({ Text(tr(label)) }, { more = false; app.switchWorkspace(id) })
                 }
             }
         }

@@ -99,7 +99,7 @@ class QObject(metaclass=_QtMeta):
     def installEventFilter(self, *a): pass
     def removeEventFilter(self, *a): pass
     def deleteLater(self): pass
-    def tr(self, t, *a): return t
+    def tr(self, t, *a): return __import__('_i18n').translate(type(self).__name__, t, *a)   # QObject::tr: the class is the context
     def metaObject(self): return _Meta(self)
     def __getattr__(self, name): return _fallback(name)
     def findChild(self, cls=None, name=''):
@@ -944,7 +944,7 @@ class QAction(QObject):
     def __getattr__(self, n): return _fallback(n)
 
 class QApplication(QObject):
-    translate = staticmethod(lambda context, text, *a, **k: text)
+    translate = staticmethod(lambda context, text, *a, **k: __import__('_i18n').translate(context, text, *a, **k))
     @staticmethod
     def instance(): return None
     @staticmethod

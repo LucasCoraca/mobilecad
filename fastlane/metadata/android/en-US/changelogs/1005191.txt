@@ -1,0 +1,3 @@
+• Interface languages: MobileCAD now speaks Simplified Chinese (简体中文). It follows the phone's language, or pick one in Preferences ▸ Language; the switch applies at once, as on the desktop. Commands, toolbars, property names, the NaviCube and FreeCAD's own task panels use FreeCAD's official Chinese wording; MobileCAD's own screens, hints and messages are translated too. Thanks to Toobe53 for proposing a Chinese interface (pull request #21).
+• Part ▸ Tube works again (it creates FreeCAD's Python tube feature, as the desktop does).
+• OpenSCAD and TechDraw tools that showed raw source text as their name or tooltip are named properly.

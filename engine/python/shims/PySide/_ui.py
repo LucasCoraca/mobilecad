@@ -23,10 +23,15 @@ def _class(name, custom):
     if short.endswith(('SpinBox', 'InputField')): return W.QuantitySpinBox if 'Quantity' in short or 'Input' in short or 'Unit' in short else W.QDoubleSpinBox
     return W.QWidget
 
+_form = ['']          # the .ui being loaded: its <class> is the translation context of its strings (uic's retranslateUi)
+
 def _value(p):
     """<property><string>/<bool>/<number>/<double>/<enum>/<set>/<cstring> ...</property> -> Python value."""
     for v in p:
         t = v.tag
+        if t == 'string' and v.get('notr') != 'true':
+            import _i18n
+            return _i18n.translate(_form[0], v.text or '')
         if t in ('string', 'cstring', 'enum', 'set'): return v.text or ''
         if t == 'bool': return (v.text or '').strip() == 'true'
         if t == 'number': return int(float(v.text or 0))
@@ -137,6 +142,11 @@ class _Loader:
 
     def load(self, path, parent=None):
         root = ET.parse(_resolve(path)).getroot()
+        outer, _form[0] = _form[0], root.findtext('class') or ''
+        try: return self._load(root, parent)
+        finally: _form[0] = outer
+
+    def _load(self, root, parent):
         for cw in root.iter('customwidget'):
             c = cw.findtext('class'); e = cw.findtext('extends')
             if c: self.custom[c] = e or 'QWidget'

@@ -96,11 +96,19 @@ for kind in ('Additive', 'Subtractive'):
     cmds.setdefault(grp, {})['group'] = ['PartDesign_%s%s' % (kind, p) for p in PRIMS]
     for p in PRIMS:
         cmds['PartDesign_%s%s' % (kind, p)] = {'sMenuText': '%s %s' % (kind, p), 'sToolTipText': 'Creates a %s %s primitive' % (kind.lower(), p.lower()), 'sPixmap': 'PartDesign_%s%s' % (kind, p)}
+def unwrap(t):
+    """QT_TRANSLATE_NOOP('Ctx', 'Text') / QT_TR_NOOP("Text") captured as source text -> Text (markup and C line
+    continuations dropped; a capture cut off after the context gives no text)"""
+    m = re.match(r'\s*(?:QtCore\.)?QT_(TRANSLATE|TR)_NOOP\(\s*(?:([\'"])[^\'"]*\2\s*,\s*)?([\'"])(.*)', t or '', re.S)
+    if not m: return t or ''
+    if m.group(1) == 'TRANSLATE' and not m.group(2): return ''
+    body = re.split(r'(?<!\\)' + m.group(3), m.group(4))[0]
+    return re.sub(r'\s+', ' ', re.sub(r'<[^>]+>|\\(?=\s)', ' ', body)).strip()
 def add(name):
     if name in out_cmds or name == 'Separator': return
     c = cmds.get(name, {})
-    out_cmds[name] = {'label': (c.get('sMenuText') or name.split('_', 1)[-1]).replace('&', '').replace('…', '...'),
-                      'tip': (c.get('sToolTipText') or '').replace('\\n', ' '), 'icon': icon(name), 'group': c.get('group') or []}
+    out_cmds[name] = {'label': unwrap(c.get('sMenuText') or name.split('_', 1)[-1]).replace('&', '').replace('…', '...'),
+                      'tip': unwrap(c.get('sToolTipText') or '').replace('\\n', ' '), 'icon': icon(name), 'group': c.get('group') or []}
     for m in out_cmds[name]['group']: add(m)
 wbs = []
 for wb, names in cat.items():

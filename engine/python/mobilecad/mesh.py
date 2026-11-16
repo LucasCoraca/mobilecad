@@ -5,6 +5,7 @@ import math
 import FreeCAD as App
 from FreeCAD import Vector as V
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .partdesign import _sel
 
 def _objs(names):
@@ -12,7 +13,7 @@ def _objs(names):
 
 def _meshes(names):
     ms = [o for o in _objs(names) if o.isDerivedFrom('Mesh::Feature')]
-    if not ms: raise RuntimeError('Select a mesh')
+    if not ms: raise RuntimeError(_tr('Select a mesh'))
     return ms
 
 def _add_mesh(name, mesh):
@@ -306,7 +307,7 @@ def reen_fit(kind, names, opts=None):
     o = opts or {}; d = _doc(); last = None
     for x in _objs(names):
         P = _cloud(x)
-        if len(P) < 3: raise RuntimeError('Not enough points')
+        if len(P) < 3: raise RuntimeError(_tr('Not enough points'))
         c = V()
         for p in P: c = c + p
         c = c * (1.0 / len(P))
@@ -382,7 +383,7 @@ def mesh_remesh_gmsh(name, algorithm=2, max_size=0.0, min_size=0.0, angle=40.0):
     reparametrizes and remeshes them (same .geo as the desktop dialog), the result replaces the mesh."""
     import os, subprocess, tempfile, Mesh
     exe = gmsh_binary()
-    if exe is None: raise RuntimeError('Gmsh is not available on this device')
+    if exe is None: raise RuntimeError(_tr('Gmsh is not available on this device'))
     o = _doc().getObject(name)
     tmp = tempfile.mkdtemp(prefix='remesh')
     stl, geo = os.path.join(tmp, 'mesh.stl'), os.path.join(tmp, 'mesh.geo')
@@ -395,7 +396,7 @@ def mesh_remesh_gmsh(name, algorithm=2, max_size=0.0, min_size=0.0, angle=40.0):
                 'includeBoundary = 1;\nClassifySurfaces{angle * Pi/180, includeBoundary, forceParametrizablePatches};\nCreateGeometry;\n\n'
                 'Surface Loop(1) = Surface{:};\nVolume(1) = {1};\n' % (stl, int(algorithm), float(max_size) or 1.0e22, float(min_size), float(angle)))
     r = subprocess.run([exe, '-', '-bin', '-2', geo, '-o', stl], capture_output=True, text=True, timeout=600)
-    if r.returncode != 0: raise RuntimeError('Gmsh failed: ' + (r.stderr or r.stdout)[-500:])
+    if r.returncode != 0: raise RuntimeError(_tr('Gmsh failed: %s') % (r.stderr or r.stdout)[-500:])
     m = Mesh.Mesh(stl); m.harmonizeNormals()
     o.Mesh = m; _doc().recompute()
     return {'facets': m.CountFacets, 'log': r.stdout[-300:]}

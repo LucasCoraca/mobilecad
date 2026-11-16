@@ -7,6 +7,7 @@ the widgets' own signals, so the panel's logic runs unchanged.  OK / Cancel / Ap
 / clicked(), as the desktop task view does."""
 import FreeCAD as App
 from .bridge import op, _doc
+from _i18n import tr as _tr
 
 _panels = {}          # panel id -> {'panel', 'kind', 'widgets': {id: widget}}
 _next = [1]
@@ -282,9 +283,9 @@ def panel_state(pid):
 def panel_event(pid, wid, kind='set', value=None, sel=None):
     """The user edited widget `wid`: 'set' (value / text / index / checked / click), 'check' (list row, on), 'cell'."""
     e = _panels.get(pid)
-    if e is None: raise RuntimeError('The dialog is closed')
+    if e is None: raise RuntimeError(_tr('The dialog is closed'))
     w = e['widgets'].get(wid)
-    if w is None: raise RuntimeError('Widget gone')
+    if w is None: raise RuntimeError(_tr('Widget gone'))
     W = _W()
     def go():
         if kind == 'check': w._check(*value)

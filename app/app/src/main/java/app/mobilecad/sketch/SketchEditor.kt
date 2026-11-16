@@ -21,6 +21,7 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.sin
 import app.mobilecad.ui.OS
+import app.mobilecad.i18n.tr
 
 /** Sketch tools; each produces the same geometry/constraints as the FreeCAD tool of the same name. */
 enum class SketchTool(val label: String, val points: Int) {
@@ -139,11 +140,11 @@ class SketchEditor(private val app: AppState, val name: String) {
         conflicting = set("conflicting"); redundant = set("redundant"); malformed = set("malformed")
         partiallyRedundant = if (s.has("partially_redundant")) set("partially_redundant") else emptySet()
         status = when {
-            conflicting.isNotEmpty() -> "Conflicting constraints: ${conflicting.joinToString { "#$it" }}"
-            redundant.isNotEmpty() -> "Redundant constraints: ${redundant.joinToString { "#$it" }}"
-            geos.none { !it.external } -> if (geos.isEmpty()) "Empty sketch" else "Only external geometry"
-            fully -> "Fully constrained"
-            else -> "$dof degrees of freedom"
+            conflicting.isNotEmpty() -> tr("Conflicting constraints: %1", conflicting.joinToString { "#$it" })
+            redundant.isNotEmpty() -> tr("Redundant constraints: %1", redundant.joinToString { "#$it" })
+            geos.none { !it.external } -> if (geos.isEmpty()) tr("Empty sketch") else tr("Only external geometry")
+            fully -> tr("Fully constrained")
+            else -> tr("%1 degrees of freedom", dof)
         }.let { st -> armed?.let { "${armedHint(it)}  ($st)" } ?: st }
         app.sceneVersion.intValue++; onChanged()
     }
@@ -427,7 +428,7 @@ class SketchEditor(private val app: AppState, val name: String) {
             SketchTool.ARC_SLOT -> if (pts.size == 4) { exec("sketch_arc_slot", mapOf("center" to xy(pts[0]), "start" to xy(pts[1]), "end" to xy(pts[2]),
                 "width" to 2 * kotlin.math.abs(pts[3].d(pts[0]) - pts[1].d(pts[0])), "construction" to c)); pending.clear() }
             SketchTool.TEXT -> if (pts.size == 2) { val a = xy(pts[0]); val b = xy(pts[1]); pending.clear()
-                app.textPrompt = TextPrompt("Sketch text", "Text") { t -> exec("sketch_text", mapOf("start" to a, "end" to b, "text" to t, "construction" to c)) } }
+                app.textPrompt = TextPrompt(tr("Sketch text"), "Text") { t -> exec("sketch_text", mapOf("start" to a, "end" to b, "text" to t, "construction" to c)) } }
             SketchTool.BSPLINE, SketchTool.BSPLINE_PERIODIC, SketchTool.BSPLINE_INTERP, SketchTool.BSPLINE_INTERP_PERIODIC -> {}   // finished by double tap
             else -> pending.clear()
         }
@@ -441,19 +442,19 @@ class SketchEditor(private val app: AppState, val name: String) {
     private fun hint(): String {
         val n = pending.size
         return when (tool) {
-            SketchTool.SELECT -> "Tap geometry to select, drag points or curves to move"
-            SketchTool.POLYLINE -> if (n == 0) "Polyline: tap the start point" else "Tap the next point · double tap to end"
-            SketchTool.LINE -> if (n == 0) "Line: tap the start point" else "Tap the end point or type Length"
-            SketchTool.RECTANGLE -> if (n == 0) "Rectangle: tap the first corner" else "Tap the opposite corner or type Width / Height"
-            SketchTool.CENTER_RECTANGLE -> if (n == 0) "Centered rectangle: tap the center" else "Tap a corner or type Width / Height"
-            SketchTool.CIRCLE -> if (n == 0) "Circle: tap the center" else "Tap a point on the circle or type Diameter"
-            SketchTool.ARC_CENTER -> listOf("Arc: tap the center", "Tap the start point or type Radius", "Tap the end point").getOrElse(n) { "" }
-            SketchTool.DIMENSION -> "Dimension: tap a line, circle, or two points"
-            SketchTool.TRIM -> "Trim: tap the part of a curve to remove"
-            SketchTool.PROJECTION -> "External projection: tap edges or vertices of the model"
-            SketchTool.INTERSECTION -> "External intersection: tap faces or edges crossing the sketch plane"
-            else -> if (tool.points != 0) "${tool.label}: tap point ${n + 1}" else tool.label
-        } + if (construction && tool.points != 0) " (construction)" else ""
+            SketchTool.SELECT -> tr("Tap geometry to select, drag points or curves to move")
+            SketchTool.POLYLINE -> if (n == 0) tr("Polyline: tap the start point") else tr("Tap the next point · double tap to end")
+            SketchTool.LINE -> if (n == 0) tr("Line: tap the start point") else tr("Tap the end point or type Length")
+            SketchTool.RECTANGLE -> if (n == 0) tr("Rectangle: tap the first corner") else tr("Tap the opposite corner or type Width / Height")
+            SketchTool.CENTER_RECTANGLE -> if (n == 0) tr("Centered rectangle: tap the center") else tr("Tap a corner or type Width / Height")
+            SketchTool.CIRCLE -> if (n == 0) tr("Circle: tap the center") else tr("Tap a point on the circle or type Diameter")
+            SketchTool.ARC_CENTER -> listOf(tr("Arc: tap the center"), tr("Tap the start point or type Radius"), tr("Tap the end point")).getOrElse(n) { "" }
+            SketchTool.DIMENSION -> tr("Dimension: tap a line, circle, or two points")
+            SketchTool.TRIM -> tr("Trim: tap the part of a curve to remove")
+            SketchTool.PROJECTION -> tr("External projection: tap edges or vertices of the model")
+            SketchTool.INTERSECTION -> tr("External intersection: tap faces or edges crossing the sketch plane")
+            else -> if (tool.points != 0) tr("%1: tap point %2", tr(tool.label), n + 1) else tr(tool.label)
+        } + if (construction && tool.points != 0) " " + tr("(construction)") else ""
     }
 
     // ------------------------------------------------------------------ values typed while drawing (FreeCAD 1.x on-view parameters)
@@ -480,13 +481,13 @@ class SketchEditor(private val app: AppState, val name: String) {
             "Length", "Angle" -> {
                 fun line(len: Double, ang: Double, angTyped: Boolean) = put(P2(last.x + len * cos(ang), last.y + len * sin(ang)),
                     *listOfNotNull(JSONArray(listOf("Distance", 0, len)), if (angTyped) JSONArray(listOf("Angle", 0, ang)) else null).toTypedArray())
-                if (what == "Length") ask("Length", "%.2f mm".format(lastHover?.d(last) ?: 10.0), L) { len -> if (len > 0) line(len, dir, false) }
-                else ask("Angle", "%.1f °".format(Math.toDegrees(dir)), ANGLE_UNITS) { a -> ask("Length", "%.2f mm".format(lastHover?.d(last) ?: 10.0), L) { len ->
+                if (what == "Length") ask(tr("Length"), "%.2f mm".format(lastHover?.d(last) ?: 10.0), L) { len -> if (len > 0) line(len, dir, false) }
+                else ask(tr("Angle"), "%.1f °".format(Math.toDegrees(dir)), ANGLE_UNITS) { a -> ask(tr("Length"), "%.2f mm".format(lastHover?.d(last) ?: 10.0), L) { len ->
                     if (len > 0) line(len, Math.toRadians(a), true) } }
             }
             "Width", "Height" -> {
                 val h0 = lastHover; val sx = if (h0 != null && h0.x < first.x) -1.0 else 1.0; val sy = if (h0 != null && h0.y < first.y) -1.0 else 1.0
-                ask("Width", "%.2f mm".format(h0?.let { abs(it.x - first.x) } ?: 10.0), L) { w -> ask("Height", "%.2f mm".format(h0?.let { abs(it.y - first.y) } ?: 10.0), L) { h ->
+                ask(tr("Width"), "%.2f mm".format(h0?.let { abs(it.x - first.x) } ?: 10.0), L) { w -> ask(tr("Height"), "%.2f mm".format(h0?.let { abs(it.y - first.y) } ?: 10.0), L) { h ->
                     if (w <= 0 || h <= 0) return@ask
                     val k = if (tool == SketchTool.CENTER_RECTANGLE) 0.5 else 1.0
                     val dx = sx * w * k; val dy = sy * h * k
@@ -494,9 +495,9 @@ class SketchEditor(private val app: AppState, val name: String) {
                     val horiz = if (dx * dy > 0) 0 else 1
                     put(P2(first.x + dx, first.y + dy), JSONArray(listOf("Distance", horiz, w)), JSONArray(listOf("Distance", 1 - horiz, h))) } }
             }
-            "Diameter" -> ask("Diameter", "%.2f mm".format(2 * (lastHover?.d(first) ?: 5.0)), L) { d -> if (d > 0)
+            "Diameter" -> ask(tr("Diameter"), "%.2f mm".format(2 * (lastHover?.d(first) ?: 5.0)), L) { d -> if (d > 0)
                 put(P2(first.x + d / 2 * cos(dir), first.y + d / 2 * sin(dir)), JSONArray(listOf("Diameter", 0, d))) }
-            "Radius" -> ask("Radius", "%.2f mm".format(lastHover?.d(first) ?: 5.0), L) { r -> if (r > 0)
+            "Radius" -> ask(tr("Radius"), "%.2f mm".format(lastHover?.d(first) ?: 5.0), L) { r -> if (r > 0)
                 put(P2(first.x + r * cos(dir), first.y + r * sin(dir)), *(if (tool == SketchTool.ARC_CENTER) arrayOf(JSONArray(listOf("Radius", 0, r))) else emptyArray())) }
         }
     }
@@ -551,20 +552,20 @@ class SketchEditor(private val app: AppState, val name: String) {
         }
     }
     private fun armedHint(t: String) = when (t) {
-        "Coincident" -> "Coincident: tap two points, or a point and a curve"; "PointOnObject" -> "Point on object: tap a point and a curve"
-        "Horizontal", "Vertical", "HorVer" -> "$t: tap a line or two points"; "Parallel", "Perpendicular" -> "$t: tap two lines"
-        "Equal" -> "Equal: tap two lines, circles or arcs"; "Tangent" -> "Tangent: tap two curves, or two end points"
-        "Symmetric" -> "Symmetric: tap two points, then the symmetry line or point"; "Block" -> "Block: tap the curves to fix"
-        "Lock" -> "Lock: tap a point"; "Angle" -> "Angle: tap two lines"; "Radius", "Diameter", "Radiam" -> "$t: tap a circle or arc"
-        else -> "$t: tap a line, or two points"
-    } + " · Select to finish"
+        "Coincident" -> tr("Coincident: tap two points, or a point and a curve"); "PointOnObject" -> tr("Point on object: tap a point and a curve")
+        "Horizontal", "Vertical", "HorVer" -> tr("%1: tap a line or two points", tr(t)); "Parallel", "Perpendicular" -> tr("%1: tap two lines", tr(t))
+        "Equal" -> tr("Equal: tap two lines, circles or arcs"); "Tangent" -> tr("Tangent: tap two curves, or two end points")
+        "Symmetric" -> tr("Symmetric: tap two points, then the symmetry line or point"); "Block" -> tr("Block: tap the curves to fix")
+        "Lock" -> tr("Lock: tap a point"); "Angle" -> tr("Angle: tap two lines"); "Radius", "Diameter", "Radiam" -> tr("%1: tap a circle or arc", tr(t))
+        else -> tr("%1: tap a line, or two points", tr(t))
+    } + " · " + tr("Select to finish")
     /** Applies the armed constraint once the tapped elements are a complete selection for it (keeps waiting otherwise). */
     private fun applyArmed(t: String) {
         val n = selected.size
         // a single line is a complete selection for Angle only from the menu (its angle to the horizontal axis)
         if (!(t == "Angle" && n == 1)) { constrain(t, fromArmed = true); if (selected.isEmpty()) { status = armedHint(t); return } }
         // no constraint takes more than three elements: start over, as the desktop does with an invalid sequence
-        if (n >= 3) { selected.clear(); status = "Not a valid selection for $t · " + armedHint(t) } else status = armedHint(t)
+        if (n >= 3) { selected.clear(); status = tr("Not a valid selection for %1", tr(t)) + " · " + armedHint(t) } else status = armedHint(t)
     }
     private fun toggle(e: SkSel) { if (e in selected) selected.remove(e) else selected.add(e) }
 
@@ -574,42 +575,42 @@ class SketchEditor(private val app: AppState, val name: String) {
         val L = LENGTH_UNITS; val A = ANGLE_UNITS
         when (tool) {
             SketchTool.FILLET, SketchTool.CHAMFER -> if (e != null && e.pos in 1..2 && e.geo >= 0)
-                ask(if (tool == SketchTool.FILLET) "Fillet radius" else "Chamfer size", "2 mm", L) { r ->
+                ask(if (tool == SketchTool.FILLET) tr("Fillet radius") else tr("Chamfer size"), "2 mm", L) { r ->
                     exec("sketch_fillet_vertex", mapOf("geo" to e.geo, "pos" to e.pos, "radius" to r, "chamfer" to (tool == SketchTool.CHAMFER))) }
-                else status = "Tap a corner vertex"
+                else status = tr("Tap a corner vertex")
             SketchTool.EXTEND -> if (e != null && e.geo >= 0) {
                 val gg = geos.firstOrNull { it.i == e.geo } ?: return
                 val end = if (gg.a != null && gg.b != null && p.d(gg.a) < p.d(gg.b)) 1 else 2
-                ask("Extend by", "10 mm", L) { v -> exec("sketch_extend", mapOf("geo" to e.geo, "increment" to v, "end_point" to end)) }
-            } else status = "Tap the edge near the end to extend"
-            SketchTool.SPLIT -> if (e != null && e.geo >= 0) exec("sketch_split", mapOf("geo" to e.geo, "x" to p.x, "y" to p.y)) else status = "Tap an edge where to split it"
+                ask(tr("Extend by"), "10 mm", L) { v -> exec("sketch_extend", mapOf("geo" to e.geo, "increment" to v, "end_point" to end)) }
+            } else status = tr("Tap the edge near the end to extend")
+            SketchTool.SPLIT -> if (e != null && e.geo >= 0) exec("sketch_split", mapOf("geo" to e.geo, "x" to p.x, "y" to p.y)) else status = tr("Tap an edge where to split it")
             SketchTool.JOIN -> if (e != null && e.pos in 1..2) {
                 actionPicks.add(p to e)
                 if (actionPicks.size == 2) { val a = actionPicks[0].second!!; val b = actionPicks[1].second!!; actionPicks.clear()
-                    exec("sketch_join", mapOf("geo1" to a.geo, "pos1" to a.pos, "geo2" to b.geo, "pos2" to b.pos)) } else status = "Tap the second curve's end point"
-            } else status = "Tap an end point of the first curve"
-            SketchTool.SYMMETRY -> if (g.isEmpty()) status = "Select geometry first (Select tool), then Symmetry"
+                    exec("sketch_join", mapOf("geo1" to a.geo, "pos1" to a.pos, "geo2" to b.geo, "pos2" to b.pos)) } else status = tr("Tap the second curve's end point")
+            } else status = tr("Tap an end point of the first curve")
+            SketchTool.SYMMETRY -> if (g.isEmpty()) status = tr("Select geometry first (Select tool), then Symmetry")
                 else if (e != null) { exec("sketch_symmetry", mapOf("geometry" to g, "ref_geo" to e.geo, "ref_pos" to e.pos)); selected.clear() }
-                else status = "Tap the symmetry line or point"
-            SketchTool.TRANSLATE, SketchTool.COPY, SketchTool.ARRAY -> if (g.isEmpty()) status = "Select geometry first (Select tool)" else {
+                else status = tr("Tap the symmetry line or point")
+            SketchTool.TRANSLATE, SketchTool.COPY, SketchTool.ARRAY -> if (g.isEmpty()) status = tr("Select geometry first (Select tool)") else {
                 actionPicks.add(p to e)
                 if (actionPicks.size == 2) {
                     val d = P2(actionPicks[1].first.x - actionPicks[0].first.x, actionPicks[1].first.y - actionPicks[0].first.y); actionPicks.clear()
-                    if (tool == SketchTool.ARRAY) ask("Rows", "2", emptyList()) { r -> ask("Columns", "2", emptyList()) { c ->
+                    if (tool == SketchTool.ARRAY) ask(tr("Rows"), "2", emptyList()) { r -> ask(tr("Columns"), "2", emptyList()) { c ->
                         exec("sketch_array", mapOf("geometry" to g, "dx" to d.x, "dy" to d.y, "rows" to r.toInt(), "cols" to c.toInt())) } }
                     else exec("sketch_translate", mapOf("geometry" to g, "dx" to d.x, "dy" to d.y, "copy" to (tool == SketchTool.COPY)))
                     selected.clear()
-                } else status = "Tap the destination point"
+                } else status = tr("Tap the destination point")
             }
             SketchTool.INSERT_KNOT -> if (e != null && e.geo >= 0 && geos.firstOrNull { it.i == e.geo }?.bs != null)
-                exec("sketch_insert_knot", mapOf("geo" to e.geo, "x" to p.x, "y" to p.y)) else status = "Tap a B-spline where to insert a knot"
+                exec("sketch_insert_knot", mapOf("geo" to e.geo, "x" to p.x, "y" to p.y)) else status = tr("Tap a B-spline where to insert a knot")
             SketchTool.KNOT_UP, SketchTool.KNOT_DOWN -> if (e != null && e.geo >= 0)
-                exec("sketch_knot_multiplicity", mapOf("point_geo" to e.geo, "delta" to (if (tool == SketchTool.KNOT_UP) 1 else -1))) else status = "Tap a knot point"
+                exec("sketch_knot_multiplicity", mapOf("point_geo" to e.geo, "delta" to (if (tool == SketchTool.KNOT_UP) 1 else -1))) else status = tr("Tap a knot point")
             SketchTool.PASTE -> { exec("sketch_clipboard", mapOf("action" to "paste", "dx" to p.x, "dy" to p.y)); selectTool(SketchTool.SELECT) }
-            SketchTool.ROTATE -> if (g.isEmpty()) status = "Select geometry first (Select tool)" else
-                ask("Rotation angle", "90 °", A) { a -> exec("sketch_rotate", mapOf("geometry" to g, "cx" to p.x, "cy" to p.y, "angle_deg" to a)); selected.clear() }
-            SketchTool.SCALE -> if (g.isEmpty()) status = "Select geometry first (Select tool)" else
-                ask("Scale factor", "2", emptyList()) { f -> exec("sketch_scale", mapOf("geometry" to g, "cx" to p.x, "cy" to p.y, "factor" to f)); selected.clear() }
+            SketchTool.ROTATE -> if (g.isEmpty()) status = tr("Select geometry first (Select tool)") else
+                ask(tr("Rotation angle"), "90 °", A) { a -> exec("sketch_rotate", mapOf("geometry" to g, "cx" to p.x, "cy" to p.y, "angle_deg" to a)); selected.clear() }
+            SketchTool.SCALE -> if (g.isEmpty()) status = tr("Select geometry first (Select tool)") else
+                ask(tr("Scale factor"), "2", emptyList()) { f -> exec("sketch_scale", mapOf("geometry" to g, "cx" to p.x, "cy" to p.y, "factor" to f)); selected.clear() }
             else -> {}
         }
         onChanged()
@@ -618,10 +619,10 @@ class SketchEditor(private val app: AppState, val name: String) {
     /** Commands acting on the current selection without taps (Sketcher_Offset, B-spline tools, toggles, validation, select helpers). */
     fun command(id: String) {
         val g = geoSel(); val c = selectedCons.toList()
-        fun needG(f: () -> Unit) { if (g.isEmpty()) status = "Select geometry first" else f() }
-        fun needC(f: () -> Unit) { if (c.isEmpty()) status = "Select a constraint first (tap its label)" else f() }
+        fun needG(f: () -> Unit) { if (g.isEmpty()) status = tr("Select geometry first") else f() }
+        fun needC(f: () -> Unit) { if (c.isEmpty()) status = tr("Select a constraint first (tap its label)") else f() }
         when (id) {
-            "Sketcher_Offset" -> needG { ask("Offset distance", "2 mm", LENGTH_UNITS) { d -> exec("sketch_offset", mapOf("geometry" to g, "distance" to d, "construction" to construction)) } }
+            "Sketcher_Offset" -> needG { ask(tr("Offset distance"), "2 mm", LENGTH_UNITS) { d -> exec("sketch_offset", mapOf("geometry" to g, "distance" to d, "construction" to construction)) } }
             "Sketcher_BSplineConvertToNURBS" -> needG { exec("sketch_bspline_op", mapOf("op" to "ConvertToNURBS", "geo" to g[0])) }
             "Sketcher_BSplineIncreaseDegree" -> needG { exec("sketch_bspline_op", mapOf("op" to "IncreaseDegree", "geo" to g[0])) }
             "Sketcher_BSplineDecreaseDegree" -> needG { exec("sketch_bspline_op", mapOf("op" to "DecreaseDegree", "geo" to g[0])) }
@@ -645,14 +646,14 @@ class SketchEditor(private val app: AppState, val name: String) {
             "Sketcher_ConstrainGroup" -> needG { exec("sketch_group", mapOf("geometry" to g)); selected.clear() }
             "Sketcher_ConstrainSnellsLaw" -> { val pts = selected.filter { it.pos != 0 }; val edge = selected.firstOrNull { it.pos == 0 && it.geo >= 0 }
                 if (pts.size == 2 && edge != null) { exec("sketch_snells_law", mapOf("geo1" to pts[0].geo, "pos1" to pts[0].pos, "geo2" to pts[1].geo, "pos2" to pts[1].pos,
-                    "boundary" to edge.geo, "ratio" to 1.0)); selected.clear() } else status = "Snell's law: select two ray end points and the boundary curve" }
+                    "boundary" to edge.geo, "ratio" to 1.0)); selected.clear() } else status = tr("Snell's law: select two ray end points and the boundary curve") }
             "Sketcher_SelectOrigin" -> selected.add(SkSel(-1, 1))
             "Sketcher_SelectHorizontalAxis" -> selected.add(SkSel(-1, 0))
             "Sketcher_SelectVerticalAxis" -> selected.add(SkSel(-2, 0))
             "Sketcher_StopOperation" -> { finishShape(); selectTool(SketchTool.SELECT) }
-            "Sketcher_CopyClipboard" -> needG { exec("sketch_clipboard", mapOf("action" to "copy", "geometry" to g)); status = "Copied ${g.size} element(s)" }
+            "Sketcher_CopyClipboard" -> needG { exec("sketch_clipboard", mapOf("action" to "copy", "geometry" to g)); status = tr("Copied %1 element(s)", g.size) }
             "Sketcher_Cut" -> needG { exec("sketch_clipboard", mapOf("action" to "cut", "geometry" to g)); selected.clear() }
-            "Sketcher_Paste" -> { selectTool(SketchTool.PASTE); status = "Tap where to paste" }
+            "Sketcher_Paste" -> { selectTool(SketchTool.PASTE); status = tr("Tap where to paste") }
         }
         onChanged()
     }
@@ -682,7 +683,7 @@ class SketchEditor(private val app: AppState, val name: String) {
 
     /** Sketcher_Projection / Sketcher_Intersection: a tap on the (dimmed) 3D model adds external geometry. */
     fun externalPick(obj: String, sub: String) {
-        if (sub.isEmpty()) { status = "Tap an edge or vertex of the model"; return }
+        if (sub.isEmpty()) { status = tr("Tap an edge or vertex of the model"); return }
         exec("sketch_external", mapOf("obj" to obj, "sub" to sub, "intersection" to (tool == SketchTool.INTERSECTION)))
     }
 
@@ -726,25 +727,25 @@ class SketchEditor(private val app: AppState, val name: String) {
         when (type) {
             "Coincident" -> when { pts.size == 2 -> add("Coincident", listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos))
                 pts.size == 1 && edges.size == 1 -> add("PointOnObject", listOf(pts[0].geo, pts[0].pos, edges[0].geo))
-                else -> status = "Coincident: select two points, or a point and a curve" }
-            "PointOnObject" -> if (pts.size == 1 && edges.size == 1) add(type, listOf(pts[0].geo, pts[0].pos, edges[0].geo)) else status = "Select a point and a curve"
+                else -> status = tr("Coincident: select two points, or a point and a curve") }
+            "PointOnObject" -> if (pts.size == 1 && edges.size == 1) add(type, listOf(pts[0].geo, pts[0].pos, edges[0].geo)) else status = tr("Select a point and a curve")
             "Horizontal", "Vertical", "HorVer" -> {
                 val t = if (type == "HorVer") { val g = edges.firstOrNull()?.let { geo(it.geo) }
                     if (g?.isLine == true && abs(g.b!!.y - g.a!!.y) > abs(g.b.x - g.a.x)) "Vertical" else "Horizontal" } else type
                 when { edges.size == 1 && pts.isEmpty() -> add(t, listOf(edges[0].geo))
                     pts.size == 2 -> add(t, listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos))
-                    else -> status = "$t: select a line or two points" } }
-            "Parallel", "Perpendicular", "Equal" -> if (edges.size == 2) add(type, listOf(edges[0].geo, edges[1].geo)) else status = "$type: select two curves"
+                    else -> status = tr("%1: select a line or two points", tr(t)) } }
+            "Parallel", "Perpendicular", "Equal" -> if (edges.size == 2) add(type, listOf(edges[0].geo, edges[1].geo)) else status = tr("%1: select two curves", tr(type))
             "Tangent" -> when { edges.size == 2 -> add(type, listOf(edges[0].geo, edges[1].geo))
-                pts.size == 2 -> add(type, listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos)) else -> status = "Tangent: select two curves" }
+                pts.size == 2 -> add(type, listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos)) else -> status = tr("Tangent: select two curves") }
             "Symmetric" -> when { pts.size == 2 && edges.size == 1 -> add(type, listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos, edges[0].geo))
                 pts.size == 3 -> add(type, listOf(pts[0].geo, pts[0].pos, pts[1].geo, pts[1].pos, pts[2].geo, pts[2].pos))
-                else -> status = "Symmetric: two points + a line or a point" }
+                else -> status = tr("Symmetric: two points + a line or a point") }
             "Block" -> edges.forEach { add("Block", listOf(it.geo)) }
             "Lock" -> pts.firstOrNull()?.let { s -> val p = pt(s) ?: return
                 exec("sketch_constrain", mapOf("ctype" to "DistanceX", "args" to listOf(-1, 1, s.geo, s.pos), "value" to "${p.x} mm"))
                 exec("sketch_constrain", mapOf("ctype" to "DistanceY", "args" to listOf(-1, 1, s.geo, s.pos), "value" to "${p.y} mm")); selected.clear() }
-                ?: run { status = "Lock: select a point" }
+                ?: run { status = tr("Lock: select a point") }
             else -> dimensionFromSelection(auto = false, forced = type)
         }
         onChanged()
@@ -784,7 +785,7 @@ class SketchEditor(private val app: AppState, val name: String) {
                     add("Angle", listOf(a.i, b.i), ((ang % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI), ANGLE_UNITS)
                 } }
             forced == "Angle" && edges.size == 1 && g0?.isLine == true -> add("Angle", listOf(g0.i), atan2(g0.b!!.y - g0.a!!.y, g0.b.x - g0.a.x), ANGLE_UNITS)
-            !auto -> status = "${forced ?: "Dimension"}: invalid selection"
+            !auto -> status = tr("%1: invalid selection", tr(forced ?: "Dimension"))
         }
         onChanged()
     }
@@ -793,7 +794,7 @@ class SketchEditor(private val app: AppState, val name: String) {
     private fun askValue(index: Int, title: String, units: List<String>, created: Boolean = false) {
         val c = cons.getOrNull(index - 1) ?: cons.lastOrNull() ?: return
         val cancel = { if (created) exec("sketch_delete", mapOf("constraints" to listOf(c.i))) }
-        app.numpad = NumpadRequest(title, c.label.ifEmpty { "%.3f".format(c.value) }, units, cancel) { v ->
+        app.numpad = NumpadRequest(tr(title), c.label.ifEmpty { "%.3f".format(c.value) }, units, cancel) { v ->
             app.numpad = null
             if (Regex("""^-?[\d.]+\s*[a-zA-Z°µ]*$""").matches(v.trim())) exec("sketch_set_datum", mapOf("index" to c.i, "value" to v.replace("°", "deg")))
             else exec("sketch_set_datum_expression", mapOf("index" to c.i, "expression" to v))
@@ -866,9 +867,9 @@ class SketchEditor(private val app: AppState, val name: String) {
     fun isRedundant(k: SkCons) = (k.i + 1) in redundant || (k.i + 1) in partiallyRedundant || (k.i + 1) in malformed
     /** What a constraint ties, for the list ("Line 3 ↔ Circle 5", "Line 1 start"). */
     fun describe(k: SkCons): String {
-        fun g(i: Int) = when { i == -1 -> "H axis"; i == -2 -> "V axis"; i <= -3 -> "External ${-i - 2}"; else -> geo(i)?.let { x ->
-            when { x.isLine -> "Line"; x.isCircle -> "Circle"; x.isArc -> "Arc"; x.isPoint -> "Point"; else -> "Curve" } + " ${i + 1}" } ?: "#${i + 1}" }
-        fun pos(p: Int) = when (p) { 1 -> " start"; 2 -> " end"; 3 -> " center"; else -> "" }
+        fun g(i: Int) = when { i == -1 -> tr("H axis"); i == -2 -> tr("V axis"); i <= -3 -> tr("External %1", -i - 2); else -> geo(i)?.let { x ->
+            when { x.isLine -> tr("Line"); x.isCircle -> tr("Circle"); x.isArc -> tr("Arc"); x.isPoint -> tr("Point"); else -> tr("Curve") } + " ${i + 1}" } ?: "#${i + 1}" }
+        fun pos(p: Int) = when (p) { 1 -> " " + tr("start"); 2 -> " " + tr("end"); 3 -> " " + tr("center"); else -> "" }
         val parts = listOfNotNull(k.first.takeIf { it != -2000 }?.let { g(it) + pos(k.firstPos) }, k.second.takeIf { it != -2000 }?.let { g(it) + pos(k.secondPos) },
             k.third.takeIf { it != -2000 }?.let { g(it) })
         return parts.joinToString(" ↔ ")
@@ -881,7 +882,7 @@ class SketchEditor(private val app: AppState, val name: String) {
 
     fun editDimension(c: SkCons) {
         val units = if (c.type == "Angle") ANGLE_UNITS else LENGTH_UNITS
-        app.numpad = NumpadRequest(c.type, c.label, units) { v -> app.numpad = null
+        app.numpad = NumpadRequest(tr(c.type), c.label, units) { v -> app.numpad = null
             exec("sketch_set_datum", mapOf("index" to c.i, "value" to v.replace("°", "deg"))) }
     }
 
@@ -972,11 +973,11 @@ class SketchEditor(private val app: AppState, val name: String) {
                 pFill.color = when (s.kind.removePrefix("model ")) { "point", "origin", "center" -> 0xFFE0403F.toInt(); "midpoint" -> 0xFFB04ADB.toInt(); "on curve", "on axis", "on model edge", "intersection" -> 0xFFFFC20E.toInt()
                     "horizontal", "vertical", "aligned" -> 0xFF47AB72.toInt(); else -> 0xFF2A6FC9.toInt() }
                 c.drawCircle(q[0], q[1], 6 * dp, pFill)
-                val tag = when (s.kind) { "point" -> "coincident"; "origin" -> "origin"; "center" -> "center"; "midpoint" -> "midpoint"; "on curve" -> "on curve"
-                    "on axis" -> "on axis"; "intersection" -> "on both curves"; "horizontal" -> "horizontal"; "vertical" -> "vertical"; "aligned" -> "aligned"
-                    "model point" -> "part vertex"; "model center" -> "part center"; "model midpoint" -> "part midpoint"; "on model edge" -> "on part edge"; else -> null }
+                val tag = when (s.kind) { "point" -> tr("coincident"); "origin" -> tr("origin"); "center" -> tr("center"); "midpoint" -> tr("midpoint"); "on curve" -> tr("on curve")
+                    "on axis" -> tr("on axis"); "intersection" -> tr("on both curves"); "horizontal" -> tr("horizontal"); "vertical" -> tr("vertical"); "aligned" -> tr("aligned")
+                    "model point" -> tr("part vertex"); "model center" -> tr("part center"); "model midpoint" -> tr("part midpoint"); "on model edge" -> tr("on part edge"); else -> null }
                 // every suggested constraint is named (desktop draws one icon per auto constraint next to the cursor)
-                listOfNotNull(tag, s.also).joinToString(" + ").takeIf { it.isNotEmpty() }?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }
+                listOfNotNull(tag, s.also?.let { tr(it) }).joinToString(" + ").takeIf { it.isNotEmpty() }?.let { t -> emit(textLabel(s.p, t, ldp, 11f, pFill.color, 12 * ldp, -12 * ldp, left = true)) }
             } }
         }
     }
@@ -1104,7 +1105,7 @@ class SketchEditor(private val app: AppState, val name: String) {
             if (showBsPolygon) { pLine.color = 0x88606A73.toInt(); poly(c, b.poles, scr) }
             if (showBsComb) { pLine.color = 0x88E0403F.toInt(); b.comb.forEach { (p0, p1) -> poly(c, listOf(p0, p1), scr) }
                 poly(c, b.comb.map { it.second }, scr) }
-            if (showBsDegree) b.poles.firstOrNull()?.let { emit(textLabel(it, "degree ${b.degree}", ldp, 11f, tc, 0f, -10 * ldp)) }
+            if (showBsDegree) b.poles.firstOrNull()?.let { emit(textLabel(it, tr("degree %1", b.degree), ldp, 11f, tc, 0f, -10 * ldp)) }
             if (showBsWeight) b.poles.zip(b.weights).forEach { (p, w) -> emit(textLabel(p, "%.2f".format(w), ldp, 11f, tc, 0f, 14 * ldp)) }
             if (showBsKnotMult) b.knots.forEach { (p, m) -> emit(textLabel(p, "($m)", ldp, 11f, tc, 0f, -8 * ldp)) }
         }

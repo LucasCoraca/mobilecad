@@ -1,5 +1,6 @@
 package app.mobilecad.ui
 
+import app.mobilecad.i18n.tr
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,8 +37,8 @@ fun SheetView(app: AppState, modifier: Modifier = Modifier) {
     Column(modifier.background(OS.Surface)) {
         if (d == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                if (app.sheet == null) EmptyState("No spreadsheet yet", "Create spreadsheet") { app.run("Spreadsheet_CreateSheet") }
-                else Text("Loading…", color = OS.Steel) }
+                if (app.sheet == null) EmptyState(tr("No spreadsheet yet"), tr("Create spreadsheet")) { app.run("Spreadsheet_CreateSheet") }
+                else Text(tr("Loading…"), color = OS.Steel) }
             return@Column
         }
         val cells = d.getJSONObject("cells")
@@ -49,8 +50,8 @@ fun SheetView(app: AppState, modifier: Modifier = Modifier) {
             Text(app.sheetSel + (cur?.optString("alias")?.takeIf { it.isNotEmpty() }?.let { "  ($it)" } ?: ""), Modifier.width(150.dp), color = OS.Navy, fontWeight = FontWeight.Medium, fontSize = 14.sp)
             Text(cur?.optString("content") ?: "", Modifier.weight(1f), color = OS.Navy, fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
             TextButton({ val sh = app.sheet ?: return@TextButton
-                app.textPrompt = TextPrompt("Cell $selFirst  (text, number with unit, or =expression)", cur?.optString("content")?.removePrefix("'") ?: "") { t ->
-                    app.step("Edit cell", { call("sheet_set", mapOf("name" to sh, "cell" to selFirst, "text" to t)) }) } }) { Text("Edit") }
+                app.textPrompt = TextPrompt(tr("Cell %1  (text, number with unit, or =expression)", selFirst), cur?.optString("content")?.removePrefix("'") ?: "") { t ->
+                    app.step("Edit cell", { call("sheet_set", mapOf("name" to sh, "cell" to selFirst, "text" to t)) }) } }) { Text(tr("Edit")) }
         }
         val rows = d.optInt("rows", 40); val cols = d.optInt("cols", 12)
         val widths = d.optJSONObject("widths") ?: JSONObject()
@@ -79,9 +80,9 @@ fun SheetView(app: AppState, modifier: Modifier = Modifier) {
                         Box(Modifier.width(w(c)).height(32.dp).background(if (sel) OS.SelBg else bg ?: OS.Surface)
                             .border(if (sel) 1.5.dp else 0.5.dp, if (sel) OS.Primary else OS.Metal4)
                             .combinedClickable(onClick = { app.sheetSel = anchor?.let { "$it:$name" } ?: name; anchor = null },
-                                onLongClick = { anchor = name; app.sheetSel = name; app.message = "Range from $name — tap the opposite corner" },
+                                onLongClick = { anchor = name; app.sheetSel = name; app.message = tr("Range from %1 — tap the opposite corner", name) },
                                 onDoubleClick = { app.sheetSel = name; val sh = app.sheet ?: return@combinedClickable
-                                    app.textPrompt = TextPrompt("Cell $name", cell?.optString("content")?.removePrefix("'") ?: "") { t ->
+                                    app.textPrompt = TextPrompt(tr("Cell %1", name), cell?.optString("content")?.removePrefix("'") ?: "") { t ->
                                         app.step("Edit cell", { call("sheet_set", mapOf("name" to sh, "cell" to name, "text" to t)) }) } })
                             .padding(horizontal = 4.dp),
                             contentAlignment = when { "center" in align -> Alignment.Center; "right" in align -> Alignment.CenterEnd; else -> Alignment.CenterStart }) {

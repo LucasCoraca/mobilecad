@@ -1,5 +1,6 @@
 package app.mobilecad.ui
 
+import app.mobilecad.i18n.tr
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -61,11 +62,11 @@ fun MainMenuDropdown(app: AppState, expanded: Boolean, onDismiss: () -> Unit) {
     var path by remember { mutableStateOf<List<MenuNode.Sub>>(emptyList()) }
     DropdownMenu(expanded, { path = emptyList(); onDismiss() }) {
         val items: List<MenuNode> = path.lastOrNull()?.items ?: MainMenu.bar
-        if (path.isNotEmpty()) DropdownMenuItem({ Text("‹  ${path.last().title}", color = OS.Primary) }, { path = path.dropLast(1) })
+        if (path.isNotEmpty()) DropdownMenuItem({ Text("‹  ${tr(path.last().title)}", color = OS.Primary) }, { path = path.dropLast(1) })
         items.forEach { n ->
             when (n) {
                 is MenuNode.Sep -> HorizontalDivider(Modifier.padding(vertical = 2.dp), color = OS.Metal4)
-                is MenuNode.Sub -> DropdownMenuItem({ Text(n.title) }, { path = path + n }, trailingIcon = { Icon(Icons.Default.ChevronRight, null) })
+                is MenuNode.Sub -> DropdownMenuItem({ Text(tr(n.title)) }, { path = path + n }, trailingIcon = { Icon(Icons.Default.ChevronRight, null) })
                 is MenuNode.Cmd -> if (n.id !in StdCommands.notApplicable) {
                     val c = app.catalog.cmd(n.id); val ok = MobileCommands.available(n.id)
                     DropdownMenuItem({ Text(c?.label?.replace("&", "") ?: n.id, fontSize = 14.sp) }, { path = emptyList(); onDismiss(); app.run(n.id) }, enabled = ok,

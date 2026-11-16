@@ -1,5 +1,6 @@
 package app.mobilecad.ui
 
+import app.mobilecad.i18n.tr
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -67,7 +68,7 @@ fun TaskPanelView(app: AppState, panel: JSONObject, modifier: Modifier = Modifie
             Row(Modifier.fillMaxWidth().background(OS.Metal6).padding(horizontal = 6.dp), horizontalArrangement = Arrangement.End) {
                 for (i in 0 until buttons.length()) { val b = buttons.getString(i)
                     TextButton({ GuiCommands.panelButton(app, b) }) {
-                        Text(panel.optJSONObject("labels")?.optString(b)?.takeIf { it.isNotEmpty() } ?: when (b) { "ok" -> "OK"; "cancel" -> "Cancel"; "apply" -> "Apply"; "close" -> "Close"; "yes" -> "Yes"; "no" -> "No"; "reset" -> "Reset"; else -> b.replaceFirstChar { it.uppercase() } },
+                        Text(panel.optJSONObject("labels")?.optString(b)?.takeIf { it.isNotEmpty() } ?: when (b) { "ok" -> tr("OK"); "cancel" -> tr("Cancel"); "apply" -> tr("Apply"); "close" -> tr("Close"); "yes" -> tr("Yes"); "no" -> tr("No"); "reset" -> tr("Reset"); else -> b.replaceFirstChar { it.uppercase() } },
                             color = if (b in setOf("cancel", "no")) OS.Red else OS.Primary, fontWeight = FontWeight.Medium) } }
             }
         }
@@ -137,7 +138,7 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
             val tabs = n.optJSONArray("tabs") ?: JSONArray(); val cur = n.optInt("value")
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
                 for (i in 0 until tabs.length()) { val sel = i == cur
-                    Text(tabs.getJSONObject(i).optString("title").ifEmpty { "Tab ${i + 1}" }, Modifier.padding(end = 4.dp).background(if (sel) OS.Primary else OS.Metal5, RoundedCornerShape(14.dp))
+                    Text(tabs.getJSONObject(i).optString("title").ifEmpty { tr("Tab %1", i + 1) }, Modifier.padding(end = 4.dp).background(if (sel) OS.Primary else OS.Metal5, RoundedCornerShape(14.dp))
                         .clickable { ev(id, "tab", i) }.padding(horizontal = 12.dp, vertical = 6.dp), color = if (sel) Color.White else OS.Navy, fontSize = 13.sp) }
             }
             if (cur in 0 until tabs.length()) Nodes(app, tabs.getJSONObject(cur).optJSONArray("kids"), ev)
@@ -178,7 +179,7 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
             val items = n.optJSONArray("items") ?: JSONArray()
             if (label.isNotEmpty()) Text(label, Modifier.padding(top = 6.dp), color = OS.Steel, fontSize = 13.sp)
             Column(Modifier.fillMaxWidth().heightIn(max = 220.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).verticalScroll(rememberScrollState())) {
-                if (items.length() == 0) Text("(empty)", Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
+                if (items.length() == 0) Text(tr("(empty)"), Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
                 for (i in 0 until items.length()) { val it = items.getJSONObject(i); val sel = it.optBoolean("sel")
                     Row(Modifier.fillMaxWidth().background(if (sel) OS.SelBg else Color.Transparent).clickable(enabled = en) { ev(id, "set", i) }.padding(horizontal = 8.dp, vertical = 2.dp),
                         verticalAlignment = Alignment.CenterVertically) {
@@ -194,7 +195,7 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
             Column(Modifier.fillMaxWidth().heightIn(max = 300.dp).border(1.dp, OS.Metal4, RoundedCornerShape(4.dp)).horizontalScroll(rememberScrollState())) {
                 if (cols.length() > 0 && (0 until cols.length()).any { cols.optString(it).isNotEmpty() })
                     Row { for (c in 0 until cols.length()) Text(cols.optString(c), Modifier.width(110.dp).background(OS.Metal5).padding(4.dp), color = OS.Steel, fontSize = 12.sp, maxLines = 1) }
-                if (rows.length() == 0) Text("(empty)", Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
+                if (rows.length() == 0) Text(tr("(empty)"), Modifier.padding(8.dp), color = OS.Aluminum, fontSize = 13.sp)
                 var top = -1
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     for (r in 0 until rows.length()) { val row = rows.getJSONObject(r); val isTop = row.optBoolean("top", true); if (isTop) top++
@@ -205,7 +206,7 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
                                 Row(Modifier.width(110.dp).heightIn(min = 36.dp).border(0.5.dp, OS.Metal4).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                                     if (cl.has("check")) Checkbox(cl.optInt("check") != 0, { on -> ev(id, "check", listOf(ri, on, c)) }, enabled = en && isTop, modifier = Modifier.size(32.dp))
                                     Text(cl.optString("text").ifEmpty { " " }, Modifier.weight(1f).then(if (cl.optBoolean("edit") && isTop && en) Modifier.clickable {
-                                        app.textPrompt = TextPrompt("${cols.optString(c).ifEmpty { "Value" }} (row ${ri + 1})", cl.optString("text")) { s -> ev(id, "cell", listOf(ri, c, s)) } } else Modifier),
+                                        app.textPrompt = TextPrompt(tr("%1 (row %2)", cols.optString(c).ifEmpty { tr("Value") }, ri + 1), cl.optString("text")) { s -> ev(id, "cell", listOf(ri, c, s)) } } else Modifier),
                                         color = OS.Navy, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                                 } }
                         } }
@@ -219,7 +220,7 @@ private fun Node(app: AppState, n: JSONObject, ev: (Int, String, Any?) -> Unit) 
                 Row { for (c in 0 until cols.length()) Text(cols.optString(c), Modifier.width(110.dp).background(OS.Metal5).padding(4.dp), color = OS.Steel, fontSize = 12.sp, maxLines = 1) }
                 for (r in 0 until cells.length()) Row { val row = cells.getJSONArray(r)
                     for (c in 0 until row.length()) Text(row.optString(c).ifEmpty { " " }, Modifier.width(110.dp).border(0.5.dp, OS.Metal4).clickable(enabled = en) {
-                        app.textPrompt = TextPrompt("${cols.optString(c)} (row ${r + 1})", row.optString(c)) { s -> ev(id, "cell", listOf(r, c, s)) } }.padding(4.dp),
+                        app.textPrompt = TextPrompt(tr("%1 (row %2)", cols.optString(c), r + 1), row.optString(c)) { s -> ev(id, "cell", listOf(r, c, s)) } }.padding(4.dp),
                         color = OS.Navy, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis) }
             }
         }

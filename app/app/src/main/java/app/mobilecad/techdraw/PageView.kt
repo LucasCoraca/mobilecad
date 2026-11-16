@@ -16,6 +16,7 @@ import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import app.mobilecad.ui.OS
+import app.mobilecad.i18n.tr
 
 /**
  * The Drawing tab: a TechDraw page as the desktop's QGraphicsScene shows it (template, views, dimensions, balloons,
@@ -73,7 +74,7 @@ class PageView(ctx: Context, private val app: AppState) : View(ctx) {
         val r = app.pageRender
         if (r == null) {
             text.textSize = 16 * dp; text.color = Color.parseColor("#5B6770"); text.textAlign = Paint.Align.CENTER
-            if (app.page != null) c.drawText("Loading page…", width / 2f, height / 2f, text)     // empty state: Shell's EmptyState
+            if (app.page != null) c.drawText(tr("Loading page…"), width / 2f, height / 2f, text)     // empty state: Shell's EmptyState
             text.textAlign = Paint.Align.LEFT; text.color = Color.BLACK; return
         }
         if (fitted != app.page) { fitted = app.page; fit() }

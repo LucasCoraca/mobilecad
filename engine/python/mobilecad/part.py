@@ -3,6 +3,7 @@ remaining PartDesign commands (Clone, CoordinateSystem, MoveFeature, gears ...).
 same defaults as the desktop dialog's OK button; the parameters are then edited in the mobile property dialog."""
 import FreeCAD as App
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .partdesign import _sel, _body_of, _active_body, _origin
 
 def _objs(sel):
@@ -12,7 +13,7 @@ def _objs(sel):
     return out
 
 def _need(objs, n, what):
-    if len(objs) < n: raise RuntimeError(what)
+    if len(objs) < n: raise RuntimeError(_tr(what))
     return objs
 
 def _closed_wires(o):
@@ -160,7 +161,7 @@ def part_project_on_surface(sel=None):
     Projection = the other picked shapes/edges/faces."""
     s = _sel(sel)
     sup = next(((o, [x]) for o, subs in s for x in subs if x.startswith('Face')), None)
-    if sup is None: raise RuntimeError('Select the target face first, then the shapes to project')
+    if sup is None: raise RuntimeError(_tr('Select the target face first, then the shapes to project'))
     rest = [(o, [x for x in subs if (o, [x]) != sup] or ['']) for o, subs in s]
     rest = [(o, subs) for o, subs in rest if not (o == sup[0] and subs == [''] and len(s) > 1)]
     f = _doc().addObject('Part::ProjectOnSurface', 'Projection')
@@ -253,7 +254,7 @@ def part_make_solid(sel=None):
         if sh.ShapeType == 'Solid': continue
         if sh.ShapeType in ('Compound', 'CompSolid'): s = Part.Solid(Part.Shell(sh.Faces))
         elif sh.ShapeType == 'Shell': s = Part.Solid(sh)
-        else: raise RuntimeError('%s is neither a shell nor a compound' % o.Label)
+        else: raise RuntimeError(_tr('%s is neither a shell nor a compound') % o.Label)
         n = _doc().addObject('Part::Feature', o.Name + '_solid'); n.Label = o.Label + ' (Solid)'; n.Shape = s
         last = n.Name
     return last
@@ -267,9 +268,9 @@ def part_defeaturing(sel=None):
         if not faces: continue
         sh = o.Shape
         nsh = sh.defeaturing([sh.getElement(x) for x in faces])
-        if sh.isPartner(nsh): raise RuntimeError('Defeaturing failed')
+        if sh.isPartner(nsh): raise RuntimeError(_tr('Defeaturing failed'))
         f = _doc().addObject('Part::Feature', 'Defeatured'); f.Shape = nsh; o.Visibility = False; last = f.Name
-    if last is None: raise RuntimeError('Select faces to remove')
+    if last is None: raise RuntimeError(_tr('Select faces to remove'))
     return last
 
 @op
@@ -287,7 +288,7 @@ def part_copy(mode, sel=None):
             sobj = o.getSubObject(sub, retType=1) if sub else o
             f = _doc().addObject('Part::Feature', (sobj or o).Name)
             f.Shape = sh; f.Label = (sobj or o).Label; last = f.Name
-    if last is None: raise RuntimeError('Select shapes to copy')
+    if last is None: raise RuntimeError(_tr('Select shapes to copy'))
     return last
 
 @op
@@ -397,7 +398,7 @@ def _with_type(path):
     elif '<svg' in text: kind = 'svg'
     elif text.lstrip().startswith('0') and 'SECTION' in text[:200]: kind = 'dxf'
     elif any(l.startswith(('v ', 'f ')) for l in text.splitlines()[:200]): kind = 'obj'
-    if kind is None: raise RuntimeError('Unknown file type: %s' % os.path.basename(path))
+    if kind is None: raise RuntimeError(_tr('Unknown file type: %s') % os.path.basename(path))
     typed = path + '.' + kind; shutil.copyfile(path, typed); return typed
 
 def _registered(kind, path):
@@ -411,7 +412,7 @@ def _registered(kind, path):
     for m in mods:
         try: return importlib.import_module(m)
         except Exception as e: err = e
-    raise RuntimeError('No importer/exporter for .%s%s' % (ext, ': %s' % err if err else ''))
+    raise RuntimeError(_tr('No importer/exporter for .%s%s') % (ext, ': %s' % err if err else ''))
 
 @op
 def file_types():
@@ -534,10 +535,10 @@ def pd_migrate():
     """PartDesign_Migrate: only pre-0.16 PartDesign files need it; report whether anything is legacy."""
     legacy = [o.Name for o in _doc().Objects if o.TypeId.startswith('PartDesign::') and _body_of(o) is None
               and o.TypeId not in ('PartDesign::Body',)]
-    if not legacy: return 'Nothing to migrate'
+    if not legacy: return _tr('Nothing to migrate')
     body = _doc().addObject('PartDesign::Body', 'Body')
     for n in legacy: body.addObject(_doc().getObject(n))
-    _doc().recompute(); return 'Migrated %d features' % len(legacy)
+    _doc().recompute(); return _tr('Migrated %d features') % len(legacy)
 
 # ------------------------------------------------------------------ Part_SectionCut / mesh conversions
 @op
@@ -575,7 +576,7 @@ def part_shape_from_mesh(sel=None, tolerance=0.1, sew=True):
         if not o.isDerivedFrom('Mesh::Feature'): continue
         sh = Part.Shape(); sh.makeShapeFromMesh(o.Mesh.Topology, float(tolerance), bool(sew))
         f = _doc().addObject('Part::Feature', o.Name); f.Shape = sh; f.purgeTouched(); last = f.Name
-    if last is None: raise RuntimeError('Select a mesh')
+    if last is None: raise RuntimeError(_tr('Select a mesh'))
     return last
 
 @op
@@ -588,7 +589,7 @@ def part_points_from_shape(sel=None, distance=None):
         dist = float(distance) if distance else (o.Shape.BoundBox.DiagonalLength / 20 if hasattr(o, 'Shape') else 1.0)
         r = Utils.showCompoundFromPoints(o, dist)
         if r is not None: last = r.Name
-    if last is None: raise RuntimeError('Select a shape')
+    if last is None: raise RuntimeError(_tr('Select a shape'))
     return last
 
 @op
@@ -606,13 +607,13 @@ def part_builder(mode, sel=None, planar=True, refine=False):
         return out
     if mode == 'Edge':
         v = elems('Vertex')
-        if len(v) != 2: raise RuntimeError('Select two vertexes')
+        if len(v) != 2: raise RuntimeError(_tr('Select two vertexes'))
         sh = Part.makeLine(v[0].Point, v[1].Point)
     elif mode == 'Wire':
         sh = Part.Wire(Part.__sortEdges__(elems('Edge') or _need([], 1, 'Select edges')))
     elif mode == 'FaceVertexes':
         pts = [v.Point for v in elems('Vertex')]
-        if len(pts) < 3: raise RuntimeError('Select at least three vertexes')
+        if len(pts) < 3: raise RuntimeError(_tr('Select at least three vertexes'))
         sh = Part.Face(Part.makePolygon(pts, True)) if planar else Part.makeFilledFace(Part.makePolygon(pts, True).Edges)
     elif mode == 'Face':
         e = elems('Edge') or _need([], 1, 'Select edges')
@@ -622,7 +623,7 @@ def part_builder(mode, sel=None, planar=True, refine=False):
         if refine: sh = sh.removeSplitter()
     elif mode == 'Solid':
         shell = next((o.Shape.Shells[0] for o, _ in s if o.Shape.Shells), None)
-        if shell is None: raise RuntimeError('Select a shell')
+        if shell is None: raise RuntimeError(_tr('Select a shell'))
         sh = Part.Solid(shell)
         if refine: sh = sh.removeSplitter()
     else:

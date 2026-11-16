@@ -3,6 +3,7 @@ pipeline and filters.  The Python ones (analysis, solvers, materials, mesh objec
 import FreeCAD as App
 from FreeCAD import Vector as V
 from .bridge import op, _doc
+from _i18n import tr as _tr
 from .partdesign import _sel
 
 # CmdFemConstraint*::activated: object type, base name and the property values the command sets
@@ -33,7 +34,7 @@ def _analysis():
     except Exception:
         pass
     a = next((o for o in _doc().Objects if o.isDerivedFrom('Fem::FemAnalysis')), None)
-    if a is None: raise RuntimeError('Create an FEM analysis first (FEM ▸ Analysis container)')
+    if a is None: raise RuntimeError(_tr('Create an FEM analysis first (FEM ▸ Analysis container)'))
     return a
 
 @op
@@ -60,7 +61,7 @@ def fem_nodes_set(polygon=None, view_dir=None, elements=False, name=None):
     polygon (projected along the view, like the desktop's lasso)."""
     import Part
     d = _doc(); mesh = _mesh_obj()
-    if mesh is None: raise RuntimeError('No FEM mesh')
+    if mesh is None: raise RuntimeError(_tr('No FEM mesh'))
     obj = d.getObject(name) if name else None
     if obj is None:
         obj = d.addObject('Fem::FemSetElementNodesObject' if elements else 'Fem::FemSetNodesObject', 'ElementsSet' if elements else 'NodesSet')
@@ -88,7 +89,7 @@ def fem_nodes_set(polygon=None, view_dir=None, elements=False, name=None):
 def fem_add_part(sel=None):
     """FEM_FemAddPart: analysis + FEM mesh-shape object of the selected part (the desktop then meshes it)."""
     d = _doc(); objs = [d.getObject(n) for n, _ in (sel or []) if d.getObject(n) is not None]
-    if not objs: raise RuntimeError('Select a part')
+    if not objs: raise RuntimeError(_tr('Select a part'))
     a = next((o for o in d.Objects if o.isDerivedFrom('Fem::FemAnalysis')), None) or d.addObject('Fem::FemAnalysis', 'Analysis')
     m = d.addObject('Fem::FemMeshShapeObject', objs[0].Name + '_Mesh'); m.Shape = objs[0]
     a.addObject(m); d.recompute(); return m.Name
@@ -108,7 +109,7 @@ def _pipeline(sel):
         o = d.getObject(n)
         if o is not None and o.isDerivedFrom('Fem::FemPostPipeline'): return o
     p = next((o for o in reversed(d.Objects) if o.isDerivedFrom('Fem::FemPostPipeline')), None)
-    if p is None: raise RuntimeError('Create a result pipeline first (FEM ▸ Pipeline from result)')
+    if p is None: raise RuntimeError(_tr('Create a result pipeline first (FEM ▸ Pipeline from result)'))
     return p
 
 @op
@@ -117,7 +118,7 @@ def fem_post(kind, sel=None):
     if kind == 'PipelineFromResult':                 # CmdFemPostPipelineFromResult: pipeline.load(result)
         res = next((d.getObject(n) for n, _ in (sel or []) if d.getObject(n) is not None and d.getObject(n).isDerivedFrom('Fem::FemResultObject')), None) \
             or next((o for o in d.Objects if o.isDerivedFrom('Fem::FemResultObject')), None)
-        if res is None: raise RuntimeError('Select a FEM result')
+        if res is None: raise RuntimeError(_tr('Select a FEM result'))
         p = d.addObject('Fem::FemPostPipeline', 'ResultPipeline'); p.load(res)
         try: _analysis().addObject(p)
         except Exception: pass
@@ -136,7 +137,7 @@ def fem_post(kind, sel=None):
     if kind == 'FilterLinearizedStresses':             # Python feature in femobjects
         import ObjectsFem
         f = ObjectsFem.makePostLineFilterLinearizedStresses(d) if hasattr(ObjectsFem, 'makePostLineFilterLinearizedStresses') else None
-        if f is None: raise RuntimeError('Linearized stresses needs a data-along-line filter')
+        if f is None: raise RuntimeError(_tr('Linearized stresses needs a data-along-line filter'))
         p.addObject(f); d.recompute(); return f.Name
     f = d.addObject(FILTERS[kind], kind.replace('Filter', '') or kind)
     p.addObject(f)
@@ -215,7 +216,7 @@ _display = {}       # result name -> (field, scale) chosen with FEM_ResultShow
 def fem_result_show(name, field='vonMises', scale=0.0):
     """FEM_ResultShow: which result field colours the mesh and the deformation scale."""
     o = _doc().getObject(name)
-    if o is None or not o.isDerivedFrom('Fem::FemResultObject'): raise RuntimeError('Select a FEM result')
+    if o is None or not o.isDerivedFrom('Fem::FemResultObject'): raise RuntimeError(_tr('Select a FEM result'))
     _display[name] = (field, float(scale)); o.touch(); _doc().recompute()
     v = getattr(o, field, []) or []
     return {'min': min(v) if v else 0, 'max': max(v) if v else 0, 'fields': [f for f in ('vonMises', 'DisplacementLengths', 'MaxShear',

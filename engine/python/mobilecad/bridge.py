@@ -16,6 +16,19 @@ def handle(req_json):
     except Exception as e:
         return json.dumps({'ok': False, 'error': '%s: %s' % (type(e).__name__, e), 'trace': traceback.format_exc()})
 
+# ------------------------------------------------------------------ interface language
+import _i18n
+from _i18n import tr as _tr
+try: App.Qt.translate = _i18n.translate     # FreeCAD.Qt.translate (Base::Translate): the catalogs Gui's translator holds
+except Exception: pass
+
+@op
+def set_language(path=None, language='en'):
+    """Preferences > Language: FreeCAD's own strings (task panels, Python commands' messages) in that language,
+    looked up by (context, source) as the desktop's QTranslator does; path None = English."""
+    _i18n.load(path, language)
+    return _i18n.language()
+
 def _doc():
     d = App.ActiveDocument
     if d is None:
@@ -395,8 +408,8 @@ def _edit_form(o, p, t, d, exprs):
             lines = [', '.join(_fmt(c) for c in (x.Base.x, x.Base.y, x.Base.z) + x.Rotation.getYawPitchRoll()) for x in v]
         else: lines = [_fmt(x) for x in v]
         d['text'] = '\n'.join(lines); d['count'] = len(lines)
-        d['hint'] = {'App::PropertyMap': 'one "key = value" per line', 'App::PropertyVectorList': 'one "x, y, z" per line',
-                     'App::PropertyPlacementList': 'one "x, y, z, yaw, pitch, roll" per line'}.get(t, 'one item per line')
+        d['hint'] = _tr({'App::PropertyMap': 'one "key = value" per line', 'App::PropertyVectorList': 'one "x, y, z" per line',
+                     'App::PropertyPlacementList': 'one "x, y, z, yaw, pitch, roll" per line'}.get(t, 'one item per line'))
     elif t == 'Part::PropertyFilletEdges':
         d['kind'] = 'edges'
         d['value'] = [['Edge%d' % e, L(r1), L(r2)] for e, r1, r2 in (v or [])]

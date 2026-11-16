@@ -2,6 +2,7 @@ package app.mobilecad.freecad
 
 import android.content.Context
 import android.util.Log
+import app.mobilecad.i18n.tr
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -62,12 +63,12 @@ class Engine private constructor(private val ctx: Context) {
         val root = ctx.filesDir
         val stamp = File(root, "runtime.version"); val want = ctx.packageManager.getPackageInfo(ctx.packageName, 0).lastUpdateTime.toString()
         if (!stamp.exists() || stamp.readText() != want) {
-            progress("Unpacking the CAD engine…")
+            progress(tr("Unpacking the CAD engine…"))
             File(root, "python").deleteRecursively(); File(root, "freecad").deleteRecursively()
             File(root, "lib").deleteRecursively(); extract("python", File(root, "python")); extract("freecad-runtime", File(root, "freecad"))
             stamp.writeText(want)
         }
-        progress("Starting the CAD engine…")
+        progress(tr("Starting the CAD engine…"))
         val user = File(root, "user").apply { mkdirs() }; File(user, "tmp").mkdirs()
         // programs shipped as native libraries (Gmsh: libgmsh.so) run from here; mobilecad.bridge points FreeCAD at them
         runCatching { android.system.Os.setenv("FC_NATIVE_LIB_DIR", ctx.applicationInfo.nativeLibraryDir, true) }

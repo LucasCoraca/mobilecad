@@ -1,0 +1,248 @@
+# Interface strings that reach tr() through a variable (tool / constraint / snap names, prompt tables, menu titles).
+# research/i18n_keys.py adds them to the keys a language file must translate.
+Select
+Polyline
+Line
+Rectangle
+Centered rectangle
+Circle
+3-point circle
+Arc
+3-point arc
+Point
+Slot
+Triangle
+Square
+Pentagon
+Hexagon
+Heptagon
+Octagon
+Ellipse
+Ellipse by 3 points
+Arc of ellipse
+Arc of hyperbola
+Arc of parabola
+B-spline
+Periodic B-spline
+B-spline by knots
+Periodic B-spline by knots
+Rounded rectangle
+Arc slot
+Trim
+Dimension
+Fillet
+Chamfer
+Extend
+Split
+Join curves
+Symmetry
+Move
+Copy
+Rotate
+Scale
+Rectangular array
+External projection
+External intersection
+Text
+Insert knot
+Increase knot multiplicity
+Decrease knot multiplicity
+Paste
+Part
+Tools
+First point
+Last point
+Wire
+Next point (double tap or Finish to end)
+First corner
+Opposite corner
+Center
+Point on the circle (radius)
+Start point (radius)
+End point
+Second point
+Third point
+Polygon
+Vertex (radius)
+Start point
+Control point
+End point (then continue)
+Point location
+Text location
+Dimension line position
+Label
+Target point
+Label position
+Text position
+Base point
+Destination
+Center of rotation
+Base angle
+Rotation angle
+Mirror
+Mirror line start
+Mirror line end
+Offset
+Offset point (side and distance)
+Stretch
+Box corner
+Opposite box corner
+Trimex
+New end / extrusion point
+Split point on the selected edge
+Edit
+Node to move
+New position
+Upgrade
+Downgrade
+Join
+Draft2Sketch
+Clone
+Facebinder
+Heal
+Lock
+Endpoint
+Midpoint
+Angle
+Intersection
+Perpendicular
+Extension
+Parallel
+Special
+Near
+Ortho
+Grid
+WorkingPlane
+Dimensions
+a mesh or point cloud
+shapes
+a mesh
+a shape or mesh
+point clouds
+a point cloud
+points, a mesh or a shape
+points or a mesh
+As Is
+Points
+Wireframe
+Hidden Line
+No Shading
+Shaded
+Flat Lines
+Steel
+Aluminium
+Brass
+Copper
+Red
+Orange
+Yellow
+Green
+Blue
+Purple
+Black
+White
+Gray
+Cyan
+Brown
+Cube
+Cylinder
+Cone
+Sphere
+Ellipsoid
+Torus
+Plane
+Box
+Prism
+Wedge
+Helix
+Spiral
+Vertex
+RegularPolygon
+Front
+Top
+Right
+Rear
+Bottom
+Left
+Isometric
+FrontTopLeft
+FrontTopRight
+FrontBottomLeft
+FrontBottomRight
+Up
+Down
+File
+Create
+View
+Standard Views
+Axonometric
+Zoom
+Visibility
+Link Navigation
+Tree View Actions
+Macro
+Help
+Coincident
+PointOnObject
+Point On Object
+Horizontal
+Vertical
+HorVer
+Hor Ver
+Horizontal/Vertical
+Equal
+Tangent
+Symmetric
+Block
+Radius
+Diameter
+Radiam
+Radius/Diameter
+Distance
+DistanceX
+DistanceY
+Distance X
+Distance Y
+Weight
+SnellsLaw
+Snells Law
+InternalAlignment
+Internal Alignment
+Assembly
+Drawing
+Variables
+Dress-Up Features
+Helper Features
+Modeling Features
+Transformation Features
+TemplateTools
+Inspection
+Material
+Surface
+Tools
+Sketch
+Draw
+Constrain
+Modify
+View
+3D
+3D/BIM
+Attributes
+Centerlines
+Creation
+Decoration
+Drafting
+Dress-Up
+Electromagnetic
+Extend Dimensions
+File Access
+Fluid
+Geometrical
+Helper
+Mechanical
+Modeling
+Modification
+Pages
+Transformation
+More tools
+Joints
