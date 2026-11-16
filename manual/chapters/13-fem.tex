@@ -1,0 +1,124 @@
+\chapter{有限元（FEM）：在平板上做强度分析}
+
+这是 MobileCAD 最“超出预期”的部分：它不是只能看结果的查看器——\textbf{CalculiX 求解器与 Gmsh 网格器
+都打包在 APK 里}，在设备上完成建模、划网格、求解、看云图的全流程。
+
+\section{设备上真正能跑什么}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+\textbf{组件} & \textbf{随 APK 打包} & \textbf{说明} \\
+\midrule
+CalculiX ccx 2.22 & 是（\file{libccx.so}） & 结构/热分析的求解器，真正在本机计算 \\
+Gmsh 4.13.1 & 是（\file{libgmsh.so}） & 网格划分（体网格、局部细化）\\
+OndselSolver & 是 & 装配求解器 \\
+Netgen & 否 & 只能创建对象，无法用它划网格 \\
+Elmer / Z88 / Mystran & 否 & 只有对象定义，没有可用的求解器 \\
+VTK Python & 否 & 后处理改走内置的 FRD 解析与自绘管线 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{对象模型}
+
+一次完整的分析由这些对象组成（都在特征树里）：
+
+\begin{itemize}
+  \item \ui{分析}（Analysis）容器：装材料、约束、网格、求解器、结果；
+  \item \ui{材料}：固体材料（密度、杨氏模量、泊松比……）、流体材料、非线性材料等；
+  \item \ui{边界条件与载荷}：固定、位移、力、压力、接触、弹簧、轴承、齿轮、温度、热流……
+  \item \ui{网格}：Gmsh 网格、网格区域、Gmsh 细化；
+  \item \ui{求解器}：\cmd{FEM\_SolverCalculiX}；
+  \item \ui{结果}：CCX 结果对象与后处理管线。
+\end{itemize}
+
+\section{入门流程：十步完成一次分析}
+
+\begin{enumerate}
+  \item \textbf{建模}：在“零件”页做出实体（例如一根悬臂梁），保存；
+  \item 切 \menupath{更多 ▾ → FEM}；
+  \item \ui{分析}（\cmd{FEM\_Analysis}）：新建分析容器；
+  \item 选中实体 → \ui{材料}（\cmd{FEM\_MaterialSolid}）→ 填密度、杨氏模量、泊松比；
+  \item \ui{固定}（\cmd{FEM\_ConstraintFixed}）→ 选固定面；
+  \item \ui{力}（\cmd{FEM\_ConstraintForce}）或 \ui{压力} → 选受力面 → 填大小与方向；
+  \item \ui{从形状生成 Gmsh 网格}（\cmd{FEM\_MeshGmshFromShape}）→ 先给粗尺寸（如 5--10 mm）→ 应用；
+  \item \ui{求解器}（\cmd{FEM\_SolverCalculiX}）→ \ui{运行求解器}（\cmd{FEM\_SolverRun}）；
+  \item 选中结果对象 → \ui{显示结果}（\cmd{FEM\_ResultShow}）→ 选字段（等效应力 von Mises、
+        位移、主应力、温度……）→ 设变形系数；
+  \item 需要切片/曲线时，建 \ui{后处理管线} 并加过滤器（切面、等值面、沿线的数据、点数据、计算器）。
+\end{enumerate}
+
+\section{材料与边界条件}
+
+\subsection{材料}
+
+\ui{材料} 选固体材料后，在属性里填：密度、杨氏模量、泊松比、热膨胀系数、导热系数等。
+手机上也可以从材质库选预置材料，再微调。
+
+\subsection{边界条件与载荷}
+
+工程上最常用的 16 种由应用直接创建（选中面/边自动加入 References）：固定、位移、力、压力、接触、
+弹簧、轴承、齿轮、带轮、温度、热流、初始温度、刚体、变换、平面旋转、流体边界。
+其余（Tie、自重、离心力、截面打印、电磁类、各类方程）走 FreeCAD 自带的 Python 命令。
+
+\section{网格}
+
+\begin{itemize}
+  \item \ui{Gmsh 网格}：从形状生成，可设最大/最小单元尺寸、面检测角；
+        任务面板的 \ui{应用} 就等于“生成网格”；
+  \item \ui{网格区域}、\ui{网格组}、\ui{Gmsh 细化}：对局部加密；
+  \item \ui{Mesh 重划 Gmsh}：对已有网格重新划分；
+  \item \ui{清除网格}、\ui{网格信息}、\ui{网格转 Mesh}：管理与转换；
+  \item \textbf{Netgen 不可用}——需要 Netgen 的命令在移动端会失败。
+\end{itemize}
+
+\begin{tip}[先粗后细]
+手机 CPU 与散热有限。先用 5--10 mm 的粗网格验证边界条件是否正确，确认无误后再加密到 1--2 mm。
+一次错误方向的细网格求解，可能白跑十几分钟。
+\end{tip}
+
+\section{求解}
+
+\begin{itemize}
+  \item 选中 \ui{求解器}（CalculiX）→ \ui{运行求解器}；
+  \item 应用会写出 \file{.inp} 文件、调用设备上的 ccx、读取 \file{.frd} 结果；
+  \item 求解期间会显示日志与进度；大模型请插电源、保持屏幕常亮；
+  \item 失败时检查：单位是否一致、材料是否完整、约束是否足够（刚体位移）、网格是否有效。
+\end{itemize}
+
+\section{结果查看}
+
+\ui{显示结果} 可选字段：等效应力（von Mises）、最大/最小主应力、位移、温度、剪应力……
+并可设置\textbf{变形系数}（0 = 只看云图，1 = 真实变形，>1 = 放大）。
+
+后处理管线与过滤器：\ui{从结果建管线}、\ui{变形过滤器}、\ui{等值面/裁剪}、\ui{切面}、
+\ui{沿线数据}、\ui{点数据}、\ui{计算器}、\ui{分支过滤}，以及平面/球/圆柱/盒体等“创建函数”。
+
+\screenshot[0.72]{tablet-fem.jpg}{有限元结果：树里是分析容器、材料、约束与 CCX 结果网格；视图里是应力云图。}
+
+\begin{warn}[后处理的两个限制]
+\ui{字形（Glyph）} 过滤器与 \ui{可视化} 命令在当前移植中不可用；结果是按表面顶点着色渲染的。
+需要更复杂的可视化时，请导出结果到桌面 FreeCAD 处理。
+\end{warn}
+
+\begin{practice}[练习：悬臂梁]
+\begin{enumerate}
+  \item 建一个 100 × 10 × 10 mm 的长方体；
+  \item FEM → 分析 → 材料（钢：密度 7850、E 210 GPa、ν 0.3）；
+  \item 固定一端面；另一端面加 100 N 向下的力；
+  \item Gmsh 网格尺寸 3 mm；
+  \item 求解 → 看 von Mises 与位移；
+  \item 把力改成 200 N，重新求解，观察应力翻倍。
+\end{enumerate}
+\end{practice}
+
+\section{性能与限制小结}
+
+\begin{itemize}
+  \item 只支持 CalculiX 求解器（Elmer/Z88/Mystran 不可用）；Netgen 不可用；
+  \item 无 Glyph/可视化过滤器；后处理以云图与基本管线为主；
+  \item 手机内存有限：单元数建议控制在几十万以内，必要时用对称模型或壳单元；
+  \item 求解器在设备上单线程/多线程运行，速度取决于设备散热。
+\end{itemize}

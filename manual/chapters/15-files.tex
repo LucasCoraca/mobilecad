@@ -1,0 +1,111 @@
+\chapter{文件、格式与数据安全}
+
+MobileCAD 没有自己的“云”，文件就是文件：通过 Android 的系统文件选择器（SAF）读写，位置由你决定。
+本章讲清楚格式、保存流程、自动恢复与常见坑。
+
+\section{原生文档：FCStd}
+
+\begin{itemize}
+  \item \file{.FCStd} 是 FreeCAD 的原生文档：保存\textbf{全部建模历史}（草图、特征、表达式、装配、图纸），
+        体积小、可完全还原；
+  \item 保存时会保留一份 \file{.fcstd1} 备份；
+  \item 无头引擎默认不写 \file{GuiDocument.xml}（界面/显示信息），MobileCAD 会\textbf{保留并回写}
+        颜色、透明度、面颜色、可见性——所以存回桌面打开，外观不会丢；
+  \item 打开 \file{.FCStd} 时，若文档里有装配，应用会自动切到“装配”页。
+\end{itemize}
+
+\section{导入与导出}
+
+\subsection{导入}
+
+\ui{文件 → 导入} 或 \ui{零件 → 导入}，按内容嗅探格式：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{格式} & \textbf{进入方式} \\
+\midrule
+STEP / IGES & 零件导入（Import）\\
+STL / PLY / OFF / AMF / 3MF & 网格（Mesh）\\
+BREP & 零件（Part）\\
+IFC & NativeIFC（BIM）\\
+DXF / SVG / OBJ / DAE / CSG / 3DS / SHP 等 & FreeCAD 注册的导入器 \\
+FEM 结果（\file{.frd}、Z88、Fenics） & 有限元结果导入 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{导出}
+
+\ui{文件 → 导出}：\textbf{改扩展名即改格式}——
+
+\begin{itemize}
+  \item 实体：STEP（\file{.step/.stp}）、IGES、BREP、STL、OBJ、PLY、OFF、AMF、3MF；
+  \item 建筑：IFC、IFCJSON；
+  \item 二维/图纸：DXF、SVG（扁平化）、PDF；
+  \item 其它：WebGL（\file{.html}）、CSG/SCAD、JSON；
+  \item 图像：截图 PNG；工程图页导出 PDF/SVG/DXF；电子表格 CSV/TSV；CAM G-code；机器人 \file{.src}。
+\end{itemize}
+
+\begin{warn}[两件“不能”的事]
+\begin{itemize}
+  \item \textbf{DWG 不能打开}：FreeCAD 的 DWG 导入依赖外部的 ODA/LibreDWG/QCAD 转换器，APK 没有打包；
+        请先转成 DXF。
+  \item \textbf{glTF 导入可能不可用}：运行库缺少对应的导入模块；需要时先转成 STEP/STL。
+\end{itemize}
+\end{warn}
+
+\section{系统文件选择器（SAF）}
+
+所有文件操作都走 Android 的 SAF：
+
+\begin{enumerate}
+  \item 你触发“打开/保存/导入/导出”后，应用先把请求记下来（\ui{FileRequest}），再拉起系统选择器；
+  \item \textbf{打开}：把选中的文件复制到应用缓存，再交给引擎；应用会申请持久读权限，让“最近文件”在重启后仍可用；
+  \item \textbf{保存}：引擎先写缓存文件，再通过输出流写回你选的 URI；
+  \item 文件选择器不过滤扩展名（只显示 \file{*/*}），所以\textbf{保存时务必自己写扩展名}；
+  \item 打开时没有扩展名（例如内容提供者给出 \file{document:1234}），应用会按内容嗅探：
+        STEP 头、IGES、BREP、STL 长度校验、FCStd 的 \file{Document.xml}、3MF、SVG、DXF、OBJ。
+\end{enumerate}
+
+\begin{tip}[保存的两种方式]
+\begin{itemize}
+  \item \menupath{文件 → 保存}：已知位置时\textbf{静默覆盖}，不弹选择器；
+  \item \menupath{文件 → 另存为}：总是弹选择器，指定新位置/新名字。
+\end{itemize}
+\end{tip}
+
+\section{最近文件与其它文档命令}
+
+\begin{itemize}
+  \item \ui{最近文件}：最多保留 \textbf{8} 条，存在应用配置里；可从这里快速重开；
+  \item \ui{另存副本}（SaveCopy）：导出当前文档的副本（同样保留视图数据）；
+  \item \ui{合并项目}（MergeProjects）：把另一个 \file{.FCStd} 的对象合并进当前文档；
+  \item \ui{文档信息}（ProjectInfo）：查看/修改标题、作者、公司、许可、注释等（其中 6 项可改）；
+  \item \ui{恢复到已保存版本}（Revert）：丢弃未保存修改，重新载入磁盘版本。
+\end{itemize}
+
+\section{自动保存与崩溃恢复}
+
+\begin{itemize}
+  \item 每 \textbf{60 秒}、以及应用切到后台时，若文档有改动，会把恢复副本写到应用私有目录
+        \file{files/recovery/}（\file{recovery.FCStd} + 记录 URI/名称/时间的 JSON）；
+  \item 正常保存后恢复副本被删除；
+  \item 应用异常退出后再次启动，会自动打开恢复副本并提示
+        \ui{已恢复未保存的工作 from HH:mm}；此时请立即“保存”到正式文件。
+\end{itemize}
+
+\section{单文档与内存}
+
+MobileCAD 是\textbf{单文档界面}：新开文件会替换当前视图（旧文档仍在内存，可能被系统回收）。大项目建议：
+\begin{itemize}
+  \item 一个项目一个 \file{.FCStd}，必要时拆成多个文件用“合并项目”汇总；
+  \item 频繁保存，重要节点“另存副本”；
+  \item 切换应用前先保存。
+\end{itemize}
+
+\section{单位制}
+
+所有长度内部以毫米、质量以千克存储。\menupath{偏好设置 → 单位系统} 只改变显示与输入解析（例如换成英寸），
+不会改变模型的实际尺寸。

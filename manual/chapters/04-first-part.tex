@@ -1,0 +1,175 @@
+\chapter{第一个零件：二十分钟做出一个支架}
+
+本章是一个完整的、可复现的练习。跟着做，你会用到\textbf{草图 → 凸台 → 圆角 → 孔 → 保存}这条最核心的
+建模链路。做完之后，你已经具备用 MobileCAD 做简单零件的能力。
+
+\begin{practice}[练习目标]
+一个 60 × 40 mm、厚 12 mm 的长方体支架，四角 R6 圆角，中心一个 ⌀10 的通孔，两侧各一个 ⌀5 的安装孔。
+\end{practice}
+
+\section{第 1 步：新建文档}
+
+启动后默认就是“未命名”空文档。若已有打开的文档，用 \menupath{文件 → 新建}（\cmd{Std\_New}）建立新文档。
+先保存一次，给文档起个名字：
+
+\begin{enumerate}
+  \item \menupath{文件 → 保存}（\cmd{Std\_Save}）；
+  \item 在系统文件选择器里选一个目录（例如“文档”），文件名输入 \file{bracket}；
+  \item 确定。顶栏的文档名会变成 \file{bracket}。
+\end{enumerate}
+
+\begin{tip}[为什么先保存？]
+MobileCAD 会定时自动保存，并在崩溃后从恢复副本还原；但“先保存”能确保这次工作有明确的落点，也方便之后
+另存副本做设计对比。
+\end{tip}
+
+\section{第 2 步：新建草图并选基准面}
+
+\begin{enumerate}
+  \item 确认底部在 \ui{零件} 选项卡，点顶部工具条的 \ui{草图}；
+  \item 在工具面板里点 \ui{新建草图}（命令 \cmd{Sketcher\_NewSketch}）；
+  \item 弹出 \ui{草图平面} 选择：\ui{上 (XY)}、\ui{前 (XZ)}、\ui{右 (YZ)}。选 \ui{上 (XY)}。
+\end{enumerate}
+
+\screenshot{ui-sketch-plane-zh.jpg}{新建草图时选择基准面。之后可以在草图属性里用“附着”改挂到实体表面或其他基准面上。}
+
+\section{第 3 步：画矩形}
+
+进入草图模式后，工具条会变成草图专用：\ui{绘制}、\ui{约束}、\ui{修改}、\ui{视图} 四个工具组，
+以及 \ui{构造：关}、\ui{约束}（约束列表）、常用的 \ui{折线}、\ui{矩形}、\ui{圆}、\ui{三点圆弧}、
+\ui{尺寸}、\ui{修剪}、\ui{选择}、\ui{删除}，最右侧是 ✓（离开草图）与 ✗（取消草图）。
+
+\begin{enumerate}
+  \item 点 \ui{矩形}；
+  \item 在原点附近轻触一次（第一角点），移动手指，再轻触一次（对角点）。
+        不用追求精确尺寸，形状对就行——下一步用尺寸“锁死”它。
+\end{enumerate}
+
+\screenshot{ui-sketch-tools-zh.jpg}{草图工具面板：“草图”工具组按几何、约束、编辑、视图分节列出全部草图命令；进入草图后，顶部工具条会切成草图专用的绘制/约束/修改/视图四组。}
+
+\section{第 4 步：标注尺寸，让草图“完全约束”}
+
+\begin{enumerate}
+  \item 点 \ui{尺寸}（\cmd{Sketcher\_Dimension}），依次点矩形的两条水平边或两个角点，拖到合适位置轻触放置；
+  \item 放置后数字键盘弹出，输入 \file{60}，✓ 确认；
+  \item 同样标注另一方向，输入 \file{40}；
+  \item 观察左下角状态：当显示 \ui{完全约束}（Fully constrained）时，草图的每个自由度都被约束住了；
+        若显示“欠约束 N 个自由度”，说明还差约束，模型仍可能被意外拖动。
+\end{enumerate}
+
+\begin{tip}[完全约束为什么重要？]
+完全约束意味着几何形状被数学上唯一确定。后续特征（凸台、凹槽）依赖这张草图：欠约束的草图在参数变化时
+可能“跳形”，导致特征失败。养成习惯：\textbf{每次离开草图前，让状态条变成“完全约束”}。
+\end{tip}
+
+\section{第 5 步：离开草图}
+
+点工具条最右侧的 ✓（提示“离开草图”）。视图回到 3D，特征树里多出一个 \ui{草图}（Sketch），它被收在新建的
+\ui{实体}（Body）里——这是 PartDesign 的规矩：所有特征都属于某个实体。
+
+\section{第 6 步：凸台（Pad）}
+
+\begin{enumerate}
+  \item 在树里点选刚画的草图；
+  \item 点工具条的 \ui{特征} → \ui{凸台}（\cmd{PartDesign\_Pad}）；
+  \item 特征对话框出现，\ui{轮廓} 已经自动填好；在 \ui{长度} 行点一下，用数字键盘输入 \file{12}；
+  \item 想直接看到拉伸方向？在 \ui{反向} 开关上切换；
+  \item 点标题栏的 ✓ 确认。长方体出现了。
+\end{enumerate}
+
+\begin{warn}[特征失败怎么办？]
+如果对话框下方出现红色错误（例如“无法在基准特征上找到该几何”），说明轮廓有问题（未闭合、自相交、多余线）。
+取消后回到草图，用 \ui{约束} 列表检查冲突，用 \ui{修剪} 清掉多余的线段，再试一次。
+\end{warn}
+
+\section{第 7 步：四角圆角}
+
+\begin{enumerate}
+  \item 点工具条的 \ui{特征} → \ui{圆角}（\cmd{PartDesign\_Fillet}）；
+  \item 对话框里的 \ui{基体} 已经指向当前实体；点 \ui{边}（或直接在模型上轻触四条竖直边）；
+  \item 在 \ui{半径} 里输入 \file{6}；
+  \item ✓ 确认。四条竖边变成 R6 圆角。
+\end{enumerate}
+
+\begin{tip}[圆角和倒角的“边表”]
+圆角/倒角对话框可以逐条边设置不同半径：每选一条边就多一行，点行里的数值可单独修改。想一次全部改，
+用 \ui{全部半径} 按钮。
+\end{tip}
+
+\section{第 8 步：中心通孔}
+
+有两种做法，推荐第一种：
+
+\subsection{方法 A：孔特征（Hole）}
+
+\begin{enumerate}
+  \item 先选\textbf{顶面}（轻触上表面）；
+  \item 点 \ui{特征} → \ui{孔}（\cmd{PartDesign\_Hole}）；
+  \item 在对话框里设置 \ui{直径} 为 \file{10}，\ui{深度类型} 为 \ui{贯穿全部}（Through all）；
+  \item ✓ 确认。
+\end{enumerate}
+
+\begin{tip}[标准螺纹与沉头]
+孔特征的 \ui{螺纹} 开关会按 ISO 标准生成螺纹孔（选螺纹类型、规格、精度）；\ui{孔类型} 可选沉头、埋头、
+沉孔等，并自动显示对应的直径、深度、角度参数。
+\end{tip}
+
+\subsection{方法 B：草图 + 凹槽（Pocket）}
+
+在顶面上新建草图 → 画一个 ⌀10 的圆 → 离开草图 → 选草图点 \ui{凹槽}（\cmd{PartDesign\_Pocket}）→
+深度选“贯穿全部”。两种方法结果相同，方法 B 更灵活（可以画异形孔）。
+
+\section{第 9 步：两个安装孔（练习）}
+
+用同样的方法，在两侧各开一个 ⌀5 的通孔。提示：
+\begin{itemize}
+  \item 用 \ui{圆} 工具画圆，加 \ui{尺寸} 约束直径（输入 \file{5}），再用 \ui{距离} 约束定位；
+  \item 也可以先画一个孔，再用 \ui{极阵列} 或 \ui{线性阵列} 复制；
+  \item 完成后树里应该依次是：草图 → 凸台 → 圆角 → 孔 → 草图 → 凹槽 → 圆角……
+\end{itemize}
+
+\section{第 10 步：回头改参数}
+
+这才是参数化 CAD 的精髓：
+
+\begin{enumerate}
+  \item 双击特征树里的 \ui{凸台} → 把长度从 12 改成 20 → ✓，整个模型连同后面的圆角、孔一起更新；
+  \item 双击第一个 \ui{草图} → 把 60 改成 80 → 离开草图，凸台自动变长；
+  \item 若某个后续特征因为尺寸变化而失败（例如孔跑到了实体外），树里会出现红色错误，双击那个特征看原因，
+        改约束或改位置即可。
+\end{enumerate}
+
+\section{第 11 步：保存与导出}
+
+\begin{itemize}
+  \item \menupath{文件 → 保存}：保存为 \file{.FCStd}（FreeCAD 原生格式，保留全部历史）；
+  \item \menupath{文件 → 另存副本}：存一份快照；
+  \item \menupath{文件 → 导出}：可选 STEP、IGES、STL、OBJ、3MF 等，供 3D 打印或其它 CAD 使用。
+\end{itemize}
+
+\begin{tip}[给 3D 打印的建议]
+导出 STL 前先用 \ui{零件 → 检查几何} 检查实体是否有效；STL 的精度取决于“偏差”参数，平板上的手办类模型
+建议 0.05 mm 左右，机械件 0.01 mm。
+\end{tip}
+
+\section{小结}
+
+你已经走完了 CAD 的主干流程：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{概念} & \textbf{在 MobileCAD 里对应什么} \\
+\midrule
+草图 & 2D 轮廓 + 约束 + 尺寸；完全约束后才稳定 \\
+凸台 / 凹槽 & 把闭合轮廓沿法向加料 / 减料 \\
+圆角 / 倒角 & 对边做修饰，位于特征历史中 \\
+孔 & 标准化开孔，支持螺纹、沉头 \\
+特征树 & 建模历史；双击任何一步都能回改 \\
+Tip & 实体“算到哪一步”的标记，可滚动回放 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+下一章我们把草图讲透：所有绘制工具、所有约束类型、冲突排查与 B 样条。

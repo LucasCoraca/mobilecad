@@ -1,0 +1,86 @@
+\chapter{变量与表达式：让模型“会算”}
+
+参数化建模的下一步，是把设计意图写进\textbf{变量}：把长、宽、孔径、阵列数集中到一张电子表格里，
+所有尺寸引用它。改一处，整机更新。这就是“变量”选项卡（Spreadsheet 工作台）的作用。
+
+\section{打开与创建}
+
+\begin{enumerate}
+  \item 切到底部的 \ui{变量} 选项卡；空状态显示 \ui{还没有电子表格} 与 \ui{创建电子表格}；
+  \item 点 \ui{创建电子表格}（\cmd{Spreadsheet\_CreateSheet}）；
+  \item 表格取代 3D 视图显示；树里出现 \ui{电子表格} 对象（默认名 \file{Spreadsheet}）。
+\end{enumerate}
+
+\section{单元格与输入}
+
+\begin{itemize}
+  \item \textbf{选中}：单击单元格；\textbf{区间}：长按锚定起点，再点对角单元格，得到 \file{A1:C4} 这样的区域；
+  \item \textbf{编辑}：双击单元格，或用顶部公式栏右侧的 \ui{编辑} 按钮；
+  \item 输入有三类：
+    \begin{itemize}
+      \item 文本：直接写；
+      \item 带单位的数值：\file{25 mm}、\file{30 °}；
+      \item 公式：以 \file{=} 开头，例如 \file{=A2*2}、\file{=Sheet2.B3}；
+    \end{itemize}
+  \item 公式栏左侧显示当前选区，右侧显示内容（单元格有别名时括注，例如“B3 (Thickness)”）。
+\end{itemize}
+
+\section{别名：给参数起名字}
+
+\begin{enumerate}
+  \item 选中一个单元格；
+  \item 执行 \ui{设置别名}（\cmd{Spreadsheet\_SetAlias}）；
+  \item 输入名字（例如 \file{Thickness}）。
+\end{enumerate}
+
+之后在\textbf{任何}数值属性里都可以写 \file{=Sheet.Thickness}（\file{Sheet} 是电子表格的对象名，
+可在树里改）。如果别名在整个文档里唯一，也可以简写成 \file{=Thickness}。
+
+\section{表达式：在哪里都能用}
+
+属性行（包括特征对话框里的数值、草图尺寸、FEM 载荷、装配偏移……）都支持表达式：
+
+\begin{itemize}
+  \item 输入纯“数字 + 单位”：按数值写入；
+  \item 输入其它任何内容（含运算、引用）：按\textbf{表达式}写入，属性行以蓝色 \file{=…} 显示；
+  \item 尺寸与角度都支持；向量分量（例如放置的 X/Y/Z）同样走这套规则。
+\end{itemize}
+
+\begin{lstlisting}
+=Sheet.Thickness            // 引用变量
+=Sheet.Width - 2 * 3 mm     // 留边
+=10 mm + 5 mm               // 直接运算
+\end{lstlisting}
+
+\section{格式与数据交换}
+
+工具条还提供：六种对齐、加粗/斜体/下划线、合并/拆分单元格、列宽行高、插入/删除行列，
+以及 \ui{导入}/\ui{导出} CSV/TSV（分隔符按扩展名取逗号、分号或制表符）。
+
+\section{单位制}
+
+\menupath{编辑 → 偏好设置 → 单位系统} 切换 FreeCAD 的单位方案与小数位。它影响\textbf{显示与输入解析}，
+内部始终用毫米与千克：切换后已有数值不变，只是显示方式改变。
+
+\begin{tip}[把参数表当“设计说明书”]
+建议每个模型都建一张表：\file{Length}、\file{Width}、\file{Height}、\file{HoleDia}、\file{PatternCount}……
+并在旁边写注释行说明含义。三个月后回来改设计，你会感谢自己。
+\end{tip}
+
+\begin{practice}[练习：把支架变成可配置的]
+\begin{enumerate}
+  \item 在变量页建表，A1 写 \file{Width}（值 60 mm）、A2 写 \file{Height}（40 mm）、A3 写 \file{Hole}（10 mm）；
+  \item 选中 B1/B2/B3，分别设置别名 \file{Width}/\file{Height}/\file{Hole}；
+  \item 回到支架草图，把两个尺寸改成 \file{=Sheet.Width}、\file{=Sheet.Height}；
+  \item 把孔的直径改成 \file{=Sheet.Hole}；
+  \item 回变量页把 B1 改成 100 mm——支架自动变宽，孔与圆角一起更新。
+\end{enumerate}
+\end{practice}
+
+\section{限制}
+
+\begin{itemize}
+  \item 公式输入是弹窗 + 数字键盘，没有桌面版的函数补全下拉；
+  \item 单元格类型（文本/数值/公式）按输入内容自动判定，没有显式类型设置；
+  \item 大型表格没有筛选、排序、图表；它本质是“参数表”，不是 Excel。
+\end{itemize}

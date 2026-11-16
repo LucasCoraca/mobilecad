@@ -1,0 +1,82 @@
+\chapter{CAM 与 BIM：加工与建筑}
+
+这两个工作台面向专业用途：CAM 生成数控刀路，BIM 做建筑信息模型。它们的命令都来自 FreeCAD 的官方
+Python 模块，行为与桌面一致，但移动端各有取舍。
+
+\section{CAM：从模型到 G-code}
+
+\subsection{典型流程}
+
+\begin{enumerate}
+  \item 切 \menupath{更多 ▾ → CAM}；
+  \item \ui{作业}（\cmd{CAM\_Job}）：用选中的实体（没选就用全部可见实体）建立加工任务，
+        默认模板会建好作业坐标系与输出设置；
+  \item 作业面板分三页：\ui{设置}、\ui{输出}、\ui{刀具}；
+  \item 刀具：\ui{刀具控制器} → \ui{新建刀具}/\ui{从库加载}（刀具库随包提供）；
+  \item 操作：\ui{轮廓}（Profile）、\ui{型腔}（Pocket Shape）、\ui{端面铣}（Mill Facing）、
+        \ui{螺旋}（Helix）、\ui{自适应}（Adaptive）、\ui{槽}（Slot）、\ui{钻孔}（Drilling）、
+        \ui{雕刻}（Engrave）、\ui{3D 型腔}（Pocket 3D）；
+  \item 修饰：狗骨（Dogbone）、斜坡入刀（RampEntry）、标签（Tags）、引入引出（LeadInOut）、
+        阵列/镜像、边界、Z 校正、轴映射、拖动刀、插铣等；
+  \item \ui{校验}（Sanity）：检查刀路是否为空、进给/转速是否缺失；
+  \item \ui{后处理}（\cmd{CAM\_Post}）：选后处理器（fanuc、grbl、linuxcnc、centroid、estlcam 等），
+        生成 G-code 并通过系统文件选择器保存。
+\end{enumerate}
+
+\subsection{可用范围与限制}
+
+\begin{itemize}
+  \item 后处理器脚本随包提供，常见的三轴/四轴控制器都有；
+  \item \textbf{没有材料去除仿真}：\cmd{CAM\_Simulator}/\cmd{CAMotics} 依赖的 CAMSimulator 未打包，
+        只能在 3D 视图里查看刀路曲线，用 \ui{校验} 做基本检查；
+  \item 复杂 3D 刀路（自适应、3D 型腔）在手机上计算较慢，建议先用粗公差预览。
+\end{itemize}
+
+\begin{practice}[练习：铣一个型腔]
+建一个带圆角凹槽的方块 → CAM 作业 → 新建 φ6 平底刀 → 型腔操作选凹槽底面 → 设步距与下刀深度 →
+校验 → 后处理（grbl）→ 保存 \file{pocket.nc}。
+\end{practice}
+
+\section{BIM：建筑与 IFC}
+
+BIM 工作台复刻了 FreeCAD 的 BIM 模块（131 条命令），包括：
+
+\begin{itemize}
+  \item \textbf{建筑构件}：场地（Site）、建筑（Building）、楼层（Level）、空间（Space）、
+        墙（Wall）、幕墙（CurtainWall）、柱（Column）、梁（Beam）、板（Slab）、门（Door）、
+        窗（Window）、覆盖层（Covering）、管道（Pipe）、楼梯（Stairs）、屋顶（Roof）、
+        面板（Panel）、框架（Frame）、围栏（Fence）、桁架（Truss）、设备（Equipment）、钢筋（Rebar）；
+  \item \textbf{结构构件}：柱/梁/板、结构系统、钢筋、桁架、框架、幕墙；
+  \item \textbf{材质}：材质、多材质、BIM 材质；
+  \item \textbf{标注与图框}：尺寸、文字、轴网、剖面、2D 视图、图框；
+  \item \textbf{管理}：项目设置、项目管理器、IFC 管理、图层、材质、预检。
+\end{itemize}
+
+\subsection{IFC 导入导出}
+
+\begin{itemize}
+  \item IfcOpenShell 0.8.4 随包提供；
+  \item \textbf{打开 IFC}（\file{.ifc}）：以 NativeIFC 方式打开为工程文档；
+  \item \textbf{导入 IFC}：作为对象插入当前文档（移动端默认“实体形状”策略、导入全部子项，
+        因为手机上不能像桌面那样按需展开加载）；
+  \item \textbf{导出 IFC}：\file{.ifc} 或 \file{.ifcJSON}；另有“创建 IFC 工程”“保存 IFC”“展开”
+        “更新”“对比”等命令；
+  \item 注意：IFC 使用完整 schema，文件与内存占用都较大，手机上建议先导入局部或简化模型。
+\end{itemize}
+
+\section{机器人（Robot）}
+
+Robot 工作台用于运动学演示与轨迹规划：
+
+\begin{itemize}
+  \item 默认机器人是 KUKA IR500（内置 DH 参数；VRML 模型不在包里，按运动链自绘）；
+  \item 可以建轨迹、路点（TCP 或点选）、从边生成轨迹、修饰、合成、归位、工具形状；
+  \item \ui{仿真} 用逆解跑 60 帧；
+  \item 可导出 KUKA \file{.src} 程序（走系统保存对话框）。
+\end{itemize}
+
+\section{其它专业工作台}
+
+\ui{检查}（Inspection）与 \ui{材质}（Material）已在第 8 章介绍；\ui{逆向工程} 也在第 8 章。
+这些工作台与 CAM/BIM 一样，命令覆盖完整，但受移动端屏幕与内存限制，适合做“查看、校核、小改动”，
+大型项目仍建议回桌面完成。

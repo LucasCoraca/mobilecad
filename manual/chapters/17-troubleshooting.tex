@@ -1,0 +1,79 @@
+\chapter{故障排除与数据安全}
+
+\section{启动问题}
+
+\begin{description}
+  \item[启动画面卡在“正在解压 CAD 引擎…”] 首次启动或应用升级后需要解压约 1 GB 运行时。请保持屏幕常亮、
+        确保剩余空间 ≥ 2 GB。若超过 3 分钟仍无进展，强制停止应用后重开；仍失败则卸载重装（文档在存储卡上不受影响）。
+  \item[红字“CAD 引擎启动失败：…”] 记下红字后面的错误信息。常见原因：存储空间不足、设备 ABI 不匹配
+        （本 APK 只支持 arm64）、系统 WebView/运行库异常。可先重启设备再试；持续失败请带错误信息反馈。
+  \item[启动后立即闪退] 检查是否安装了与官方版签名冲突的重打包版本；卸载后重装对应渠道的包。
+\end{description}
+
+\section{特征失败}
+
+特征树里出现红色文字/叹号，说明该特征无法计算。处理顺序：
+
+\begin{enumerate}
+  \item 双击该特征打开对话框，看顶部红条的错误文字（例如“无法在基准特征上找到该几何”“基体特征上不存在该几何”）；
+  \item 检查它的\textbf{引用}：轮廓是否闭合、是否自相交、引用的面/边是否还存在（前面的特征改过形，可能让引用失效）；
+  \item 用 \ui{压缩} 临时跳过它，确认后面的特征是否依赖它；
+  \item 回到草图用 \ui{约束} 列表排查（冲突/冗余/格式错误），或删掉多余线段；
+  \item 修复后，长按该特征选 \ui{重新计算对象}。
+\end{enumerate}
+
+\section{草图问题}
+
+\begin{description}
+  \item[状态条一直显示“欠约束 N 个自由度”] 还差 N 个约束。常见遗漏：没有把某个点固定在原点附近、缺少水平/竖直约束、
+        缺少一个尺寸。用 \ui{约束} 列表逐条查看。
+  \item[冲突（Conflicting）] 两条约束互相矛盾（例如同时给了水平与竖直距离又给了角度）。删除其中一条。
+        冲突约束会显示红色，\ui{约束} 面板可只看“冲突/冗余”。
+  \item[冗余（Redundant）] 约束重复（同一条边被约束两次），删除多余的那条。
+  \item[草图跳形] 欠约束时拖动几何或改尺寸，形状可能整体翻转。把草图约束到“完全约束”并给关键点加锁定。
+  \item[尺寸是驱动还是参考] 尺寸可切换为“参考（从动）”：它只显示测量值、不参与约束，用于标注检查。
+\end{description}
+
+\section{文件与导出}
+
+\begin{description}
+  \item[打开的文件是空白/报错] 确认文件格式受支持；\file{.FCStd} 建议用相近版本的 FreeCAD 保存。
+        从网上下载的 STEP/IGES 若结构复杂，导入可能耗时。
+  \item[导出 STEP 后没有实体] 模型里可能只有网格或曲面；先用“零件 → 检查几何”确认是有效实体。
+  \item[STL 表面很粗糙] 降低导出时的偏差（0.01--0.05 mm）；或先加密网格。
+  \item[导出 PDF 是空白页] 工程图页面里还没有视图，或视图比例过大跑出纸面；检查页面与视图属性。
+\end{description}
+
+\section{崩溃与恢复}
+
+MobileCAD 有崩溃恢复：每 60 秒自动保存恢复副本。异常退出后重新打开，应用会提示恢复。建议：
+\begin{itemize}
+  \item 重要节点手动 \menupath{文件 → 保存}；
+  \item 用 \menupath{文件 → 另存副本} 做版本快照；
+  \item 如果恢复提示没有出现，检查应用私有目录下的 \file{files/recovery/}（需 root 或调试版）。
+\end{itemize}
+
+\section{更新问题}
+
+\begin{description}
+  \item[提示“更新失败：校验和不匹配”] 下载损坏，重试即可；应用会校验 SHA-256。
+  \item[提示“更新未安装”] 需要允许 MobileCAD 安装未知应用：按提示进入系统设置授权后返回。
+  \item[F-Droid 版不提示更新] 正常：F-Droid 版本通过 F-Droid 更新，应用内会提示“更新来自安装来源”。
+\end{description}
+
+\section{性能与内存}
+
+\begin{itemize}
+  \item 大装配先隐藏无关对象；复杂模型避免同时打开多个实时预览对话框；
+  \item 有限元求解会占满 CPU，注意设备发热与降频；网格数先从几千开始；
+  \item 剩余存储低于 2 GB 时系统可能回收后台，请先保存再切换应用。
+\end{itemize}
+
+\section{反馈与求助}
+
+\begin{itemize}
+  \item 项目仓库：\url{https://github.com/LucasCoraca/mobilecad}（issue 里请附：设备型号、Android 版本、
+        MobileCAD 版本、FreeCAD 提交号、复现步骤、截图或录屏）；
+  \item FreeCAD 本身的问题（几何内核、算法）同样可以反馈给上游 FreeCAD 项目；
+  \item 本手册的勘误：在仓库提 issue 并标注 “manual”。
+\end{itemize}

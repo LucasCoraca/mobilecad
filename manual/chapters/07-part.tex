@@ -1,0 +1,139 @@
+\chapter{零件工作台：实体、布尔与造型}
+
+\textbf{零件}（Part）工作台与“零件设计”不同：它不维护特征历史，而是直接对\textbf{形状}做操作——建基本体、
+做布尔、拉伸/旋转/放样/扫掠、倒圆角。它适合：快速建毛坯、处理导入的 STEP/IGES、做“一次性”几何运算，
+以及把多个实体合成为一个。
+
+\section{入口}
+
+底部 \ui{零件} 选项卡的工具条里有五组：\ui{草图}、\ui{特征}、\ui{零件}、\ui{曲面}、\ui{Draft}。
+其中 \ui{零件} 展开后分三段：\ui{实体}、\ui{零件工具}、\ui{布尔工具}。也可以从
+\menupath{更多 ▾ → 零件} 进入同一工作台。
+
+\section{基本体}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{基本体} & \textbf{默认参数} \\
+\midrule
+立方体 Box & 10 × 10 × 10 mm \\
+圆柱 Cylinder & 半径 2、高 10、角度 360° \\
+球 Sphere & 半径 5、纬度 $-90°\sim90°$、经度 360° \\
+圆锥 Cone & 半径1 2、半径2 4、高 10 \\
+圆环 Torus & 半径1 10、半径2 2、角度范围 \\
+管 Tube & 外半径、内半径、高 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+椭球、棱柱、楔形等 16 种图元在 \ui{图元...}（\cmd{Part\_Primitives}）对话框里统一创建：
+平面、立方体、圆柱、圆锥、球、椭球、圆环、棱柱（默认 6 边）、楔形、螺旋、螺线、圆、椭圆、顶点、线、
+正多边形。
+
+\begin{tip}[参数随时可改]
+基本体创建后，双击树里对象即可重新打开参数对话框。尺寸、角度、半径都能改，但\textbf{不会}像 PartDesign
+那样带动后续特征——Part 对象之间是独立形状。
+\end{tip}
+
+\section{布尔运算}
+
+\begin{itemize}
+  \item \ui{布尔}（\cmd{Part\_Boolean}）是对话框：先选两个以上对象，再选运算——\ui{交集 / 剪切 / 结合 / 剖面}；
+  \item \ui{并}（Fuse）、\ui{交}（Common）支持多对象（全部选入）；
+  \item \ui{差}（Cut）只取“基体 + 工具”：\textbf{第一个选中的是基体}，其余为工具；
+  \item “布尔工具”里还有一组变体：\ui{分割形状}（布尔碎片/切片/分离切片/异或）、
+        \ui{连接形状}（连接/嵌入/切口）。
+\end{itemize}
+
+\begin{warn}[选择顺序决定结果]
+Part 的布尔没有“撤销选择顺序”的按钮。切/差之前，养成先点基体、再点工具的习惯；搞反了，撤销重来即可。
+\end{warn}
+
+\section{造型：拉伸、旋转、放样、扫掠}
+
+\begin{description}
+  \item[拉伸 Extrude] 选中草图/线框/面，沿法向拉伸（默认 10 mm）；闭合轮廓自动成实体；可设反向长度、拔模角、对称。
+        多选多个轮廓会各建一个。
+  \item[旋转 Revolve] 轮廓绕轴旋转（默认 Z 轴过原点、360°）；选一条边即作为旋转轴。
+  \item[放样 Loft] 至少两个截面，生成“实心”的过渡体；可设直纹、闭合。
+  \item[扫掠 Sweep] 截面 + 路径：先选截面，最后选路径对象（或直接点它的边）；可开 Frenet、实心。
+  \item[镜像 Mirror] 关于 XY/XZ/YZ 平面，或第二选择作为镜像面。
+  \item[缩放 Scale] 默认均匀 1.0，可切换为 X/Y/Z 分向。
+  \item[投影到表面] 先点目标面，再选要投影的形状/边。
+\end{description}
+
+\section{细节特征}
+
+\begin{itemize}
+  \item \ui{圆角}/\ui{倒角}：先问半径/尺寸（默认 1 mm），选中边则只处理所选边，未选则全部边；
+        \textbf{如果选择集里有实体或实体内的特征，会自动改调 PartDesign 的圆角/倒角}（否则会生产一个挂在
+        历史之外的形状）；
+  \item \ui{厚度}（1 mm）、\ui{偏移}（3D/2D）、\ui{直纹面}、\ui{建立面}、\ui{剖面}；
+  \item 树里右键 Part 圆角/倒角，可以 \ui{移入实体}，把它吸收进实体历史。
+\end{itemize}
+
+\section{阵列：LinkArray}
+
+\ui{链接阵列} 一次提供五种：\textbf{线性、极坐标、圆周、路径、点}。第一个所选对象是被阵列的对象，
+路径/点阵列取第二个所选对象作为参考。
+
+\section{检查与测量}
+
+\begin{itemize}
+  \item \ui{检查几何}（\cmd{Part\_CheckGeometry}）与 \ui{形状信息} 共用一个信息面板：
+        BOP 检查结果、实体/壳/面/线/边/点计数、体积/面积/长度、包围盒、质心；
+  \item 测量不在零件工具条里：\menupath{工具 → 测量}——
+        选一个元素给出坐标/边长/半径/面积/体积，选两个给出最小距离、ΔX/ΔY/ΔZ、两直线边或两个面的夹角；
+  \item \ui{质量属性}：体积、面积、密度、质量、质心、惯性矩（质量需要先给对象赋材质密度）；
+  \item \ui{单位换算}：单位之间的换算计算器。
+\end{itemize}
+
+\section{构建与复合}
+
+\begin{itemize}
+  \item \ui{形状构建器}（\cmd{Part\_Builder}）：两点成边、边成线框、点/边成面、面成壳、壳成实体；
+  \item \ui{转为实体}：壳/复合体 → 实体；
+  \item \ui{复合}、\ui{炸开复合}、\ui{复合过滤}、\ui{容差集}；
+  \item \ui{去除特征}：点选面，直接去掉该面衍生的特征；
+  \item \ui{精炼形状}、\ui{反转形状}、\ui{简单副本/变换副本/元素副本}；
+  \item 选择过滤：顶点/边/面选择、\ui{选择过滤}、\ui{框选面}。
+\end{itemize}
+
+\section{导入与导出}
+
+\ui{导入}/\ui{导出}走系统文件选择器，并按文件内容嗅探格式：
+
+\begin{itemize}
+  \item STEP / IGES → 零件导入；STL / PLY / OFF / 3MF → 网格；BREP → 零件；OBJ/IFC/DXF/SVG 走对应导入器；
+  \item 导出时\textbf{改扩展名即改格式}：\file{.step}、\file{.iges}、\file{.brep}、\file{.stl}、\file{.obj}……；
+  \item 导出多个对象前，可先 \ui{复合} 成一个对象；否则会分别写出。
+\end{itemize}
+
+\begin{practice}[练习：布尔求差与导出]
+\begin{enumerate}
+  \item 建一个立方体（20×20×20）和一个圆柱（半径 5、高 30）；
+  \item 移动圆柱到立方体中心（树里双击圆柱改“放置”，或直接在对话框里改位置）；
+  \item 先点立方体、再点圆柱 → \ui{布尔 → 剪切} → 得到带通孔的方块；
+  \item \ui{检查几何} 确认 BOP 无误；
+  \item \ui{文件 → 导出}，文件名写 \file{block.step}，保存。
+\end{enumerate}
+\end{practice}
+
+\section{与零件设计的分工}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{场景} & \textbf{用哪个} \\
+\midrule
+要反复改尺寸、要历史 & 零件设计（PartDesign）\\
+快速建毛坯、一次性运算 & 零件（Part）\\
+处理导入的 STEP/IGES & 零件（Part）\\
+把几个独立实体合成一个 & 零件（Part）的布尔/复合 \\
+需要圆角且希望可回改 & 零件设计（PartDesign）\\
+\bottomrule
+\end{tabularx}
+\end{center}

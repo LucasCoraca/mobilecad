@@ -1,0 +1,29 @@
+\chapter*{About this manual (English)}
+\addcontentsline{toc}{chapter}{About this manual (English)}
+\markboth{About this manual}{About this manual}
+
+This is a complete, task-oriented handbook for \textbf{MobileCAD}, the Android front end of the FreeCAD engine.
+It is written from the source code — the Kotlin/Compose interface, the Python bridge and the bundled FreeCAD
+modules — and takes a reader who has never opened the app to a finished parametric part, an assembly, a
+drawing, a finite-element run, toolpaths and a BIM model.
+
+\begin{itemize}
+  \item \textbf{Scope:} 17 chapters and 3 appendices, about 90 pages. Chapters 1--4 get a beginner productive
+        (UI tour, gestures, first part); 5--7 cover the modelling core (sketch, PartDesign, Part); 8--14 cover
+        the remaining workbenches (Draft, TechDraw, expressions, Assembly, FEM, CAM, BIM, mesh, points);
+        15--17 cover files, efficiency and troubleshooting; the appendices hold a command reference, a bilingual
+        glossary and an FAQ.
+  \item \textbf{Accuracy:} commands, dialog rows and status messages are taken from the source (the command
+        catalog is generated from FreeCAD's own sources), and limitations are stated where the port has them
+        (e.g. no Netgen mesher, no CAM material-removal simulation, no DWG import).
+  \item \textbf{Language:} the manual is written in Simplified Chinese because it accompanies the Chinese
+        interface; every UI label is given as it appears in Chinese (the English command name is shown in
+        parentheses on first use), and Appendix B maps both.
+  \item \textbf{Screenshots:} from a Samsung Galaxy Tab S9+ (Android 16) running the Chinese build, plus the
+        project's own marketing screenshots.
+  \item \textbf{Building:} \file{cd manual \&\& xelatex main.tex} (run twice for the table of contents). It needs
+        XeLaTeX with \file{ctex}, and a CJK font — the preamble uses macOS' Songti SC / Heiti SC; on other
+        systems change the four \file{\textbackslash setCJK...font} lines in \file{main.tex}.
+  \item \textbf{License:} GNU General Public License v3.0 or later, like the application. Contributions and
+        corrections are welcome as issues or pull requests against \file{manual/}.
+\end{itemize}

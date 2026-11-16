@@ -1,0 +1,39 @@
+\chapter*{写在前面}
+\addcontentsline{toc}{chapter}{写在前面}
+\markboth{写在前面}{写在前面}
+
+MobileCAD 把 FreeCAD 的建模引擎搬到了手机上：同一套几何内核（Open CASCADE）、同一套参数化建模
+体系、同一种文档格式（\file{.FCStd}），却配了一套为手指设计的界面。它不是“看图纸”的浏览器，而是
+能真正建模、装配、出图、算有限元、生成刀路的完整 CAD。
+
+这本手册的目标只有一个：\textbf{让你从第一次打开应用，到能独立完成一个中等复杂度的产品设计}。因此它
+不是功能清单，而是按“先跑通、再深入、最后融会贯通”的顺序组织：
+
+\begin{itemize}
+  \item \textbf{第 1--4 章}：认识它、装上它、看懂界面，并完成第一个零件。读到这里你已经能画东西了。
+  \item \textbf{第 5--7 章}：草图、零件设计、零件工作台——参数化建模的核心，占全书篇幅最大。
+  \item \textbf{第 8--14 章}：其他工作台：绘图（Draft）、工程图（TechDraw）、变量与表达式、
+        装配、有限元、CAM 与 BIM。
+  \item \textbf{第 15--17 章}：文件交换、效率技巧、故障排除。
+  \item \textbf{附录}：常用命令速查、中英术语对照、常见问题。
+\end{itemize}
+
+\section*{怎么读}
+\begin{itemize}
+  \item 第一次接触 CAD：按顺序读，每章的\emph{动手练习}都做一遍。
+  \item 用过桌面 FreeCAD：第 3 章看交互差异，第 5--7 章看移动端特有的对话框与 Tip 机制，其余按需查。
+  \item 只想解决问题：直接看目录、附录 A 的命令速查和附录 C 的常见问题。
+\end{itemize}
+
+\section*{约定}
+\begin{itemize}
+  \item \ui{粗体}表示界面上的按钮、标签或菜单项，例如 \ui{凸台}、\ui{更多选项}。
+  \item \cmd{等宽字体}表示 FreeCAD 命令 ID，例如 \cmd{PartDesign\_Pad}，便于在源码与文档间对照。
+  \item \menupath{菜单 → 子菜单}表示操作路径，例如 \menupath{文件 → 保存}。
+  \item 本手册以\textbf{中文界面}为准，并在括号里给出英文原文，例如 \ui{凸台}（Pad）。切换语言的方法见 3.7 节。
+\end{itemize}
+
+\section*{关于这本手册}
+本手册依据 MobileCAD 源码（应用层 Kotlin + Python 桥接 + FreeCAD 引擎）逐项核对写成，命令名、对话框
+字段、提示语均取自源码。截图来自真实设备（三星 Galaxy Tab S9+，Android 16）与应用官方素材。若你发现
+手册与当前版本不符，欢迎在项目仓库提 issue——CAD 软件演进很快，手册也会随之更新。

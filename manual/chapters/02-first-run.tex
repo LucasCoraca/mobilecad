@@ -1,0 +1,113 @@
+\chapter{安装与第一次启动}
+
+\section{安装}
+
+\subsection{官方渠道}
+
+\begin{enumerate}
+  \item \textbf{GitHub Releases}（推荐）：打开 \url{https://github.com/LucasCoraca/mobilecad/releases/latest}，
+        下载 \file{MobileCAD-arm64.apk}，用系统文件管理器点开安装。首次安装需要允许该来源“安装未知应用”。
+  \item \textbf{F-Droid}：项目提供 F-Droid 构建配方（\file{fdroid/}），在 F-Droid 里搜索 MobileCAD 即可。
+        F-Droid 版本通过 F-Droid 自身更新，不使用应用内更新。
+  \item \textbf{中文测试版}（本书配套）：由 \file{i18n/zh-hans} 分支构建，包名 \file{app.mobilecad.i18n}，
+        可与官方版\textbf{并存}安装，界面为简体中文。它使用独立的测试签名，不参与官方更新。
+\end{enumerate}
+
+\begin{warn}[签名与升级]
+官方 APK 与任何第三方重打包版本签名不同，\textbf{不能互相覆盖安装}。若你先装了官方版，再想换其他构建，
+需要先卸载（文档保存在存储卡上不受影响；应用内的设置与最近列表会丢失）。
+\end{warn}
+
+\subsection{首次启动会发生什么}
+
+第一次启动时，应用要做三件事，通常几十秒内完成（平板约 20--40 秒）：
+
+\begin{enumerate}
+  \item \textbf{解压运行时}：把 APK 内约 1 GB 的 FreeCAD、Python、Open CASCADE、Qt 运行库解压到应用私有目录；
+  \item \textbf{启动引擎}：加载 100 多个本地库、初始化 Python 3.14、导入 FreeCAD，启动画面会显示
+        \ui{正在启动 CAD 引擎…}（英文界面为 \ui{Starting the CAD engine…}）；应用升级后的第一次启动还会先显示
+        \ui{正在解压 CAD 引擎…}（Unpacking the CAD engine…）；
+  \item \textbf{建立空文档}：进入一个名为 \ui{未命名}（Unnamed）的新文档，特征树为空。
+\end{enumerate}
+
+之后每次启动只需 2--5 秒。解压只发生一次（应用升级后若运行时版本变化会重新解压）。若引擎启动失败，
+启动画面会以红字显示 \ui{CAD 引擎启动失败：…}，并保留错误原因便于反馈。
+
+\begin{tip}[不需要存储权限]
+MobileCAD \textbf{不申请存储权限}。打开、保存、导入、导出全部通过 Android 的系统文件选择器（SAF）完成：
+你选择哪个目录，应用就能读写哪个文件。文档默认保存在你选的位置，应用私有目录只存配置与崩溃恢复副本。
+\end{tip}
+
+\section{三十秒上手}
+
+启动后你会看到如下的界面（中文版）：
+
+\screenshot{ui-main-zh.jpg}{MobileCAD 中文主界面。左侧是特征树，顶部是 ☰ 菜单与文档信息，中间是 3D 视图，底部是元素选项卡（零件/装配/工程图/变量/更多），视图右上角是导航立方体。}
+
+\begin{enumerate}
+  \item \textbf{转一转}：单指在视图上拖动——模型绕中心旋转。
+  \item \textbf{放大}：双指捏合缩放；双指拖动平移。
+  \item \textbf{换个方向}：点右上角导航立方体的 \ui{前}/\ui{上}/\ui{右} 面，视图会动画转到对应方向；
+        拖动立方体还能自由旋转。
+  \item \textbf{打开菜单}：点左上角 ☰，能看到 文件、编辑、视图、工具、宏、帮助 六组菜单。
+  \item \textbf{画点东西}：点顶部工具条的 \ui{草图}，在展开的工具栏里选 \ui{新建草图}，挑一个基准面，
+        即可进入草图模式（第 4 章会完整走一遍）。
+\end{enumerate}
+
+\section{手势速查}
+
+MobileCAD 的手势在“建模”和“草图”两种状态下有所不同，这一点和桌面 CAD 差别最大，值得先记住：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+\textbf{手势} & \textbf{建模状态} & \textbf{草图状态} \\
+\midrule
+单指拖动 & 旋转视图 & 绘制（手指上方 50 dp 处为实际落点）\\
+双指拖动 & 平移 & 平移（第二指在 300 ms 内落下视为取消绘制）\\
+双指捏合 & 缩放 & 缩放 \\
+三指拖动 & 以三指中心旋转（大范围翻转） & 同左 \\
+单指轻触 & 选择面/边/顶点 & 选择几何/约束 \\
+双击 & 清除选择 & 清除选择 \\
+双指轻触 & 打开右键菜单（等同桌面右键） & 同左 \\
+长按 & 精确指针：准星出现在手指上方 60 dp，便于不遮挡目标 & 长按尺寸标签可编辑数值 \\
+双指长按 & 框选（拖动矩形选择对象） & — \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tip}[为什么指针在手指上方？]
+手指会遮住落点，这是移动端 CAD 最大的交互难题。MobileCAD 在绘制与长按精确模式下，把实际落点画在手指
+上方一段距离处（绘制 50 dp，长按 60 dp），并显示准星与吸附提示。习惯了之后，精度不输鼠标。
+\end{tip}
+
+\section{中文界面与语言切换}
+
+中文版会\textbf{自动跟随系统语言}：系统是中文就显示简体中文，否则显示英文。也可以手动固定：
+
+\begin{enumerate}
+  \item 打开 \menupath{编辑 → 偏好设置}（或点工具条上的 \ui{偏好设置}）；
+  \item 选 \ui{语言（当前：…）}；
+  \item 在列表里选 \ui{系统语言}、\ui{英语} 或 \ui{简体中文}。界面会立即重绘，文档与引擎状态保留。
+\end{enumerate}
+
+\screenshot[0.8]{ui-language-zh.jpg}{语言选择对话框。第一项“系统语言（简体中文）”表示跟随 Android；切换后界面即时刷新。}
+
+\begin{tip}[术语一致性]
+中文界面里的命令名、任务面板字段与属性名，直接采用 FreeCAD 官方中文翻译（例如 \ui{凸台}、\ui{凹槽}、
+\ui{完全约束}）。如果你同时使用桌面 FreeCAD，两边会看到同一套术语。
+\end{tip}
+
+\section{配置自己的工作区}
+
+在 \menupath{编辑 → 偏好设置} 里还有三项常用设置：
+
+\begin{itemize}
+  \item \textbf{单位系统}：切换 FreeCAD 的单位方案（毫米/米、英寸等）。影响所有数值的显示与输入；
+  \item \textbf{主题}：跟随系统、浅色或深色。深色适合长时间建模与 OLED 屏幕；
+  \item \textbf{每日检查更新}：开启后启动时静默检查 GitHub Releases，有新版会弹出更新对话框（显示版本说明、
+        下载大小，并提示“安装时 Android 会关闭 MobileCAD，请先保存”）。
+\end{itemize}
+
+\screenshot[0.8]{ui-preferences-zh.jpg}{偏好设置：单位系统、主题、语言、更新检查。}

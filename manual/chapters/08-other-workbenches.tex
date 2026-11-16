@@ -1,0 +1,134 @@
+\chapter{曲面、网格、点云与其它工作台}
+
+这一章覆盖“不是每天都用，但关键时刻能救场”的工作台：曲面补洞、网格修复、点云拟合、OpenSCAD、
+逆向工程、检查与材质。它们都在 \ui{更多 ▾} 里。
+
+\section{曲面（Surface）}
+
+曲面工作台有 7 条命令，都是“先选边界，再建对象，再在对话框里调参数”：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{命令} & \textbf{作用} \\
+\midrule
+填充 Filling & 用一组边界曲线围出一块曲面；可调次数（默认 3）、曲线上点数（15）、迭代次数（2）\\
+几何填充 GeomFillSurface & 在 2/3/4 条边界之间生成过渡曲面，可选填充类型 \\
+截面 Sections & 多截面生成曲面（类似放样，但只出曲面）\\
+延伸面 ExtendFace & 把已有面沿 U/V 方向延伸（默认 0.05 倍），可对称 \\
+混合曲线 BlendCurve & 两条边之间的相切过渡曲线 \\
+网格上的曲线 CurveOnMesh & 在网格上点选控制点，投影出样条曲线 \\
+剪切 Cut & 两个形状互剪 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+曲面对象不是实体：需要时用 \ui{零件 → 厚度} 加厚，或 \ui{转为实体}（缝合后）变成实体。
+
+\begin{practice}[练习：给破洞的壳补面]
+选洞口一圈边 → \ui{填充} → 调整次数使曲面平滑 → 确定 → 选中曲面与壳 → \ui{零件 → 转为实体}。
+\end{practice}
+
+\section{网格（Mesh）}
+
+网格工作台处理三角网格：导入的 STL、3D 扫描结果、为分析而离散的模型。
+
+\subsection{创建网格}
+
+\begin{itemize}
+  \item \ui{从形状建网格}（Standard）：线性偏差 0.1、角度 28.65°；
+  \item \ui{Mefisto 网格}：按最大边长（默认 1.0）细分；
+  \item \ui{从几何体建网格}：对形状做细分；
+  \item \ui{规则实体}：立方体/圆柱/圆锥/球/椭球/圆环；
+  \item \ui{Gmsh 重划网格}：使用内置 Gmsh（算法 + 最大/最小尺寸 + 面检测角）。
+\end{itemize}
+
+\subsection{修改与修复}
+
+统一/翻转法线、补洞（按边数或点选）、加三角面（三点）、按组件数删除、平滑（Taubin/Laplace/中值，4 次）、
+简化（减面率 0.9）、缩放、合并、按组件拆分。
+
+\subsection{布尔与切割}
+
+并/交/差（至少两个网格，用网格内核自身的布尔）；多边形切割/修剪/分段/按平面切割/剖面（先在视图上画
+多边形，再选保留内或外）；按平面偏移修剪；截面（轴 + 条数）。
+
+\subsection{分析}
+
+\ui{网格分析} 汇总：点数、面数、是否封闭实体、非流形边、自交、翻转面，并提供一键修复按钮
+（全部修复、去重点、修退化、去非流形、修朝向、修自交、去褶皱）。另有面评估、曲率、曲率信息、
+实体评估、包围盒。
+
+\begin{practice}[练习：STL 修复并转实体]
+导入 STL → \ui{网格分析} → 看非流形/自交 → 点 \ui{全部修复} → \ui{平滑} 一次 →
+\ui{零件 → 从网格建形状}（缝合容差 0.1）→ \ui{转为实体} → \ui{精炼形状} → 导出 STEP。
+\end{practice}
+
+\section{点云（Points）}
+
+\begin{itemize}
+  \item \ui{导入点云}：支持常见的点云文本/二进制格式；
+  \item \ui{导出点云}：建议 \file{.asc}；
+  \item \ui{转换为点云}：从形状或网格生成点云（点距 0.1）；
+  \item \ui{结构化点云}：把点云整理成规则网格（可设列宽）；
+  \item \ui{合并}：多个点云合并；
+  \item \ui{多边形裁剪}：在视图上画多边形，保留外侧或内侧的点。
+\end{itemize}
+
+点云既是检查（Inspection）的“实测几何”，也是逆向工程拟合曲面的输入。
+
+\section{OpenSCAD}
+
+OpenSCAD 工作台提供 15 条命令，但\textbf{应用没有内置 OpenSCAD 可执行文件}，这一点必须知道：
+
+\begin{itemize}
+  \item \textbf{纯 Python 实现、可用}：镜像/缩放/调整网格特征、精炼形状、增加容差、边转面、展开放置、
+        炸开组、替换对象、删除对象及其子对象、按颜色着色；
+  \item \textbf{需要外部二进制、在移动端会失败}：添加 OpenSCAD 元素、凸包（Hull）、闵可夫斯基和、
+        网格布尔。它们会报“OpenSCAD executable unavailable”。
+  \item 第二条工具条直接复用零件命令：检查几何、图元、形状构建器、剪切/结合/交集、拉伸、旋转。
+\end{itemize}
+
+\section{逆向工程（Reverse Engineering）}
+
+15 条命令中 13 条可用，核心是“从点/网格拟合出几何”：
+
+\begin{itemize}
+  \item \ui{近似平面/球/圆柱}：最小二乘拟合，输出对应曲面；
+  \item \ui{近似曲面}：B 样条曲面，可设 U/V 次数与极点数；
+  \item \ui{近似曲线}、\ui{近似多项式}（只输出系数与残差报告）；
+  \item \ui{网格边界}：提取网格边界线框；
+  \item \ui{分割}：按曲率容差（0.1）与每段最少面数（20）自动分块；
+  \item \ui{最佳拟合分割}：按平面/圆柱/球拟合来分割；
+  \item \ui{手动分割}：在网格上画多边形分块；
+  \item 缺失：泊松重建（Poisson）与视图三角化（ViewTriangulation）。
+\end{itemize}
+
+\begin{practice}[练习：扫描件逆向]
+导入点云 → \ui{裁剪} 去掉杂物 → \ui{近似球} 或 \ui{近似曲面} → 把结果加厚/转实体 → 导出。
+\end{practice}
+
+\section{检查（Inspection）}
+
+用于曲面比对：
+
+\begin{itemize}
+  \item \ui{视觉检查}：多选“实测几何”和“名义几何”，设搜索距离（默认 0.05），生成检查组，
+        在实测件上用蓝→绿→红画偏差色图；
+  \item \ui{检查…}：在模型上点一下就读该点的距离；超出搜索半径会提示没有距离。
+\end{itemize}
+
+\section{材质（Material）}
+
+\begin{itemize}
+  \item \ui{编辑材质}：打开材质库，逐项修改物理属性与外观属性，“保存为新材质”进入用户库；
+  \item \ui{设置材质}：给对象赋材质（同时按外观上色）；
+  \item \ui{查看材质}/\ui{查看外观}：读取当前值；
+  \item \ui{逐面上色}：给单个面上色；
+  \item \ui{纹理映射}：给对象贴图。
+\end{itemize}
+
+\begin{tip}[质量属性需要密度]
+\ui{零件 → 质量属性} 计算质量、质心、惯性矩时依赖材质的\textbf{密度}。先 \ui{设置材质}，再算质量。
+\end{tip}

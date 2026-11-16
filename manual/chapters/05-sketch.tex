@@ -1,0 +1,286 @@
+\chapter{草图：一切参数化建模的起点}
+
+草图（Sketcher）是 PartDesign 的地基：\textbf{2D 轮廓 + 约束 + 尺寸}。本章把草图工作台拆到底——
+每个绘制工具需要点几次、每个约束怎么用、冲突怎么排查、B 样条怎么编辑。
+
+\section{进入与退出草图}
+
+\subsection{新建草图}
+
+\begin{enumerate}
+  \item 点工具条的 \ui{草图}（Sketcher 工具组）→ \ui{新建草图}（\cmd{Sketcher\_NewSketch}）；
+  \item 若当前已选中一个平面或基准面，草图直接附着到它上面；否则弹出 \ui{草图平面} 选择：
+        \ui{上 (XY)}、\ui{前 (XZ)}、\ui{右 (YZ)}；
+  \item 草图会落在\textbf{活动实体}（Body）中，附着模式为“贴平面”（FlatFace）。曲面不能作为草图平面。
+\end{enumerate}
+
+\subsection{编辑与退出}
+
+\begin{itemize}
+  \item 编辑已有草图：树里双击草图，或选中后点 \ui{编辑草图}（\cmd{Sketcher\_EditSketch}）；
+  \item \ui{✓ 离开草图}：保存修改并重算（快捷键位置在工具条最右）；
+  \item \ui{✗ 取消草图}：\textbf{回滚}到打开草图时的状态。两个按钮之间隔 20 dp，防止误触。
+\end{itemize}
+
+\begin{warn}[撤销在草图中是“封底”的]
+进入草图后，撤销只能退到“打开草图”这一步之前——草图内部的所有修改属于同一个事务。想整段放弃，
+请用 ✗ 取消草图；取消掉的草图仍然可以用“重做”恢复。
+\end{warn}
+
+\section{草图工具条}
+
+进入草图后，顶部工具条变成四组：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{工具组} & \textbf{内容} \\
+\midrule
+\ui{绘制} & 折线、线、矩形、圆、圆弧等全部绘制工具（对应 FreeCAD 的 Geometries 工具条）\\
+\ui{约束} & 全部约束命令（对应 Constraints 工具条）\\
+\ui{修改} & 修剪、延伸、分割、圆角、倒角、移动、旋转、缩放、阵列、外部几何、B 样条工具 \\
+\ui{视图} & 对齐视图、剖切、网格、显示顺序、圆弧叠加、B 样条信息层 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+工具组右侧还有固定按钮：\ui{构造：开/关}、\ui{约束}（打开约束列表）、\ui{折线}、\ui{矩形}、\ui{圆}、
+\ui{三点圆弧}、\ui{尺寸}、\ui{修剪}、\ui{选择}、\ui{删除}、\ui{完成}，以及最右的 ✓ / ✗。
+工具面板里同样按 FreeCAD 工具条分节，并有 \ui{更多工具（N）}。
+
+\screenshot{ui-sketch-tools-zh.jpg}{草图模式：顶部工具条四组 + 固定按钮；底部状态条显示“完全约束”；右下角是当前工具（折线）的退出胶囊。}
+
+\section{绘制工具全表}
+
+每个绘制工具需要“点”若干次；多点工具（折线、B 样条）用\textbf{双击}或点 \ui{完成} 结束。
+
+\begin{longtable}{@{}p{0.20\linewidth}p{0.12\linewidth}p{0.60\linewidth}@{}}
+\toprule \textbf{工具} & \textbf{点数} & \textbf{操作} \\ \midrule \endhead
+线 & 2 & 起点 → 终点 \\
+折线 & 多点 & 逐段点；点回起点闭合；双击或“完成”结束 \\
+矩形 & 2 & 两个对角点 \\
+中心矩形 & 2 & 中心 → 角点（自动加构造线与对称）\\
+圆 & 2 & 圆心 → 半径点 \\
+三点圆 & 3 & 圆上三点 \\
+圆弧 & 3 & 圆心 → 起点 → 终点（逆时针）\\
+三点圆弧 & 3 & 起点 → 终点 → 弧上一点 \\
+点 & 1 & 放置一个点 \\
+长圆槽 & 3 & 两圆心 → 半径点 \\
+正多边形 & 2 & 中心 → 角点（边数由命令定：3--8 边）\\
+椭圆 & 3 & 中心 → 长轴端 → 定点 \\
+三点椭圆 & 3 & 椭圆上三点 \\
+椭圆弧 & 4 & 中心、长轴、起点、终点 \\
+双曲线弧 & 4 & 焦点、顶点、起点、终点 \\
+抛物线弧 & 4 & 焦点、顶点、起点、终点 \\
+圆角矩形 & 2 & 两个对角点（带圆角）\\
+圆弧槽 & 4 & 弧上两点 + 两个半径点 \\
+文本 & 2 & 先画一条把手线，再输入文字 \\
+B 样条 & 多点 & 控制点式 / 周期式 / 按节点插值式；双击或“完成”结束 \\
+\bottomrule
+\end{longtable}
+
+\subsection{动作型工具（不画新几何）}
+
+修剪、尺寸、圆角、倒角、延伸、分割、连接曲线、对称、移动、复制、旋转、缩放、矩形阵列、外部投影/相交、
+插节点、增减重数、粘贴——这些工具都是“点选已有几何后执行”，详见 5.10 与 5.12。
+
+\section{吸附与自动约束}
+
+草图里有一个总开关 \cmd{Sketcher\_Snap}（工具面板的 \ui{吸附/自动约束}）。开启时，落点会自动吸附，
+并\textbf{自动加上合适的约束}：
+
+\begin{itemize}
+  \item 落在端点、圆心、原点 → \textbf{重合}（Coincident）；
+  \item 落在模型顶点/圆心 → 重合，并把该元素隐式投影进草图；
+  \item 落在两曲线交点 → 两条“点在对象上”；
+  \item 落在线段中点 → 自动加“关于两端点对称”；落在圆弧中点 → “点在对象上”；
+  \item 落在曲线或坐标轴上 → “点在对象上”；
+  \item 与上一点接近水平/竖直（2° 容差）→ 自动加水平/竖直约束，并显示绿色对齐虚线。
+\end{itemize}
+
+光标旁会直接写出将添加的约束（例如“coincident + horizontal”），加完还会自动删除冗余约束。关掉吸附＝同时
+关掉推断；网格由 \cmd{Sketcher\_Grid} 单独控制。
+
+\begin{tip}[自动约束是双刃剑]
+它让画图飞快，但也可能在你没注意时加上“不想 要”的约束，导致后面改尺寸跳形。养成习惯：画完后打开
+\ui{约束} 列表过一遍，把多余的重合/水平竖直删掉。
+\end{tip}
+
+\section{约束类型全表}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{约束} & \textbf{用法与效果} \\
+\midrule
+重合 Coincident & 两点（或点与曲线端点）重合 \\
+点在对象上 PointOnObject & 点落在曲线/轴上 \\
+水平/竖直 Horizontal/Vertical & 线水平或竖直；\cmd{HorVer} 会按当前方向自动判断 \\
+平行 Parallel / 垂直 Perpendicular & 两条线的关系 \\
+相切 Tangent & 两曲线相切，或曲线与端点相接处的相切 \\
+相等 Equal & 等长、等半径 \\
+对称 Symmetric & 两点关于点/线对称 \\
+锁定 Block & 固定已有几何，使其不被后续操作拖动 \\
+固定 Lock & 把点同时约束到原点的 X、Y 距离上 \\
+距离 Distance / 距离X / 距离Y & 长度或坐标分量 \\
+半径 Radius / 直径 Diameter & 圆/圆弧尺寸；\cmd{Radiam} 一键切换 \\
+角度 Angle & 两线夹角，或单线相对 X 轴的角度 \\
+组 Group & 把若干几何作为一个整体（配合块使用）\\
+Snell 定律 SnellsLaw & 光学折射约束 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{施加约束的两种方式}
+
+\begin{enumerate}
+  \item \textbf{先选元素，再点约束}：点选一个/多个几何（点、线、圆），再点约束命令，立即生效。
+  \item \textbf{先点约束，再点元素（武装模式）}：什么都不选就点约束命令，状态条会提示依次点哪些元素；
+        点够数量自动施加，并可连续施加；若点的元素类型不匹配，会提示 \ui{Not a valid selection for X}
+        并清空选择。
+\end{enumerate}
+
+\section{尺寸：一把统一的“尺寸”命令}
+
+\cmd{Sketcher\_Dimension} 会按当前选择自动判断要标什么：长度、半径、直径或角度，并弹出数字键盘、预填
+当前值。X/Y 距离会自动交换两点使结果为正值；也支持“点到线的垂距”。
+
+\begin{itemize}
+  \item \textbf{修改尺寸}：长按尺寸标签（触感反馈）→ 数字键盘；或打开约束列表点行末的 ✎；也可直接拖动标签位置；
+  \item \textbf{驱动 / 参考}：列表行菜单里的 \ui{转为参考（从动）} 让尺寸只测量不参与求解（灰色，标“(reference)”）；
+  \item \textbf{命名约束}：给它起名后，可以在表达式里引用，例如 \file{=Sketch.Constraints.Width * 2}。
+\end{itemize}
+
+\section{约束列表与冲突排查}
+
+点工具条的 \ui{约束} 打开列表（标题显示约束总数）：
+
+\begin{itemize}
+  \item 顶部筛选 \ui{全部} / \ui{冲突 / 冗余}；
+  \item 每行显示编号、名称、值、关系描述（如“线3 ↔ 圆5”）；
+  \item 颜色：\textbf{红色 = 冲突}、\textbf{橙色 = 冗余}、\textbf{灰色 = 停用}（标“(off)”）；
+  \item 行菜单：\ui{停用/启用}、\ui{转为参考（从动）}/\ui{转为驱动}、\ui{重命名}、\ui{删除}。
+\end{itemize}
+
+\begin{practice}[冲突处理的标准流程]
+\begin{enumerate}
+  \item 状态条点开约束列表，筛选 \ui{冲突 / 冗余}；
+  \item 对红色冲突：停用其中一条看是否恢复，再决定删除哪条；
+  \item 对橙色冗余：直接删除（它只是重复）；
+  \item 运行 \ui{验证草图}（Validate Sketch）：它会补重合点、补水平/竖直、自动去除冗余；
+  \item 回到 \ui{全部}，确认状态条变回“完全约束”。
+\end{enumerate}
+\end{practice}
+
+\section{构造几何}
+
+构造几何只用于辅助作图，不参与成形（显示为青色虚线）。
+
+\begin{itemize}
+  \item \textbf{没有选中任何曲线}时，点 \ui{构造：关} 切换为“下一个画出的形状是构造线”；
+  \item \textbf{选中曲线}后，同一个开关把选中曲线在“构造/普通”之间转换；
+  \item 外部几何（投影进来的边）也可以在两态之间切换“参考/定义”。
+\end{itemize}
+
+\section{编辑工具}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{工具} & \textbf{操作要点} \\
+\midrule
+修剪 Trim & 点要去掉的线段，一次一段 \\
+延伸 Extend & 点靠近待延伸端，再输入增量（默认 10 mm）\\
+分割 Split & 点分割位置，把一条曲线拆成两条 \\
+连接曲线 Join & 依次点两条曲线的端点 \\
+草图圆角 / 倒角 & 点一个\textbf{顶点}，输入半径/尺寸（默认 2 mm）\\
+移动 / 复制 & 先选中几何，点两次定义位移矢量 \\
+旋转 & 选几何 → 点中心 → 输入角度（默认 90°）\\
+缩放 & 选几何 → 点中心 → 输入倍率（默认 2）\\
+对称 & 选几何 → 点对称线或对称点 \\
+矩形阵列 & 选几何 → 点两次定方向与间距 → 输入行列数（默认 2 × 2）\\
+偏移 Offset & 选几何后点工具，正数外扩、负数内缩 \\
+粘贴 & 先复制/剪切，再用粘贴工具点目标点 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{warn}[这些工具都有前提]
+对称、移动、旋转、缩放、阵列、偏移都要求\textbf{先选中几何}，否则只会提示“请先选择几何”。
+圆角/倒角只作用于顶点，不是任意两条曲线；修剪/分割一次只处理一条曲线。
+\end{warn}
+
+\section{外部几何：引用模型上的边}
+
+\ui{外部投影}（External geometry）把模型上的边/顶点投影进草图，作为绘制参照；\ui{外部相交} 则取与草图
+平面相交的面/边。
+
+\begin{itemize}
+  \item 选工具后，点模型上的边或顶点；
+  \item 跨 Body 引用时，应用会自动改用同一实体内的元素，或创建一个 SubShapeBinder；会造成循环引用时直接报错；
+  \item 投影进来的几何默认是“参考”（不参与成形），可切换为“定义”（参与）。
+\end{itemize}
+
+\section{B 样条与曲线编辑}
+
+四种创建方式：\textbf{控制点式}、\textbf{周期式}（至少 3 点）、\textbf{按节点插值式}、\textbf{周期插值式}。
+度数取 $\min(3, n-1)$。
+
+\begin{itemize}
+  \item \ui{插入节点}：点曲线上的位置，在最近点处插入；
+  \item \ui{增加/减少节点重数}：必须点在节点上，否则提示 \ui{请选择 B 样条节点}；
+  \item \ui{转换为 NURBS}、\ui{增减次数}、\ui{连接曲线} 是曲线级操作；
+  \item 视图工具组里的 \ui{B 样条信息} 可分别显示：次数、控制多边形、曲率梳、节点重数、极点权重。
+\end{itemize}
+
+\section{草图里的数值输入}
+
+绘制过程中，视图底部会出现 \ui{输入：} 行，可为主题形状键入精确值：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{形状} & \textbf{可输入} \\
+\midrule
+线 / 折线 & 长度、角度 \\
+矩形 / 中心矩形 & 宽、高 \\
+圆 & 直径 \\
+圆弧 / 正多边形 & 半径 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+方向取手指最后的位置。槽、椭圆、B 样条等没有输入框，先画后标尺寸。输入的值会变成 FreeCAD 表达式：
+纯数字+单位按数值写入，其余（带运算）按表达式写入。
+
+\section{草图视图辅助}
+
+\ui{视图} 工具组里：\ui{对齐视图到草图}（正对草图）、\ui{剖切视图}、\ui{网格}、\ui{显示顺序}、
+\ui{圆弧叠加}、\ui{B 样条信息}。网格间距与显示由 FreeCAD 的草图网格设置控制。
+
+\begin{practice}[练习：完全约束的六边形]
+\begin{enumerate}
+  \item 新建草图，选 XY 平面；
+  \item 点 \ui{多边形}（6 边），中心放在原点附近，拉出外接圆；
+  \item 加 \ui{尺寸}：外接圆半径（例如 20 mm）；再给中心点加 \ui{固定}（到原点的 X/Y 距离为 0）；
+  \item 观察状态条：显示“完全约束”；六条边应全部变黑（已定义）；
+  \item 试着拖动任意一个顶点——完全约束时它不会动；
+  \item 长按半径尺寸改成 30，六边形整体放大。
+\end{enumerate}
+\end{practice}
+
+\section{常见问题}
+
+\begin{description}
+  \item[草图状态一直是“欠约束 N 个自由度”] 缺 N 个约束。常见：没有固定位置（缺 X/Y 距离）、缺水平/竖直、缺尺寸。
+  \item[改尺寸后形状翻转] 草图欠约束时可能整体镜像。加到完全约束，并给关键点加“锁定”。
+  \item[多点工具画完却没生成] 折线和 B 样条需要双击或点“完成”提交。
+  \item[跨 Body 引用报错] 草图只能在一个 Body 内；需要引用别的体，先建 SubShapeBinder 或改用外部几何。
+  \item[想撤销整个草图] 用 ✗ 取消草图，而不是连续撤销。
+\end{description}
+
+下一章：把草图变成实体——零件设计工作台。

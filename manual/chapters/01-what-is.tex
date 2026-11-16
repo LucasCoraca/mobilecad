@@ -1,0 +1,96 @@
+\chapter{什么是 MobileCAD}
+
+\section{一句话概括}
+
+MobileCAD 是 \textbf{FreeCAD 引擎的 Android 前端}：它把桌面 FreeCAD 的建模内核、工作台与 Python 生态
+打包进一个 APK，再用 Kotlin + Jetpack Compose 重写了整层用户界面——为触屏、为平板、也为手机。
+
+这意味着两件事：
+
+\begin{enumerate}
+  \item 你得到的不是“简化版”建模器。参数化草图、实体建模、曲面、装配、工程图、有限元、CAM、BIM、
+        网格与点云，背后都是 FreeCAD 原生的 C++ 实现；
+  \item 文档格式与 FreeCAD 完全互通。手机上限时画的零件，可以在电脑上用 FreeCAD 打开继续改；反之亦然。
+\end{enumerate}
+
+\begin{tip}[一个引擎，两种界面]
+桌面 FreeCAD 用 Qt 画界面；MobileCAD 用 Compose 画界面，但\emph{不}启动 FreeCAD 的 Qt 界面——它直接调用
+FreeCAD 的 App 层（\file{FreeCAD.so}、\file{Part.so}、\file{PartDesign.so}……），并通过一个以 Python 实现的
+“Qt 模拟层”让 FreeCAD 自带的任务面板（Pad 参数、BIM 墙参数、FEM 约束……）仍能运行，只是被渲染成了
+Compose 的控件。所以你看到的每个对话框，逻辑都来自 FreeCAD 本身。
+\end{tip}
+
+\section{能力地图}
+
+MobileCAD 复刻了 FreeCAD 的 \textbf{22 个工作台、984 个命令中的 980 个}（源码中的可比矩阵见
+\file{research/PARITY.md}），未移植的只有桌面窗口管理一类没有手机对应物的命令。按用途归类：
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{类别} & \textbf{工作台与能力} \\
+\midrule
+参数化建模 & \textbf{草图}（Sketcher）：几何、约束、尺寸、构造线、B 样条；\textbf{零件设计}（PartDesign）：
+凸台、凹槽、旋转、放样、管道、螺旋、孔、圆角、倒角、拔模、厚度、阵列、镜像、参考几何 \\
+实体与曲面 & \textbf{零件}（Part）：基本体、布尔、拉伸/旋转/扫掠/放样、偏移、检查、测量；\textbf{曲面}（Surface）\\
+装配 & \textbf{装配}（Assembly）：12 种关节、接地、求解、冲突诊断、BOM、快照、仿真 \\
+工程图 & \textbf{工程图}（TechDraw）：页面与模板、投影组、剖视、详图、尺寸、符号、导出 PDF/SVG/DXF \\
+数据与表达式 & \textbf{变量}（Spreadsheet）：电子表格、别名、跨对象表达式、单位制 \\
+仿真与制造 & \textbf{有限元}（FEM，CalculiX 求解器在设备上运行）；\textbf{CAM}（作业、刀具、刀路、后处理）\\
+建筑与交换 & \textbf{BIM}（墙、板、柱、窗、楼梯、屋顶、IFC 导入导出）；\textbf{网格}、\textbf{点云}、
+\textbf{OpenSCAD}、\textbf{逆向工程}、\textbf{机器人}、\textbf{检查}、\textbf{材质} \\
+核心工具 & \textbf{Std}：文件、编辑、视图、测量、宏、依赖图、工程图导出、首选项等 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tip}[“全部命令”是否都常用？]
+不是。984 个命令里有大量是同义或专业工作台的细分操作。日常建模真正高频的约 \textbf{40 个}：草图里的
+十来个绘制/约束工具、零件设计里的凸台/凹槽/圆角/阵列、文件的打开保存导出。本书会把它们讲透，其余在
+第 8 章与附录 A 中按图索骥。
+\end{tip}
+
+\section{与桌面 FreeCAD 的关系}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+ & \textbf{桌面 FreeCAD} & \textbf{MobileCAD} \\
+\midrule
+几何内核 & Open CASCADE & 相同（同一份交叉编译的库）\\
+文档格式 & \file{.FCStd} & 相同，可直接互开 \\
+Python 控制台 & 有 & 无（但宏与 Python 特征仍可运行）\\
+任务面板 & Qt 对话框 & 同一套 Python 面板，渲染为触屏控件\\
+界面 & Qt Widgets，双栏大量面板 & Compose，单工作区 + 浮动面板 \\
+输入 & 鼠标键盘、快捷键 & 手指手势 + 数字键盘 + 软键盘；支持硬件键盘\\
+绘图 / CAM / FEM & 完整 & 完整（求解器随 APK 打包）\\
+桌面窗口管理 & 多窗口、停靠 & 无（移动端不需要）\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{warn}[版本对齐]
+MobileCAD 的每个版本绑定一个 FreeCAD 提交。本手册对应 \textbf{FreeCAD main e95a31c}（应用内顶栏副标题
+会显示，例如“零件 · 基于 FreeCAD main e95a31c”）。用桌面 FreeCAD 打开同一文档时，建议使用相近版本，
+以免新特性（如某些 PartDesign 参数）在旧版里丢失。
+\end{warn}
+
+\section{运行条件与性能预期}
+
+\begin{itemize}
+  \item \textbf{系统}：Android 8.0 及以上，\textbf{arm64} 设备（手机、平板；Android 上的 Quest 头显走独立的
+        MobileCAD XR 版本）。
+  \item \textbf{存储}：安装包约 165 MB，首次启动解压运行时后占用约 1 GB；建议预留 2 GB 以上。
+  \item \textbf{内存}：建模流畅建议 6 GB 以上；8--12 GB 平板可轻松处理几百个特征的装配。
+  \item \textbf{性能}：实体建模与桌面 FreeCAD 同量级；有限元求解受手机散热限制，网格规模建议在桌面
+        的 1/3 以内；大型装配的显示做了移动端优化（视口按需重绘、离屏缓存）。
+\end{itemize}
+
+\section{授权、隐私与数据}
+
+MobileCAD 是 \textbf{GPL-3.0-or-later} 的自由软件，包含 FreeCAD（LGPL）、Open CASCADE（LGPL）、Qt（LGPL）、
+Gmsh、CalculiX、IfcOpenShell 等组件。所有计算都在设备本地完成：\textbf{不上传文档、不依赖云}。唯一的
+网络访问是你主动触发的“检查更新”（从 GitHub Releases 读取版本信息）以及 BIM/帮助里打开的网页。
+完整许可列表在 \menupath{帮助 → 关于 MobileCAD → 开源许可}。

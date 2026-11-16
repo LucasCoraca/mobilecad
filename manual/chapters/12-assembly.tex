@@ -1,0 +1,90 @@
+\chapter{装配：把零件装到一起}
+
+装配工作台把多个零件用\textbf{关节}（joint）连接起来，求解它们的相对位置，并检查自由度。它对应桌面
+FreeCAD 的 Assembly 工作台，求解器是 OndselSolver。
+
+\section{创建装配与插入零件}
+
+\begin{enumerate}
+  \item 切到 \ui{装配} 选项卡；
+  \item 点 \ui{创建装配}（\cmd{Assembly\_CreateAssembly}）——生成装配容器与关节组；
+  \item 点 \ui{插入零件}（\cmd{Assembly\_InsertLink}）：
+        对话框列出\textbf{不在当前装配里}的实体（Body）、零件（App::Part）与形状（Part::Feature），
+        选中即插入为链接（App::Link）；
+  \item \textbf{第一个插入的零件会自动接地}（固定），这与桌面 FreeCAD 的行为一致。
+\end{enumerate}
+
+树里会看到 \ui{装配} → \ui{原点}、\ui{关节} 与各构件。
+
+\section{关节}
+
+\subsection{13 种关节类型}
+
+固定（Fixed）、旋转（Revolute）、圆柱（Cylindrical）、滑动（Slider）、球（Ball）、距离（Distance）、
+平行（Parallel）、垂直（Perpendicular）、角度（Angle）、齿轮齿条（RackPinion）、螺杆（Screw）、
+齿轮（Gears）、皮带（Belt），另有 \ui{刚性组}（RigidGroup）。
+
+\begin{tip}[没有单独的“平面”关节]
+这个版本的引擎里，平面约束用“平行/垂直 + 距离”的组合来表达。
+\end{tip}
+
+\subsection{选择连接点}
+
+\begin{enumerate}
+  \item 点一个关节工具（例如 \ui{旋转关节}）；
+  \item 在第一个零件上点\textbf{面、边或顶点}——必须点子元素，直接点零件会提示“请选择面、边或顶点”；
+  \item 在\textbf{另一个零件}上点第二个连接点（点同一个零件会提示）；
+  \item 两点齐全，立即创建关节并弹出关节对话框。
+\end{enumerate}
+
+连接器由“元素 + 最近顶点”生成（与桌面 TaskAssemblyCreateJoint 同一个算法）。对话框里可以：
+重新选择 Reference1/2、改关节类型、改 \ui{偏移}（@Offset）、\ui{旋转}（@Rotation）、\ui{反向}（@Reverse）；
+改完自动重新求解。
+
+\section{求解与拖动}
+
+\begin{itemize}
+  \item \ui{求解装配}（\cmd{Assembly\_SolveAssembly}）：计算所有关节与自由度；失败时提示
+        \ui{求解失败（代码）}；
+  \item \textbf{拖动零件}：在视图中直接拖构件，应用先施加位移再求解——和桌面的拖拽器一样；
+  \item \ui{接地}：选中零件点 \ui{切换固定}，再次执行取消。
+\end{itemize}
+
+\section{诊断}
+
+装配出错时，用这些命令把问题“选中”出来：
+
+\begin{itemize}
+  \item \ui{选择冲突约束}、\ui{选择冗余约束}、\ui{选择格式错误约束}；
+  \item \ui{有自由度的构件}、\ui{构件的关节}、\ui{选择链接对象}。
+\end{itemize}
+
+它们读取引擎记录的最后一次冲突/冗余/格式错误列表，把相关对象选中，便于在树里定位。
+
+\section{输出与其它工具}
+
+\begin{itemize}
+  \item \ui{物料清单 BOM}（\cmd{Assembly\_CreateBom}）：生成物料清单对象（列可增删、拖动），可导出；
+  \item \ui{快照}（\cmd{Assembly\_CreateSnapshot}）：冻结当前装配的副本；
+  \item \ui{视图}（\cmd{Assembly\_CreateView}）：生成爆炸视图；
+  \item \ui{仿真}（\cmd{Assembly\_CreateSimulation}）：运动仿真；
+  \item \ui{导出 ASMT}：装配交换格式（走系统保存对话框）。
+\end{itemize}
+
+\begin{practice}[练习：做一个铰链]
+\begin{enumerate}
+  \item 建两个零件（底座与翻盖），都保存进同一个文档；
+  \item 装配 → 创建装配 → 插入底座（自动接地）→ 插入翻盖；
+  \item 在两个零件上各点一条同轴的边 → \ui{旋转关节}；
+  \item \ui{求解装配}；拖动翻盖，确认它绕轴转动而不是乱跑；
+  \item 如果拖动时其他方向也在动，检查是否漏了“重合/距离”约束，或添加平行/垂直约束补足自由度。
+\end{enumerate}
+\end{practice}
+
+\section{限制}
+
+\begin{itemize}
+  \item 关节需要两次子元素选择，不能直接选整个零件；
+  \item 没有独立的“平面”关节（用组合约束代替）；
+  \item 大装配求解耗时随零件数增长，手机上建议分组件装配再总装。
+\end{itemize}

@@ -1,0 +1,174 @@
+\chapter{零件设计：把草图变成实体}
+
+零件设计（PartDesign）是 MobileCAD 最常用的工作台。它的核心思想是\textbf{历史}：一个实体（Body）由一串
+特征组成，每个特征都是“在上一步结果上做一件事”。改任何一步，后面的步骤自动重算。
+
+\section{三个关键概念：实体、特征、Tip}
+
+\begin{description}
+  \item[实体（Body）] 特征的容器，也是 PartDesign 的工作单位。所有草图与特征都属于某个实体。
+        新建特征时，如果还没有实体，应用会自动创建一个并把新特征放进去。
+  \item[特征（Feature）] 历史中的一步：凸台、凹槽、圆角、阵列……
+  \item[Tip] 实体“计算到哪一步”的标记。树里有一条蓝色回滚条，长按某个特征选 \ui{将 Tip 滚动到此处}
+        就能回到那一步的历史状态（回放建模过程）。
+\end{description}
+
+\textbf{活动实体}（Active Body）：有多个实体时，新特征进入“活动”的那个（树里标签加粗）。双击实体或
+右键 \ui{切换活动实体} 来切换。
+
+\section{特征是怎么“被准备好”的}
+
+PartDesign 的命令大多“看选区行事”，这能省掉大量对话框操作：
+
+\begin{itemize}
+  \item 选中\textbf{草图}后点凸台/凹槽 → 轮廓自动填入；
+  \item 选中\textbf{平面}后点凸台/凹槽 → 先在该平面新建草图；
+  \item 什么都没选时，凸台/凹槽会取文档里\textbf{最后一个草图}；没有草图则提示“请先选择草图或平面”；
+  \item 圆角/倒角/拔模/厚度：若选中整个特征，则自动对所有边/面生效（\ui{UseAllEdges}）；没选时在 Tip 上等点边；
+  \item 默认值：凸台 10 mm、凹槽 5 mm、旋转 360°（轴取草图 V 轴）、镜像默认 V 轴、
+        线性阵列 X 向 100 mm × 2 个、极阵列 Z 轴 360° × 2 个。
+\end{itemize}
+
+\section{加料特征}
+
+\begin{longtable}{@{}p{0.17\linewidth}p{0.10\linewidth}p{0.65\linewidth}@{}}
+\toprule \textbf{特征} & \textbf{命令} & \textbf{关键参数} \\ \midrule \endhead
+凸台 & Pad & 轮廓、类型（长度/双向长度/到头/到面/到形状/尺寸）、长度、长度2、偏移、中面、反向、拔模角、精炼 \\
+旋转 & Revolution & 轮廓、参考轴、类型（角度/两角度/到头/到面）、角度、角度2、中面、反向、精炼 \\
+放样 & Additive Loft & 轮廓、截面（多个）、直纹、闭合、精炼 \\
+管道 / 扫掠 & Additive Pipe & 轮廓、路径、模式、过渡、变换、精炼 \\
+螺旋 & Additive Helix & 轮廓、参考轴、模式、螺距、高度、圈数、角度、增长、左旋、反向、精炼 \\
+加料基本体 & Additive Box/Cylinder/Sphere/Cone/Torus/Ellipsoid/Prism/Wedge & 长宽高/半径/角度等；选中面时贴面创建 \\
+\bottomrule
+\end{longtable}
+
+\section{减料特征}
+
+\begin{itemize}
+  \item \ui{凹槽}（Pocket）：与凸台对称，把轮廓向内挖；深度类型同样支持贯穿全部（Through all）；
+  \item \ui{孔}（Hole）：标准孔特征。参数包括：轮廓、\ui{螺纹}、螺纹类型/规格/等级/配合、直径、方向、
+        孔切割类型（沉孔/埋头/沉头）及其直径/深度/角度、深度类型/深度、钻尖角度、锥度、反向；
+  \item \ui{槽}（Groove）：绕轴挖环形槽；
+  \item \ui{减料放样/管道/螺旋} 与加料版本参数一致，只是方向相反；
+  \item \ui{减料基本体}：8 种基本体的减料版本。
+\end{itemize}
+
+\begin{tip}[孔特征会自动找位置]
+在没有圆孔的面直接调用“孔”，应用会在该面中心自动建一个 R3 的草图圆作为轮廓——之后再改孔直径即可。
+这能省掉“先画圆草图”的步骤。
+\end{tip}
+
+\section{修饰特征}
+
+\begin{description}
+  \item[圆角 Fillet] 参数：基体、边（边表，可逐边设半径）、全部使用边、精炼。拖动箭头能直接在模型上改半径。
+  \item[倒角 Chamfer] 参数：基体、倒角类型（等距/两距离/距离+角度）、尺寸、尺寸2、角度、翻转方向、全部使用边。
+  \item[拔模 Draft] 参数：基体、中性面、拉动方向、角度、反向。
+  \item[厚度 Thickness] 参数：基体、厚度值、模式（皮肤/管道/矩形）、连接类型（弧/切线/相交）、反向、相交。
+  \item[去除特征] 删除已有的面/圆角，恢复其下的几何。
+\end{description}
+
+\screenshot{ui-feature-dialog-zh.jpg}{特征对话框（圆锥体）：主属性在前（角度、高度、半径 1、半径 2），其余收进“更多选项（6）”。右上角 ✓/✗ 决定提交或回滚。}
+
+\section{阵列与镜像}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{特征} & \textbf{参数} \\
+\midrule
+线性阵列 LinearPattern & 原始特征、方向（边/轴）、模式（长度/间隔）、长度、偏移、数量、反向、精炼 \\
+极阵列 PolarPattern & 原始特征、轴、模式（角度/间隔）、角度、偏移、数量、反向、精炼 \\
+镜像 Mirrored & 原始特征、镜像平面、精炼 \\
+多变换 MultiTransform & 组合多个阵列/镜像（走通用建对象流程）\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tip}[阵列的“长度 vs 间隔”]
+\textbf{长度}（Extent）是首尾之间的总距离；\textbf{间隔}（Spacing）是相邻两个实例的间距。
+六个圆周孔：选 \ui{极阵列}，轴取 Z 轴，角度 360°，数量 6 即可。
+\end{tip}
+
+\section{参考几何与附着}
+
+\ui{参考几何}（Datum）让你在没有现成面可用时有“虚拟基准”：
+
+\begin{itemize}
+  \item \ui{参考平面}、\ui{参考线}、\ui{参考点}、\ui{坐标系}；
+  \item 创建时的参数包括：附着支持（\ui{AttachmentSupport}）、贴图模式（\ui{MapMode}）、\ui{反向}、
+        偏移（\ui{AttachmentOffset}）、路径参数（\ui{MapPathParameter}）；
+  \item \ui{编辑附着}（树里长按）只改附着，不打开整个特征。
+\end{itemize}
+
+\begin{warn}[附着模式决定“跟着谁动”]
+草图挂在实体表面上时，如果那个面因为前面的特征变化而移动，草图和它派生出的特征会一起更新——这正是
+参数化建模想要的行为；但如果面消失（例如被倒角切掉），依赖它的特征就会失败。
+\end{warn}
+
+\section{布尔操作}
+
+\begin{itemize}
+  \item \ui{零件设计 → 布尔}（PartDesign Boolean）：把选中的对象作为工具，与活动实体做并/差/交；
+  \item \ui{零件}（Part）工作台的 \ui{并/差/交} 是“独立实体之间的布尔”，不是 PartDesign 历史的一部分；
+  \item 布尔前先确认两个形状都是有效实体（\ui{零件 → 检查几何}）。
+\end{itemize}
+
+\section{特征对话框的读法}
+
+特征对话框由三部分组成：
+
+\begin{enumerate}
+  \item \textbf{标题栏}：名称 + ▾ 折叠 + ✓ 确定 + ✗ 取消；
+  \item \textbf{错误条}（红色）：特征计算失败时显示原因，例如“基体特征上不存在该几何”；
+  \item \textbf{属性区}：按 FreeCAD 任务面板顺序排列主属性，其余在 \ui{更多选项（N）} 里。
+\end{enumerate}
+
+每种属性行的交互方式见 3.7 节。两个实用细节：
+
+\begin{itemize}
+  \item \textbf{实时预览}：改动立即作用于模型，每次改动都是独立事务；
+  \item \textbf{拖动箭头}：凸台长度、圆角半径等数量属性在视图里有箭头，可直接拖动并在标签上看到毫米值。
+\end{itemize}
+
+\section{失败特征与排查}
+
+特征失败时：
+
+\begin{itemize}
+  \item 树里该特征标签变\textbf{红}，并出现红色错误图标；
+  \item 视图里用\textbf{红色半透明“幽灵”}显示它最后一次有效的前驱形状；
+  \item 打开对话框，顶部红条给出错误字符串。
+\end{itemize}
+
+\begin{practice}[排查四步法]
+1) 打开失败特征看红条；2) 检查它引用的轮廓/面/边是否还存在；3) 长按它选 \ui{压缩}，看后面的特征是否也依赖它；
+4) 回到草图修约束，或长按选 \ui{重新计算对象}。
+\end{practice}
+
+\section{完整工作流：从块体到成品}
+
+用第 4 章的支架继续：
+
+\begin{enumerate}
+  \item \textbf{加筋}：在支架上表面新建草图，画一条直线 → 退出 → \ui{凸台}（勾选“对称于面”），得到筋板；
+  \item \textbf{打沉头孔}：选顶面 → \ui{孔} → 打开 \ui{螺纹} 或选 \ui{沉头} → 填直径/深度；
+  \item \textbf{阵列}：选中孔 → \ui{线性阵列}，方向选一条边，数量 4，长度 40；
+  \item \textbf{倒角}：选外轮廓边 → \ui{倒角}，尺寸 1 mm；
+  \item \textbf{改基体}：双击第一个凸台，把长度从 12 改到 16——筋、孔、阵列、倒角全部自动跟随；
+  \item 导出 STEP 给同事，或去“工程图”选项卡出图。
+\end{enumerate}
+
+\screenshot[0.72]{tablet-partdesign.jpg}{一个真实的 PartDesign 模型（螺丝刀头）：树里是 Pad → Groove → Mirrored → Revolution → DatumPlane → Pocket → PolarPattern…… 每一步都可以回改，这正是参数化的威力。}
+
+\section{常见坑}
+
+\begin{itemize}
+  \item \textbf{草图必须在活动实体内}；跨体引用会被替换成 SubShapeBinder，可能引发循环报错；
+  \item \textbf{没有 M 键}：桌面端的折线模式切换、尺寸类型轮换等快捷键在移动端不存在；
+  \item \textbf{正多边形边数固定}：命令只有 3--8 边；
+  \item \textbf{多点工具要双击/完成}：折线、B 样条不双击不会落库；
+  \item \textbf{部分阵列走通用流程}：圆周/路径/点阵列与多变换、椭球/棱柱/楔形的主参数在“更多选项”里；
+  \item \textbf{验证草图不显示修复计数}：它确实在修，但界面不回报数字。
+\end{itemize}

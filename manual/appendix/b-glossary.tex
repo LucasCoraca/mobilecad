@@ -1,0 +1,92 @@
+\chapter{中英术语对照}
+\markboth{附录 B 中英术语对照}{附录 B 中英术语对照}
+
+MobileCAD 的中文界面直接采用 FreeCAD 官方译法。对照本表，可以无缝切换到英文界面或桌面 FreeCAD。
+
+\section{建模概念}
+
+\begin{longtable}{@{}p{0.16\linewidth}p{0.24\linewidth}p{0.52\linewidth}@{}}
+\toprule \textbf{中文} & \textbf{English} & \textbf{说明} \\ \midrule \endhead
+参数化建模 & parametric modelling & 用尺寸、约束与特征历史描述模型，改参数即改模型 \\
+草图 & sketch & 2D 轮廓，通常作为 3D 特征的截面 \\
+约束 & constraint & 限定几何关系的规则（水平、相切、距离……） \\
+自由度 & degree of freedom (DoF) & 草图未被约束的独立变量数 \\
+完全约束 & fully constrained & 自由度为 0，形状被唯一确定 \\
+构造几何 & construction geometry & 只辅助作图、不参与成形的线 \\
+尺寸 & dimension & 数值约束（长度、角度、半径……） \\
+参考（从动） & reference / driven & 只测量不驱动的尺寸 \\
+凸台 & Pad & 把闭合轮廓沿法向拉伸出实体 \\
+凹槽 & Pocket & 用轮廓在实体上挖出凹坑/通孔 \\
+旋转 & Revolution & 轮廓绕轴旋转成回转体 \\
+槽 & Groove & 在回转体上挖环形槽 \\
+放样 & Loft & 用多个截面过渡成实体 \\
+管道 / 扫掠 & Pipe / Sweep & 轮廓沿路径扫掠 \\
+螺旋 & Helix & 沿螺旋线扫掠（弹簧、螺纹） \\
+圆角 & Fillet & 把尖边变成圆弧过渡 \\
+倒角 & Chamfer & 把尖边切出斜面 \\
+拔模 & Draft & 给侧面加脱模斜度 \\
+厚度 & Thickness & 把实体抽壳成薄壁 \\
+孔 & Hole & 标准孔特征（可带螺纹、沉头） \\
+阵列 & Pattern & 线性/极坐标/路径/点阵列 \\
+镜像 & Mirrored & 关于平面镜像 \\
+实体（体） & Body & PartDesign 里承载特征历史的容器 \\
+特征 & feature & 建模历史中的一步（凸台、圆角……）\\
+Tip & Tip & 实体“计算到哪一步”的标记 \\
+基准面/轴/点 & Datum plane/axis/point & 辅助建模的参考几何 \\
+附着 & Attachment & 把草图/基准几何挂到面、边或坐标上 \\
+布尔运算 & boolean operation & 并、差、交 \\
+B-rep & boundary representation & 用边界曲面描述实体的几何表示 \\
+\bottomrule
+\end{longtable}
+
+\section{装配、工程图与仿真}
+
+\begin{longtable}{@{}p{0.16\linewidth}p{0.24\linewidth}p{0.52\linewidth}@{}}
+\toprule \textbf{中文} & \textbf{English} & \textbf{说明} \\ \midrule \endhead
+装配 & Assembly & 多个构件的组合与约束 \\
+构件 & component & 装配中的零件/子装配 \\
+关节 / 配合 & joint & 限定两个构件相对运动的关系 \\
+接地 & grounded & 把构件固定在空间 \\
+求解 & solve & 计算装配的自由度与位置 \\
+工程图 & drawing (TechDraw) & 由 3D 生成的二维图纸 \\
+投影组 & projection group & 前视/上视/右视等一组视图 \\
+剖视图 & section view & 用剖切面切开显示的视图 \\
+局部详图 & detail view & 放大局部区域 \\
+尺寸标注 & dimension & 图纸上的尺寸 \\
+电子表格 & spreadsheet & 参数表，可被表达式引用 \\
+别名 & alias & 单元格的名字，如 \file{Thickness} \\
+表达式 & expression & 以 \file{=} 开头的公式 \\
+单位制 & unit system & 毫米/米、英寸等 \\
+有限元 & FEM & 有限元分析 \\
+网格划分 & meshing & 把实体离散为单元 \\
+边界条件 & boundary condition & 固定、载荷等 \\
+求解器 & solver & CalculiX（ccx）等 \\
+后处理 & post-processing & 云图、变形、导出结果 \\
+刀路 & toolpath & CAM 生成的加工路径 \\
+后处理器 & post-processor & 把刀路转成机床 G-code \\
+\bottomrule
+\end{longtable}
+
+\section{文件与技术}
+
+\begin{longtable}{@{}p{0.16\linewidth}p{0.24\linewidth}p{0.52\linewidth}@{}}
+\toprule \textbf{中文} & \textbf{English} & \textbf{说明} \\ \midrule \endhead
+FCStd & FreeCAD document & 原生文档，保留建模历史 \\
+STEP & STEP (.step/.stp) & 通用的实体交换格式 \\
+IGES & IGES (.iges/.igs) & 较老的曲面/线框交换格式 \\
+STL & STL (.stl) & 三角网格，3D 打印常用 \\
+OBJ & OBJ (.obj) & 网格格式，带材质/贴图 \\
+3MF & 3MF (.3mf) & 现代 3D 打印格式 \\
+DXF / DWG & DXF / DWG & 二维 CAD 交换格式 \\
+SVG & SVG & 矢量图（工程图/导入图形）\\
+PDF & PDF & 工程图输出/打印 \\
+IFC & IFC & 建筑信息模型交换格式 \\
+G-code & G-code & 数控机床指令 \\
+SAF & Storage Access Framework & Android 系统文件选择器 \\
+手势 & gesture & 触屏操作 \\
+精密指针 & precision pointer & 长按时出现在手指上方的准星 \\
+导航立方体 & NaviCube & 右上角的方向指示与视图切换器 \\
+事务 & transaction & 一次可撤销的修改单位 \\
+恢复副本 & recovery copy & 崩溃后自动保存的文档副本 \\
+\bottomrule
+\end{longtable}
