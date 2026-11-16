@@ -1,0 +1,211 @@
+\chapter{The interface in detail}
+
+MobileCAD's interface has only four permanent areas: the \textbf{top bar}, the \textbf{feature tree}, the
+\textbf{toolstrip and view area}, and the \textbf{element tabs}. Every dialog, panel and hint appears as an
+overlay on top of the view area. Understand these four and you understand the whole app.
+
+\screenshot{ui-main-zh.jpg}{The four permanent areas of the main screen: top bar (1), feature tree (2), toolstrip and view area (3), element tabs (4).}
+
+\section{Top bar}
+
+From left to right:
+
+\begin{itemize}
+  \item \ui{☰}: the main menu (File, Edit, View, Tools, Macro, Help).
+  \item \textbf{Document name}: the name of the current document (\file{.FCStd}); it shows “Unnamed” until
+        you save.
+  \item \textbf{Subtitle}: \ui{Workbench · based on FreeCAD commit}, for example “Part · based on FreeCAD main
+        e95a31c”. It tells you which workbench you are in and which FreeCAD version the engine corresponds to.
+  \item \ui{↶ / ↷}: Undo and Redo. A long-press (or reading the hint text) shows the name of the operation
+        you are about to undo, for example “Undo Pad”.
+\end{itemize}
+
+\section{Element tabs and workbenches}
+
+The row of tabs along the bottom corresponds to FreeCAD's workbenches, but reorganised around the design
+workflow:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Tab} & \textbf{Contents} \\
+\midrule
+\ui{Part} & A combined workspace with Part Design, Part, Sketch, Surface and Draft; everyday modelling happens
+here \\
+\ui{Assembly} & Joints, solving and BOM \\
+\ui{Drawing} & TechDraw: produce 2D drawings and export them to PDF/SVG/DXF \\
+\ui{Variables} & Spreadsheet: parameter tables, aliases and expressions \\
+\ui{More ▾} & Every other workbench: BIM, FEM, CAM, Mesh, Mesh Part, Points, Reverse Engineering, Robot,
+OpenSCAD, Inspection, Material, Draft, Part, Part Design, Sketcher, Surface and so on \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+You can switch workbenches in two ways: tap a tab at the bottom, or choose from the full list under
+\menupath{View → Workbench}. After you switch to a workbench from More, the tab shows its name (for example
+“FEM ▾”).
+
+\section{Feature tree}
+
+The left side is the \textbf{model tree} (FreeCAD's Tree View). It is more than a list: it is the history and
+structure of the model:
+
+\begin{itemize}
+  \item \textbf{Hierarchy}: a Body contains sketches and features; an assembly contains components and joints;
+        a drawing contains pages and views.
+  \item \textbf{Icons}: each object type has its own icon (body, pad, sketch, datum plane, point, hole,
+        pattern, …), the same as in desktop FreeCAD.
+  \item \textbf{State}: red text means the feature has an error; grey or translucent means hidden; a
+        strikethrough means suppressed; a small icon after the name means the object needs recomputing
+        (Touched); the \ui{Tip} marker shows how far the body has been computed. A small red exclamation mark
+        on the right of a feature row means that feature failed; open its dialog to see the error.
+  \item \textbf{Tap}: select the object (it highlights in the view); \textbf{double-tap}: open its dialog (on a
+        body, double-tap switches the active body); \textbf{long-press}: context menu.
+  \item \ui{◀}: collapses the feature tree (it becomes a 40 dp vertical strip; tap it to expand again). On a
+        tablet, a 14 dp drag handle resizes the tree between 160 and 480 dp (240 dp by default). On a phone
+        the feature tree is an overlay drawer: open it from the tree button in the top bar and close it by
+        tapping the dark backdrop.
+  \item The count at the top of the tree (for example “15”) is the number of objects in the document. The tree
+        \textbf{does not support drag-and-drop reordering}: the model structure is determined by the feature
+        history. To change the order, use “Roll tip to here” and the references inside feature dialogs.
+\end{itemize}
+
+\screenshot[0.72]{tablet-partdesign.jpg}{The feature tree and a Part Design model. The tree shows the full modelling history — Pad, Groove, Mirrored, Revolution, DatumPlane, Pocket, PolarPattern and others — and that is what “parametric” means: every step can be changed later.}
+
+The menu that a long-press opens (it varies with the object type):
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Menu item} & \textbf{What it does} \\
+\midrule
+\ui{Edit …} / \ui{Edit Attachment} & Open the feature dialog, or edit only its attachment (where the sketch or
+datum plane is attached) \\
+\ui{Rename} & Change the display name (the internal type stays the same) \\
+\ui{Hide / Show} & Toggle visibility (also works on sub-elements) \\
+\ui{Suppress / Unsuppress} & Skip the feature in the computation for now, to track down errors or compare
+designs \\
+\ui{Mark to recompute} & Force the object to update at the next recompute \\
+\ui{Recompute object} & Recompute the object now \\
+\ui{Roll tip to here} & Move the body's computation endpoint to this feature — design exploration by replaying
+history \\
+\ui{Move into Body} & Merge an external feature such as a fillet or chamfer into the body's history \\
+\ui{Toggle active body} & With several bodies, choose which one new features go into \\
+\ui{Delete} & Delete the object (Undo brings it back) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Toolstrip and tool panel}
+
+The toolstrip holds a row of \textbf{toolsets}, for example \ui{Sketch}, \ui{Features}, \ui{Part}, \ui{Surface}
+and \ui{Draft}. Each toolset corresponds to one or more FreeCAD toolbars:
+
+\begin{itemize}
+  \item Tap a toolset → a \textbf{tool panel} unfolds in the top-left corner of the view area, with the buttons
+        grouped by FreeCAD toolbar. A button's name is the FreeCAD command name;
+  \item at the top of the panel is \ui{Search all tools}: you can search in English or Chinese (for example
+        “pad” or “凸台”), and the results are grouped by workbench;
+  \item \ui{More tools (N)} at the bottom of the panel folds away or expands the commands of this workbench that
+        are not on a toolbar, so every command is reachable;
+  \item the right side of the toolstrip shows the \textbf{six most recently used} tools, separated by vertical
+        lines, so repeated operations are quick. On a phone the toolstrip scrolls horizontally;
+  \item tap the toolset again (or tap empty space in the view) to close the panel.
+\end{itemize}
+
+\screenshot{ui-toolpanel-zh.jpg}{The “Features” tool panel: sections follow FreeCAD toolbars (modelling features, …), and both command names and icons come from FreeCAD; the top of the panel searches all tools.}
+
+\section{View area}
+
+\begin{itemize}
+  \item \textbf{NaviCube} (top right, 112×108 dp): its six faces (top, bottom, front, back, right, left)
+        correspond to the standard views; tap a face centre to animate to it. The edge strips and corner blocks
+        between the faces give 26 directions; the ▲▼◀▶ around it rotate by 15° each time, and ↶ ↷ by 90°. The
+        small ☰ menu at its top right switches \ui{Orthographic/Perspective}, \ui{Isometric} and \ui{Fit all}.
+        Drag the cube itself to rotate freely. It always shows the current orientation.
+  \item \textbf{Selection}: tap to pick faces, edges and vertices. Selected elements collect in a “selection
+        bar” along the bottom of the view area (a label plus ×); tap × to deselect.
+  \item \textbf{Floating bars}: the sketch status bar (“Fully constrained ›”), sketch value entry, Draft hints,
+        assembly joint hints, the selection filter and so on float at the edges of the view area without
+        covering the model.
+  \item \textbf{Context menu}: \textbf{two fingers tap} on the view (or right-click with a mouse) opens it, and
+        the contents follow the current selection: with a face you get “Sketch / Extrude (Pad) / Plane”, with an
+        edge “Fillet / Chamfer”, and with a sketch “Extrude (Pad) / Revolve / Pocket / Edit sketch”.
+\end{itemize}
+
+\section{The dialog system}
+
+MobileCAD has five kinds of interactive control. Learn to recognise them and you will never be lost:
+
+\begin{description}
+  \item[Feature dialog] The equivalent of a desktop FreeCAD task panel: a 44 dp title bar (▾ collapses, ✓
+        confirms, ✗ cancels, and the two buttons sit apart so that you do not hit the wrong one), an error strip
+        below it, property rows in the middle, and \ui{More options (N)}/\ui{Fewer options} at the bottom. Rows
+        follow the order of the matching FreeCAD task panel (for a pad, for example: profile / type / length /
+        length 2 / …), with the main rows first and the rest folded away. Row types include: number (Numpad),
+        enumeration (up to 4 entries as segmented buttons, more as a drop-down), boolean (switch), link (shows
+        “Pad · Edge3, Edge7”; tap to enter picking mode with the \ui{Tap geometry} prompt), colour (swatch +
+        11-colour palette + custom), text/list/file, edge table (a radius per edge), and vector/placement (one
+        row per component). \textbf{Every change is an undoable transaction and the model previews live}; ✓
+        commits, ✗ rolls back to the state when the dialog opened.
+  \item[Task panel] An interface built by FreeCAD's own Python commands (BIM, CAM, FEM, OpenSCAD, TechDraw and
+        others) and rendered as the same touch controls: group boxes, number fields, drop-downs, lists, tables,
+        checkboxes and radio buttons, and buttons. At the bottom are \ui{OK/Cancel/Apply/Close}, as FreeCAD
+        defines them.
+  \item[Chooser] A title plus a number of options (pick one or several). Used for “choose a plane”, “choose a
+        joint type”, “choose the views to display” and so on.
+  \item[Numpad] Slides in from the edge of the screen when a number is needed (on a tablet a 320 dp panel on
+        the right, on a phone full width at the bottom): the keys are 7 8 9 / 4 5 6 / 1 2 3 / ± 0 ., the right
+        column holds backspace, +, −, × and ÷, and the bottom row holds brackets, C, ✕ and ✓. Units can be
+        switched at the top (length mm/cm/m/µm/in/ft, angle °/rad). The entry is a FreeCAD expression, for
+        example \file{25 mm} or \file{2 * (10 mm + 5 mm)}. A property value that starts with \file{=} is treated
+        as an \textbf{expression} (shown in blue).
+  \item[Text input] A single-line or multi-line text box for file names, labels, expressions, macro code and so
+        on.
+\end{description}
+
+\screenshot{ui-feature-dialog-zh.jpg}{A feature dialog: the title is “Cone”, the properties are Angle / Height / Radius 1 / Radius 2, and the bottom reads “More options (6)”. The arrow at the top left collapses it; ✓ confirms and ✗ cancels at the top right.}
+
+\section{Preferences}
+
+\menupath{Edit → Preferences} (there is also a \ui{Preferences} button on the toolstrip) offers four groups of
+settings: unit system, theme, language and update checks. See Section 2.6 for details.
+
+\section{Tablets, phones and headsets}
+
+\begin{itemize}
+  \item \textbf{Tablet (width ≥ 600 dp)}: the feature tree stays on the left, the tool panel floats in the
+        top-left corner of the view and dialogs float on the left;
+  \item \textbf{Phone (width < 600 dp)}: the feature tree becomes a drawer (use the tree button in the top bar,
+        or swipe in from the left), panels slide up from the bottom and the toolstrip scrolls horizontally;
+  \item \textbf{MobileCAD XR} (Quest and similar headsets): the whole interface is rendered on an 880×620 dp
+        panel, the model sits in the room, and the Numpad and on-screen keyboard appear as a second floating
+        window; dialogs are drawn inline instead (LocalInlineDialogs in the code).
+\end{itemize}
+
+\section{The Back button, Undo and getting stuck}
+
+\begin{itemize}
+  \item \textbf{The Back button is Esc}: it closes things from the inside out — Numpad → text dialog → chooser
+        → menu → tool panel → Draft tool → assembly joint → task panel → feature dialog → sketch. When
+        everything is closed it sends the app to the background \textbf{instead of quitting}, so that a stray
+        tap cannot lose your document.
+  \item \textbf{Undo/Redo} sits on the right of the top bar. Every feature change and every property edit is a
+        separate transaction, and the Undo button's hint names the exact operation.
+  \item Unavailable commands (greyed out in menus, 38\% transparent in tool panels) show “<command> is not
+        available on mobile yet” when tapped at runtime. They usually belong to desktop window management and
+        have no mobile counterpart.
+\end{itemize}
+
+\section{Keyboards and input methods}
+
+\begin{itemize}
+  \item When text input is needed (expressions, text properties, macros), the on-screen keyboard appears
+        automatically and your Android keyboard's word suggestions work.
+  \item With a \textbf{hardware keyboard} connected you can type straight into the fields, and physical keys
+        are not swallowed by the input method (the app handles Android's IME focus specially for this).
+  \item In a single-line field, Enter confirms and hides the keyboard; in a multi-line field, Enter inserts a
+        line break.
+\end{itemize}

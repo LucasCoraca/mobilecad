@@ -1,0 +1,172 @@
+\chapter{Draft: 2D Lines and the Working Plane}
+
+The Draft workbench is made for 2D drawing: lines, circles, polygons and dimensions on a plane, plus
+drawing-style operations such as paths and arrays. Its coordinate system is the \textbf{working
+plane}, not a fixed XY plane — that is the key to using Draft well.
+
+\section{Access and Toolbars}
+
+Open it from \menupath{More ▾ → Draft}, or use the \ui{Draft} toolset on the \ui{Part} tab. The
+tools are grouped by FreeCAD's five toolbars: \ui{Creation}, \ui{Annotation}, \ui{Modification},
+\ui{Utility} and \ui{Snap}.
+
+\section{Working Plane}
+
+Choose \ui{Working plane} in \ui{More tools}; there are five options:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Option} & \textbf{Meaning} \\
+\midrule
+Top (XY) / Front (XZ) / Side (YZ) & The three coordinate planes \\
+Selected face & Uses the plane you selected as the working plane (select one first, otherwise the app says ``Select a planar face first''; a non-planar face raises an error)\\
+Current view & The plane passes through the camera target point; screen right/up are u/v and the view direction is the normal \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The working plane affects where points land, the orientation of rectangles/circles/polygons, the
+mirror and rotation axes, how typed coordinates are interpreted and the direction in which grid
+snapping rounds. It does \textbf{not} affect the display of the 3D grid (the grid always stays on
+the XY ground).
+
+\section{Snapping}
+
+The Draft snap bar has 15 toggles; \ui{Lock} is the master switch:
+
+\begin{itemize}
+  \item \textbf{On by default}: Lock, Endpoint, Midpoint, Center, Near, Intersection, Perpendicular,
+        Grid, Working plane;
+  \item \textbf{Off by default}: Angle, Ortho, Parallel, Extension, Special, Dimensions;
+  \item Endpoint/midpoint/center come from visible shapes: vertices, the midpoint of every edge and
+        the center of circles/arcs, taking the nearest one within 18 dp;
+  \item When there is nothing to snap to, the point lands on the working plane: \ui{Ortho} locks
+        horizontal/vertical, otherwise \ui{Angle} snaps every 15°, and finally \ui{Grid} rounds to
+        1 mm;
+  \item The name of the snap is shown next to the cursor (for example ``Endpoint'' or
+        ``Intersection'').
+\end{itemize}
+
+\section{Entering Points}
+
+Tap to place a point; the top banner shows the tool name, the prompt, and
+\ui{Typing}/\ui{Undo}/\ui{Close}/\ui{Finish}/\ui{Copy}/✕.
+
+\begin{itemize}
+  \item \ui{Type}: enter \file{x, y, z} or \file{@dx, dy, dz} (2 or 3 numbers, separated by commas,
+        semicolons or spaces). Coordinates are interpreted in the \textbf{working plane's local
+        coordinates}; \file{@} means relative to the previous point;
+  \item Long-press to enter precise mode (the crosshair sits 60 dp above your finger); lift your
+        finger and the point is placed;
+  \item Multi-segment tools end with a double tap (the second tap removes the point just added);
+        tools with a fixed number of points end by themselves once they have enough;
+  \item \ui{Finish} needs the minimum number of points; \ui{Close} exists only for polylines with at
+        least 2 points; \ui{Undo} removes the last point.
+\end{itemize}
+
+\section{Drawing Tools}
+
+\begin{longtable}{@{}p{0.18\linewidth}p{0.10\linewidth}p{0.62\linewidth}@{}}
+\toprule \textbf{Tool} & \textbf{Points} & \textbf{Notes} \\ \midrule \endhead
+Line & 2 & Start point → end point \\
+Polyline & Multiple & Connect points; double-tap to end \\
+Rectangle & 2 & Two opposite corners \\
+Circle & 2 & Center → radius point \\
+Arc & 3 & Center → start point → end point \\
+3-point arc & 3 & Three points on the arc \\
+Ellipse & 2 & Two opposite corners (major and minor axes swap automatically)\\
+Polygon & 2 & Asks for the number of sides (default 6), then center + vertex (inscribed)\\
+B-spline & Multiple & Connect points \\
+Bézier & Multiple & Cubic curve; after every 4 points you continue \\
+Point & 1 & A single point \\
+Text & 2 & Enter the text first (\file{\textbackslash n} for a line break), then tap the position \\
+Shape string & 2 & Then asks for the height (default 10); the font is fixed to Roboto \\
+Dimension & 3 & Three-point linear dimension \\
+Label & Multiple & Enter the text first; the target is the current selection; then tap the target point and the label point \\
+Face & — & Select a face first, then run it (the face is bound)\\
+Hatch & — & Select the objects first; choose one of 8 patterns and a scale (default 10)\\
+\bottomrule
+\end{longtable}
+
+\section{Modifying and Arrays}
+
+\textbf{Select the objects first}, otherwise the app says ``Select objects first''.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Tool} & \textbf{Action} \\
+\midrule
+Move & Base point → target point (copies when ``Copy'' is on in the banner)\\
+Rotate & Center → base angle point → rotation angle point (the axis is the plane normal)\\
+Scale & Base point → factor (default 2)\\
+Mirror & Two points define the mirror line \\
+Offset & One tap sets the side and the distance; circles/arcs change their radius, lines move by the perpendicular distance; only the first object is handled \\
+Stretch & Box with two points → base point → target point \\
+Trim / Extend & Tap the target (a face is extruded along the normal, a line is changed at the nearest end)\\
+Split & Select the line first, then tap the split position \\
+Edit & Tap a node, then tap the new position (only for objects with Points)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Others: \ui{Upgrade}/\ui{Downgrade} (they delete the original object), \ui{Join}, \ui{Draft to
+Sketch}, \ui{Clone}, \ui{Shape 2D View} (fixed to +Z), \ui{Convert Wire/B-Spline}, \ui{Heal}, \ui{Add
+to Construction Group}.
+
+\subsection{Arrays}
+
+\begin{itemize}
+  \item \ui{Rectangular array}: asks for the number of X/Y copies and the interval (default
+        2/2/100; Z has 1 copy and uses the same interval as X);
+  \item \ui{Polar array}: asks for the number of elements (5) and the sweep angle (360°);
+        \textbf{the center is fixed at the origin} and cannot be picked;
+  \item \ui{Circular array}: asks for radial 100, tangential 50 and 3 circles; the center is again at
+        the origin;
+  \item \ui{Path array / Twisted path array / Point array}: follow the selection order (the base
+        object first, the path or point object after), with a fixed number (4 or 15) and no
+        parameter dialog;
+  \item The Link versions are link arrays (they reference the original object).
+\end{itemize}
+
+\section{Styles and Layers}
+
+\begin{itemize}
+  \item \ui{Set Style}/\ui{Apply Current Style}/\ui{Annotation Styles Editor} all lead to the
+        standard ``Appearance'' dialog: \textbf{only 12 colors + Default}, used to change the object
+        color; on mobile there is no line width, line style, layer style or annotation style editor;
+  \item Layers: \ui{New Layer} (puts the selection inside if there is one), \ui{Add to Layer},
+        \ui{Layers Manager} (tap a layer to toggle its display), \ui{Auto-Group} (sets the default
+        layer for new objects), \ui{Add to Group}/\ui{Select Group};
+  \item Construction mode: adds new objects to the Construction group.
+\end{itemize}
+
+\begin{practice}[Exercise: a dimensioned floor plan]
+\begin{enumerate}
+  \item Set the working plane to \ui{Top (XY)} and turn on \ui{Grid} snapping;
+  \item Draw a 4000 × 3000 room with \ui{Rectangle} (enter the opposite corners with Type), then
+        draw a partition with \ui{Polyline};
+  \item Add the two main dimensions with \ui{Dimension};
+  \item Copy a row of column grid lines with \ui{Rectangular array} (X interval 1000, 2 copies);
+  \item Save, then go to \ui{More → Part} and use \ui{Extrude} to turn the wall lines into 3D walls.
+\end{enumerate}
+\end{practice}
+
+\section{Limitations Visible in the Source}
+
+\begin{itemize}
+  \item Styles are colors only; polar/circular array centers are fixed at the origin; the
+        rectangular array shares one interval across X, Y and Z;
+  \item Path/point arrays have no parameter dialog and depend on the selection order;
+  \item The Parallel, Extension, Special and Dimensions snap toggles have no corresponding logic in
+        the source;
+  \item The grid interval is fixed at 1 mm, and the grid is drawn on the XY ground instead of the
+        working plane;
+  \item Offset handles only the first object; trim/extend only support lines/faces; edit only works
+        on objects with Points;
+  \item The shape string font is fixed to Roboto; Shape 2D View is fixed to +Z; hatch applies to the
+        whole object.
+\end{itemize}

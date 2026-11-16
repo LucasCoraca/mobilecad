@@ -1,0 +1,147 @@
+\chapter{The Part workbench: solids, Booleans and shaping}
+
+The \textbf{Part} workbench is not the same as PartDesign: it keeps no feature history and works directly on
+\textbf{shapes} --- building primitives, running Booleans, extruding/revolving/lofting/sweeping, filleting. It is the
+right tool for a quick blank, for handling imported STEP/IGES, for one-off geometry operations, and for merging several
+solids into one.
+
+\section{Getting there}
+
+The toolbar of the \ui{Part} tab at the bottom has five groups: \ui{Sketch}, \ui{Features}, \ui{Part}, \ui{Surface},
+\ui{Draft}. The \ui{Part} group expands into three sections: \ui{Solids}, \ui{Part Tools}, \ui{Boolean Tools}. You can also
+reach the same workbench from \menupath{More ▾ → Part}.
+
+\section{Primitives}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Primitive} & \textbf{Default parameters} \\
+\midrule
+Box & 10 × 10 × 10 mm \\
+Cylinder & Radius 2, height 10, angle 360° \\
+Sphere & Radius 5, latitude $-90°\sim90°$, longitude 360° \\
+Cone & Radius 1 = 2, radius 2 = 4, height 10 \\
+Torus & Radius 1 = 10, radius 2 = 2, angle range \\
+Tube & Outer radius, inner radius, height \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The 16 primitives --- ellipsoid, prism, wedge and the rest --- are all created in the \ui{Primitives...}
+(\cmd{Part\_Primitives}) dialog: plane, box, cylinder, cone, sphere, ellipsoid, torus, prism (6 sides by default), wedge,
+helix, spiral, circle, ellipse, vertex, line, polygon.
+
+\begin{tip}[Parameters can be changed at any time]
+After a primitive is created, double-tap the object in the tree to reopen its parameter dialog. Size, angle and radius
+can all be changed, but this will \textbf{not} drive the later features the way PartDesign does --- Part objects are
+independent shapes.
+\end{tip}
+
+\section{Boolean operations}
+
+\begin{itemize}
+  \item \ui{Boolean} (\cmd{Part\_Boolean}) is a dialog: select two or more objects, then choose the operation ---
+        \ui{Common / Cut / Fuse / Section};
+  \item \ui{Fuse} and \ui{Common} accept several objects (all that are selected);
+  \item \ui{Cut} takes only ``base + tools'': \textbf{the first object you select is the base}, the rest are tools;
+  \item The Boolean Tools group also holds a set of variants: \ui{Split Shapes} (Boolean fragments/slice/slice apart/XOR)
+        and \ui{Connect Shapes} (connect/embed/cutout).
+\end{itemize}
+
+\begin{warn}[Selection order decides the result]
+A Part Boolean has no ``undo the selection order'' button. Before a cut or a difference, get into the habit of tapping
+the base first and the tools after; if you get it backwards, undo and start again.
+\end{warn}
+
+\section{Shaping: extrude, revolve, loft, sweep}
+
+\begin{description}
+  \item[Extrude] Select a sketch, wire or face and extrude it along the normal (10 mm by default); a closed profile becomes a solid automatically; you can set a reverse length, a draft angle and symmetry. Selecting several profiles creates one extrusion for each.
+  \item[Revolve] Revolves a profile around an axis (by default the Z axis through the origin, 360°); select an edge to use it as the axis.
+  \item[Loft] At least two sections; produces a solid transitional body; ruled and closed can be set.
+  \item[Sweep] Section + path: select the section first and the path object last (or tap one of its edges directly); Frenet and solid can be turned on.
+  \item[Mirror] About the XY/XZ/YZ planes, or with the second selection as the mirror plane.
+  \item[Scale] Uniform 1.0 by default; can be switched to separate X/Y/Z factors.
+  \item[Project onto surface] Tap the target face first, then select the shape or edges to project.
+\end{description}
+
+\section{Detail features}
+
+\begin{itemize}
+  \item \ui{Fillet}/\ui{Chamfer}: the app asks for the radius/size first (1 mm by default); with edges selected it works
+        on those edges only, otherwise on all edges; \textbf{if the selection contains a body or a feature inside a body,
+        it calls PartDesign's fillet/chamfer instead} (otherwise it would produce a shape that sits outside the history);
+  \item \ui{Thickness} (1 mm), \ui{Offset} (3D/2D), \ui{Ruled surface}, \ui{Make face}, \ui{Section};
+  \item Right-click a Part fillet/chamfer in the tree and choose \ui{Move into Body} to absorb it into the body history.
+\end{itemize}
+
+\section{Arrays: Link array}
+
+\ui{Link array} offers five kinds at once: \textbf{linear, polar, circular, path, point}. The first selected object is
+the one being arrayed; path and point arrays take the second selected object as the reference.
+
+\section{Checking and measuring}
+
+\begin{itemize}
+  \item \ui{Check geometry} (\cmd{Part\_CheckGeometry}) and \ui{Shape info} share one information panel: BOP check
+        result, counts of solids/shells/faces/wires/edges/vertices, volume/area/length, bounding box, center of mass;
+  \item Measure is not on the Part toolbar: \menupath{Tools → Measure} --- select one element for its
+        coordinates/edge length/radius/area/volume, two for the minimum distance, $\Delta$X/$\Delta$Y/$\Delta$Z and the
+        angle between two straight edges or two faces;
+  \item \ui{Mass properties}: volume, area, density, mass, center of mass, moments of inertia (mass needs a material
+        density on the object first);
+  \item \ui{Units converter}: a calculator for converting between units.
+\end{itemize}
+
+\section{Building and compounding}
+
+\begin{itemize}
+  \item \ui{Shape builder} (\cmd{Part\_Builder}): two points make an edge, edges make a wire, points/edges make a face,
+        faces make a shell, shells make a solid;
+  \item \ui{Convert to solid}: shell/compound → solid;
+  \item \ui{Compound}, \ui{Explode compound}, \ui{Compound filter}, \ui{Tolerance set};
+  \item \ui{Defeaturing}: tap faces to remove the features they carry;
+  \item \ui{Refine shape}, \ui{Reverse shapes}, \ui{Simple copy/transformed copy/element copy};
+  \item Selection filtering: vertex/edge/face selection, \ui{Selection filter}, \ui{Drag a box to select faces}.
+\end{itemize}
+
+\section{Import and export}
+
+\ui{Import}/\ui{Export} use the system file picker and sniff the format from the file contents:
+
+\begin{itemize}
+  \item STEP / IGES → Part import; STL / PLY / OFF / 3MF → mesh; BREP → Part; OBJ/IFC/DXF/SVG go to their own importers;
+  \item On export, \textbf{changing the extension changes the format}: \file{.step}, \file{.iges}, \file{.brep},
+        \file{.stl}, \file{.obj}...;
+  \item Before exporting several objects you can \ui{Compound} them into one; otherwise each is written separately.
+\end{itemize}
+
+\begin{practice}[Exercise: a Boolean cut and an export]
+\begin{enumerate}
+  \item Create a box (20×20×20) and a cylinder (radius 5, height 30);
+  \item Move the cylinder to the center of the box (double-tap the cylinder in the tree and edit ``Placement'', or change
+        the position in the dialog);
+  \item Tap the box first, then the cylinder → \ui{Boolean → Cut} → a block with a through hole;
+  \item \ui{Check geometry} to confirm that the BOP check is clean;
+  \item \ui{File → Export}, name the file \file{block.step} and save.
+\end{enumerate}
+\end{practice}
+
+\section{Division of labour with PartDesign}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Scenario} & \textbf{Use} \\
+\midrule
+You will keep changing dimensions and want history & PartDesign \\
+A quick blank or a one-off operation & Part \\
+Working with imported STEP/IGES & Part \\
+Merging several independent solids into one & Part's Boolean/Compound \\
+You need fillets you can go back and edit & PartDesign \\
+\bottomrule
+\end{tabularx}
+\end{center}

@@ -1,0 +1,390 @@
+\chapter{Command reference}
+\markboth{Appendix A · Command reference}{Appendix A · Command reference}
+
+The tables below list the main commands of each workbench: the English label, the label the Chinese interface
+shows, and the FreeCAD command ID. The ID is the same as on the desktop: search it there, or run
+\file{Gui.runCommand("ID")} in FreeCAD's Python console. The in-app \ui{Search all tools} box searches all 984
+commands; its data is \file{assets/freecad/catalog.json} in this repository.
+
+\section{Core（Std）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+About \%1 & 关于 \%1 & \cmd{Std\_About} \\
+About Qt & 关于 Qt & \cmd{Std\_AboutQt} \\
+Activate Window & 激活窗口 & \cmd{Std\_WindowsMenu} \\
+Align to Selection & 对齐到所选 & \cmd{Std\_AlignToSelection} \\
+Align To... & 对齐到… & \cmd{Std\_Alignment} \\
+Annotation Label & 注释标签 & \cmd{Std\_AnnotationLabel} \\
+Appearance & 外观 & \cmd{Std\_SetAppearance} \\
+Attach to Remote Debugger & 附加到远程调试器 & \cmd{Std\_MacroAttachDebugger} \\
+Bottom & 底视 & \cmd{Std\_ViewBottom} \\
+Bounding Box & 包围盒 & \cmd{Std\_SelBoundingBox} \\
+Box Element Selection & 框选元素 & \cmd{Std\_BoxElementSelection} \\
+Box Selection & 框选 & \cmd{Std\_BoxSelection} \\
+Box Zoom & 框选缩放 & \cmd{Std\_ViewBoxZoom} \\
+Breakable Bar & 可分割条 & \cmd{Std\_TestProgress1} \\
+Bypass Mouse Events in Overlay Panels & 覆盖面板穿透鼠标事件 & \cmd{Std\_DockOverlayMouseTransparent} \\
+Cascade & 层叠 & \cmd{Std\_CascadeWindows} \\
+Choose Open Window & 选择打开的窗口 & \cmd{Std\_Windows} \\
+Clarify Selection & 澄清选择 & \cmd{Std\_ClarifySelection} \\
+Clipping View & 剖切视图 & \cmd{Std\_ToggleClipPlane} \\
+Close & 关闭 & \cmd{Std\_CloseActiveWindow} \\
+Close All & 全部关闭 & \cmd{Std\_CloseAllWindows} \\
+Collapse Selected Items & 折叠选定项目 & \cmd{Std\_TreeCollapse} \\
+Collapse/Expand & 折叠/展开 & \cmd{Std\_TreeCollapseDocument} \\
+Command Line & 命令行 & \cmd{Std\_CommandLine} \\
+Copy & 复制 & \cmd{Std\_Copy} \\
+Customize & 自定义 & \cmd{Std\_DlgCustomize} \\
+Cut & 剪切 & \cmd{Std\_Cut} \\
+Delete & 删除 & \cmd{Std\_Delete} \\
+Dependency Graph & 依赖关系图 & \cmd{Std\_DependencyGraph} \\
+Developers Handbook & 开发人员手册 & \cmd{Std\_DevHandbook} \\
+\bottomrule
+\end{longtable}
+\section{Sketch（Sketcher）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Arc & 圆弧 & \cmd{Sketcher\_CompCreateArc} \\
+B-Spline & 贝塞尔曲线 & \cmd{Sketcher\_CompCreateBSpline} \\
+Conic & 圆锥 & \cmd{Sketcher\_CompCreateConic} \\
+Dimension & 尺寸 & \cmd{Sketcher\_CompDimensionTools} \\
+Edit Edges & 编辑边 & \cmd{Sketcher\_CompCurveEdition} \\
+External Geometry & 外部几何元素 & \cmd{Sketcher\_CompExternal} \\
+Fillet/Chamfer & 圆角/倒角 & \cmd{Sketcher\_CompCreateFillets} \\
+Horizontal/Vertical Constraint & 水平/垂直约束 & \cmd{Sketcher\_CompHorVer} \\
+Polygon & 多边形 & \cmd{Sketcher\_CompCreateRegularPolygon} \\
+Polyline & 折线 & \cmd{Sketcher\_CompLine} \\
+Radius/Diameter Dimension & 半径/直径尺寸 & \cmd{Sketcher\_CompConstrainRadDia} \\
+Rectangle & 矩形 & \cmd{Sketcher\_CompCreateRectangles} \\
+Slot & 长圆槽 & \cmd{Sketcher\_CompSlot} \\
+Toggle Constraints & 切换约束 & \cmd{Sketcher\_CompToggleConstraints} \\
+Align View to Sketch & 将视图对齐到草图 & \cmd{Sketcher\_ViewSketch} \\
+Angle Dimension & 角度尺寸 & \cmd{Sketcher\_ConstrainAngle} \\
+Arc From 3 Points & 三点创建圆弧 & \cmd{Sketcher\_Create3PointArc} \\
+Arc From Center & 从圆心创建圆弧 & \cmd{Sketcher\_CreateArc} \\
+Arc Slot & 弧形槽 & \cmd{Sketcher\_CreateArcSlot} \\
+Attach Sketch & 附加草图 & \cmd{Sketcher\_MapSketch} \\
+B-Spline From Knots & 通过节点创建B样条 & \cmd{Sketcher\_CreateBSplineByInterpolation} \\
+Block Constraint & 固定约束 & \cmd{Sketcher\_ConstrainBlock} \\
+Cancel Editing & 取消编辑 & \cmd{Sketcher\_CancelSketch} \\
+Carbon Copy & 影子克隆 & \cmd{Sketcher\_CarbonCopy} \\
+Centered Rectangle & 居中矩形 & \cmd{Sketcher\_CreateRectangle\_Center} \\
+Chamfer & 倒角 & \cmd{Sketcher\_CreateChamfer} \\
+Circle From 3 Points & 三点创建圆 & \cmd{Sketcher\_Create3PointCircle} \\
+Circle From Center & 从圆心创建圆 & \cmd{Sketcher\_CreateCircle} \\
+Clone & 克隆 & \cmd{Sketcher\_CompCopy} \\
+Coincident Constraint & 重合约束 & \cmd{Sketcher\_ConstrainCoincidentUnified} \\
+\bottomrule
+\end{longtable}
+\section{Part Design（PartDesign）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Additive Primitive & 增料图元 & \cmd{PartDesign\_CompPrimitiveAdditive} \\
+Create Datum & 创建基准 & \cmd{PartDesign\_CompSketches} \\
+Subtractive Primitive & 减料图元 & \cmd{PartDesign\_CompPrimitiveSubtractive} \\
+Additive Box & 增料立方体 & \cmd{PartDesign\_AdditiveBox} \\
+Additive Cone & 增料圆锥体 & \cmd{PartDesign\_AdditiveCone} \\
+Additive Cylinder & 增料圆柱体 & \cmd{PartDesign\_AdditiveCylinder} \\
+Additive Ellipsoid & 增料椭球体 & \cmd{PartDesign\_AdditiveEllipsoid} \\
+Additive Helix & 添加式螺旋 & \cmd{PartDesign\_AdditiveHelix} \\
+Additive Loft & 添加式放样 & \cmd{PartDesign\_AdditiveLoft} \\
+Additive Pipe & 添加式管道 & \cmd{PartDesign\_AdditivePipe} \\
+Additive Prism & 增料棱柱体 & \cmd{PartDesign\_AdditivePrism} \\
+Additive Sphere & 增料球体 & \cmd{PartDesign\_AdditiveSphere} \\
+Additive Torus & 增料圆环体 & \cmd{PartDesign\_AdditiveTorus} \\
+Additive Wedge & 增料楔形体 & \cmd{PartDesign\_AdditiveWedge} \\
+Boolean Operation & 布尔运算 & \cmd{PartDesign\_Boolean} \\
+Chamfer & 倒角 & \cmd{PartDesign\_Chamfer} \\
+Circular Pattern & 圆周阵列 & \cmd{PartDesign\_CircularPattern} \\
+Clone & 克隆 & \cmd{PartDesign\_Clone} \\
+Datum Line & 基准线 & \cmd{PartDesign\_Line} \\
+Datum Plane & 基准面 & \cmd{PartDesign\_Plane} \\
+Datum Point & 基准点 & \cmd{PartDesign\_Point} \\
+Defeaturing & 清除特征 & \cmd{PartDesign\_Defeaturing} \\
+Draft & Draft & \cmd{PartDesign\_Draft} \\
+Duplicate Object & 复制对象 & \cmd{PartDesign\_DuplicateSelection} \\
+Fillet & 圆角 & \cmd{PartDesign\_Fillet} \\
+Groove & 挖槽 & \cmd{PartDesign\_Groove} \\
+Hole & 孔 & \cmd{PartDesign\_Hole} \\
+Involute Gear & 渐开线齿轮 & \cmd{PartDesign\_InvoluteGear} \\
+Linear Pattern & 线性阵列 & \cmd{PartDesign\_LinearPattern} \\
+Local Coordinate System & 局部坐标系 & \cmd{PartDesign\_CoordinateSystem} \\
+\bottomrule
+\end{longtable}
+\section{Part（Part）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Compound Tools & 复合工具 & \cmd{Part\_CompCompoundTools} \\
+Join Shapes & 合并形状 & \cmd{Part\_CompJoinFeatures} \\
+Link Arrays & 链接阵列 & \cmd{Part\_LinkArrays} \\
+Offset & 偏移 & \cmd{Part\_CompOffset} \\
+Split Shapes & 分割形状 & \cmd{Part\_CompSplitFeatures} \\
+2D Offset & 2D 偏移 & \cmd{Part\_Offset2D} \\
+3D Offset & 3D 偏移 & \cmd{Part\_Offset} \\
+Appearance per Face & 每面外观 & \cmd{Part\_ColorPerFace} \\
+Attachment & 附着 & \cmd{Part\_EditAttachment} \\
+Boolean Fragments & 布尔碎片 & \cmd{Part\_BooleanFragments} \\
+Boolean Operation & 布尔运算 & \cmd{Part\_Boolean} \\
+Boolean XOR & 布尔异或 & \cmd{Part\_XOR} \\
+Box Fix 1 & 盒子修复1 & \cmd{Part\_Box2} \\
+Box Fix 2 & 盒子修复2 & \cmd{Part\_Box3} \\
+Box Selection & 框选 & \cmd{Part\_BoxSelection} \\
+Chamfer & 倒角 & \cmd{Part\_Chamfer} \\
+Check Geometry & 检查几何 & \cmd{Part\_CheckGeometry} \\
+Circular Link Array & 圆周链接阵列 & \cmd{Part\_LinkArrayCircular} \\
+Compound & 组合 & \cmd{Part\_Compound} \\
+Compound Filter & 组合过滤器 & \cmd{Part\_CompoundFilter} \\
+Cone & 圆锥体 & \cmd{Part\_Cone} \\
+Connect Shapes & 连接形状 & \cmd{Part\_JoinConnect} \\
+Convert to Solid & 转换为实体 & \cmd{Part\_MakeSolid} \\
+Coordinate System & 坐标系 & \cmd{Part\_CoordinateSystem} \\
+Cross-Sections & 横截面 & \cmd{Part\_CrossSections} \\
+Cube & 立方体 & \cmd{Part\_Box} \\
+Cut & 剪切 & \cmd{Part\_Cut} \\
+Cutout Shape & 切出形状 & \cmd{Part\_JoinCutout} \\
+Cylinder & 圆柱体 & \cmd{Part\_Cylinder} \\
+Datum Line & 基准线 & \cmd{Part\_DatumLine} \\
+\bottomrule
+\end{longtable}
+\section{Draft（Draft）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+2D View Tools & 二维视图工具 & \cmd{Draft\_Shape2DViewTools} \\
+Arc Tools & 圆弧工具 & \cmd{Draft\_ArcTools} \\
+Array Tools & 阵列工具 & \cmd{Draft\_ArrayTools} \\
+Bézier Tools & 贝塞尔工具 & \cmd{Draft\_BezierTools} \\
+Add to Construction Group & 添加到构造组 & \cmd{Draft\_AddConstruction} \\
+Add to Group & 添加到组 & \cmd{Draft\_AddToGroup} \\
+Add to Layer & 添加到图层 & \cmd{Draft\_AddToLayer} \\
+Annotation Styles & 注释样式 & \cmd{Draft\_AnnotationStyleEditor} \\
+Apply Current Style & 应用当前样式 & \cmd{Draft\_ApplyStyle} \\
+Arc & 圆弧 & \cmd{Draft\_Arc} \\
+Arc From 3 Points & 三点创建圆弧 & \cmd{Draft\_Arc\_3Points} \\
+Array & 阵列 & \cmd{Draft\_OrthoArray} \\
+Auto-Group & 自动分组 & \cmd{Draft\_AutoGroup} \\
+B-Spline & 贝塞尔曲线 & \cmd{Draft\_BSpline} \\
+Bézier Curve & 贝塞尔曲线 & \cmd{Draft\_BezCurve} \\
+Circle & 圆 & \cmd{Draft\_Circle} \\
+Circular Array & 环形阵列 & \cmd{Draft\_CircularArray} \\
+Clone & 克隆 & \cmd{Draft\_Clone} \\
+Convert Wire/B-Spline & 转换多段线/B样条曲线 & \cmd{Draft\_WireToBSpline} \\
+Cubic Bézier Curve & 三次贝塞尔曲线 & \cmd{Draft\_CubicBezCurve} \\
+Dimension & 尺寸 & \cmd{Draft\_Dimension} \\
+Downgrade & 降级 & \cmd{Draft\_Downgrade} \\
+Draft to Sketch & 草绘转草图 & \cmd{Draft\_Draft2Sketch} \\
+Edit & 编辑 & \cmd{Draft\_Edit} \\
+Ellipse & 椭圆 & \cmd{Draft\_Ellipse} \\
+Facebinder & 面引用连接 & \cmd{Draft\_Facebinder} \\
+Fillet & 圆角 & \cmd{Draft\_Fillet} \\
+Flip Dimension & 翻转标注 & \cmd{Draft\_FlipDimension} \\
+Force 2D View Update & 强制更新 2D 视图 & \cmd{Draft\_UpdateShape2DView} \\
+Hatch & 剖面线 & \cmd{Draft\_Hatch} \\
+\bottomrule
+\end{longtable}
+\section{Drawing（TechDraw）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Align Horizontal Chain Dimensions & 对齐水平链式尺寸 & \cmd{TechDraw\_ExtensionPosChainDimensionGroup} \\
+Cascade Horizontal Dimensions & 级联水平尺寸 & \cmd{TechDraw\_ExtensionCascadeDimensionGroup} \\
+Centerline & 中心线 & \cmd{TechDraw\_CenterLineGroup} \\
+Circle Centerlines & 圆中心线 & \cmd{TechDraw\_ExtensionCircleCenterLinesGroup} \\
+Cosmetic 1 Point Circle & 装饰单点圆 & \cmd{TechDraw\_ExtensionDrawCirclesGroup} \\
+Cosmetic Intersection Vertices & 装饰性交点顶点 & \cmd{TechDraw\_CommandVertexCreationGroup} \\
+Cosmetic Parallel Line & 装饰平行线 & \cmd{TechDraw\_ExtensionLinePPGroup} \\
+Cosmetic Thread Hole Side View & 装饰性螺纹孔侧视图 & \cmd{TechDraw\_ExtensionThreadsGroup} \\
+Cosmetic Vertex & 修饰顶点 & \cmd{TechDraw\_CosmeticVertexGroup} \\
+Dimension & 尺寸 & \cmd{TechDraw\_CompDimensionTools} \\
+Extend Line & 延长线 & \cmd{TechDraw\_ExtensionExtendShortenLineGroup} \\
+Extent Dimension & 扩展尺寸 & \cmd{TechDraw\_ExtentGroup} \\
+Horizontal Chain Dimension & 水平链式标注 & \cmd{TechDraw\_ExtensionCreateChainDimensionGroup} \\
+Horizontal Chamfer Dimension & 水平倒角标注 & \cmd{TechDraw\_ExtensionChamferDimensionGroup} \\
+Horizontal Coordinate Dimension & 水平坐标标注 & \cmd{TechDraw\_ExtensionCreateCoordDimensionGroup} \\
+Increase Decimal Places & 增加小数位数 & \cmd{TechDraw\_ExtensionIncreaseDecreaseGroup} \\
+Insert '⌀' Prefix & 插入 '⌀' 前缀 & \cmd{TechDraw\_ExtensionInsertPrefixGroup} \\
+Section View (Simple or Complex) & 剖面视图（简单或复杂） & \cmd{TechDraw\_SectionGroup} \\
+View Stacking Order & 视图堆叠顺序 & \cmd{TechDraw\_StackGroup} \\
+Active View & 活动视图 & \cmd{TechDraw\_ActiveView} \\
+Add View To Clip Group & 将视图添加到裁剪组 & \cmd{TechDraw\_ClipGroupAdd} \\
+Align Oblique Chain Dimensions & 对齐倾斜链式尺寸 & \cmd{TechDraw\_ExtensionPosObliqueChainDimension} \\
+Align Vertical Chain Dimensions & 对齐垂直链式尺寸 & \cmd{TechDraw\_ExtensionPosVertChainDimension} \\
+Align Vertices/Edge Horizontally & 水平对齐顶点/边 & \cmd{TechDraw\_AlignVertexesHorizontally} \\
+Align Vertices/Edge Vertically & 垂直对齐顶点/边 & \cmd{TechDraw\_AlignVertexesVertically} \\
+Angle Dimension & 角度尺寸 & \cmd{TechDraw\_AngleDimension} \\
+Angle Dimension From 3 Points & 基于3点的角度标注 & \cmd{TechDraw\_3PtAngleDimension} \\
+Arc Length Annotation & 弧长标注 & \cmd{TechDraw\_ExtensionArcLengthAnnotation} \\
+Arc Length Dimension & 弧长标注 & \cmd{TechDraw\_ExtensionCreateLengthArc} \\
+Area Annotation & 面积注释 & \cmd{TechDraw\_AreaDimension} \\
+\bottomrule
+\end{longtable}
+\section{Assembly（Assembly）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Gears/Belt Joint & 齿轮/皮带配合 & \cmd{Assembly\_CreateJointGearBelt} \\
+Insert Component & 插入零件 & \cmd{Assembly\_Insert} \\
+Activate Assembly & 激活装配体 & \cmd{Assembly\_ActivateAssembly} \\
+Angle Joint & 角度配合 & \cmd{Assembly\_CreateJointAngle} \\
+Ball Joint & 球窝配合 & \cmd{Assembly\_CreateJointBall} \\
+Belt Joint & 皮带配合 & \cmd{Assembly\_CreateJointBelt} \\
+Bill of Materials & 材料清单 & \cmd{Assembly\_CreateBom} \\
+Create Rigid Group & 创建刚性组 & \cmd{Assembly\_CreateJointRigidGroup} \\
+Cylindrical Joint & 同轴配合 & \cmd{Assembly\_CreateJointCylindrical} \\
+Distance Joint & 距离配合 & \cmd{Assembly\_CreateJointDistance} \\
+Exploded View & 爆炸视图 & \cmd{Assembly\_CreateView} \\
+Export ASMT File & 导出 ASMT 文件 & \cmd{Assembly\_ExportASMT} \\
+Fixed Joint & 固定配合 & \cmd{Assembly\_CreateJointFixed} \\
+Gears Joint & 齿轮配合 & \cmd{Assembly\_CreateJointGears} \\
+Go to Linked Assembly & 转到关联的装配体 & \cmd{Assembly\_LinkSelectLinked} \\
+New Assembly & 新建装配体 & \cmd{Assembly\_CreateAssembly} \\
+New Part & 新零件 & \cmd{Assembly\_InsertNewPart} \\
+Parallel Joint & 平行配合 & \cmd{Assembly\_CreateJointParallel} \\
+Perpendicular Joint & 垂直配合 & \cmd{Assembly\_CreateJointPerpendicular} \\
+Rack and Pinion Joint & 齿轮齿条配合 & \cmd{Assembly\_CreateJointRackPinion} \\
+Revolute Joint & 旋转配合 & \cmd{Assembly\_CreateJointRevolute} \\
+Screw Joint & 螺纹配合 & \cmd{Assembly\_CreateJointScrew} \\
+Select Component Joints & 选择零件配合 & \cmd{Assembly\_SelectJointsOfComponent} \\
+Select Components With DoFs & 选择具有自由度的零件 & \cmd{Assembly\_SelectComponentsWithDoFs} \\
+Select Conflicting Constraints & 选择冲突约束 & \cmd{Assembly\_SelectConflictingConstraints} \\
+Select Malformed Constraints & 选择格式错误的约束 & \cmd{Assembly\_SelectMalformedConstraints} \\
+Select Redundant Constraints & 选择冗余约束 & \cmd{Assembly\_SelectRedundantConstraints} \\
+Simulation & 模拟 & \cmd{Assembly\_CreateSimulation} \\
+Slider Joint & 滑块配合 & \cmd{Assembly\_CreateJointSlider} \\
+Snapshot & 快照 & \cmd{Assembly\_CreateSnapshot} \\
+\bottomrule
+\end{longtable}
+\section{Spreadsheet（Spreadsheet）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Align Bottom & 底部对齐 & \cmd{Spreadsheet\_AlignBottom} \\
+Align Horizontal Center & 水平居中对齐 & \cmd{Spreadsheet\_AlignCenter} \\
+Align Left & 左对齐 & \cmd{Spreadsheet\_AlignLeft} \\
+Align Right & 右对齐 & \cmd{Spreadsheet\_AlignRight} \\
+Align Top & 顶部对齐 & \cmd{Spreadsheet\_AlignTop} \\
+Align Vertical Center & 垂直居中对齐 & \cmd{Spreadsheet\_AlignVCenter} \\
+Bold Text & 粗体文本 & \cmd{Spreadsheet\_StyleBold} \\
+Export Spreadsheet & 导出电子表格 & \cmd{Spreadsheet\_Export} \\
+Import Spreadsheet & 导入电子表格 & \cmd{Spreadsheet\_Import} \\
+Italic Text & 斜体文本 & \cmd{Spreadsheet\_StyleItalic} \\
+Merge Cells & 合并单元格 & \cmd{Spreadsheet\_MergeCells} \\
+New Spreadsheet & 新建电子表格 & \cmd{Spreadsheet\_CreateSheet} \\
+Set Alias & 设置别名 & \cmd{Spreadsheet\_SetAlias} \\
+Split Cell & 拆分单元格 & \cmd{Spreadsheet\_SplitCell} \\
+Underline Text & 下划线文本 & \cmd{Spreadsheet\_StyleUnderline} \\
+\bottomrule
+\end{longtable}
+\section{CAM（CAM）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Dressup Operations & 修饰操作 & \cmd{CAM\_DressupTools} \\
+Drilling Operations & 钻孔操作 & \cmd{CAM\_DrillingTools} \\
+Engraving Operations & 雕刻加工 & \cmd{CAM\_EngraveTools} \\
+Post process Operations & 后处理加工 & \cmd{CAM\_PostTools} \\
+Simulators & 模拟器 & \cmd{CAM\_SimTools} \\
+3dTools & 三维工具 & \cmd{CAM\_3dTools} \\
+Adaptive & 自适应 & \cmd{CAM\_Adaptive} \\
+Add Toolbit... & 添加刀具… & \cmd{CAM\_ToolBitDock} \\
+Area & 区域 & \cmd{CAM\_Area} \\
+Area Workplane & 区域工作平面 & \cmd{CAM\_Area\_Workplane} \\
+Array & 阵列 & \cmd{CAM\_Array} \\
+Axis Map & 轴映射 & \cmd{CAM\_DressupAxisMap} \\
+Boundary & 边界 & \cmd{CAM\_DressupPathBoundary} \\
+Boundary2 & 边界2 & \cmd{CAM\_DressupPathBoundary2} \\
+CAM Simulator & CAM模拟器 & \cmd{CAM\_SimulatorGL} \\
+CAMotics & CAMotics & \cmd{CAM\_Camotics} \\
+Comment & 注释 & \cmd{CAM\_Comment} \\
+Compound & 组合 & \cmd{CAM\_Compound} \\
+Copy & 复制 & \cmd{CAM\_Copy} \\
+Copy Operation & 复制操作 & \cmd{CAM\_OperationCopy} \\
+Custom & 自定义 & \cmd{CAM\_Custom} \\
+Deburr & 去毛刺 & \cmd{CAM\_Deburr} \\
+Dogbone & 狗骨圆角 & \cmd{CAM\_DressupDogbone} \\
+Drag Knife & 拖刀 & \cmd{CAM\_DressupDragKnife} \\
+Drilling & 钻孔 & \cmd{CAM\_Drilling} \\
+Engrave & 雕刻 & \cmd{CAM\_Engrave} \\
+Export Template & 导出模板 & \cmd{CAM\_ExportTemplate} \\
+Finish Selecting Loop & 完成所选循环 & \cmd{CAM\_SelectLoop} \\
+Fixture & 夹具 & \cmd{CAM\_Fixture} \\
+From Shape & 从形状 & \cmd{CAM\_Shape} \\
+\bottomrule
+\end{longtable}
+\section{Mesh（Mesh）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Add Triangle & 添加三角形 & \cmd{Mesh\_AddFacet} \\
+Bounding Box Info & 边界框信息 & \cmd{Mesh\_BoundingBox} \\
+Close Hole & 封闭孔 & \cmd{Mesh\_FillInteractiveHole} \\
+Cross-Sections & 横截面 & \cmd{Mesh\_CrossSections} \\
+Curvature Info & 曲率信息 & \cmd{Mesh\_CurvatureInfo} \\
+Curvature Plot & 曲率图 & \cmd{Mesh\_VertexCurvature} \\
+Cut & 剪切 & \cmd{Mesh\_PolyCut} \\
+Decimate & 精简 & \cmd{Mesh\_Decimating} \\
+Difference & 差集 & \cmd{Mesh\_Difference} \\
+Evaluate and Repair & 评估和修复 & \cmd{Mesh\_Evaluation} \\
+Evaluate Solid & 评估实体 & \cmd{Mesh\_EvaluateSolid} \\
+Export Mesh... & 导出网格… & \cmd{Mesh\_Export} \\
+Face Info & 面信息 & \cmd{Mesh\_EvaluateFacet} \\
+Fill Holes & 填充孔 & \cmd{Mesh\_FillupHoles} \\
+Flip Normals & 翻转法线 & \cmd{Mesh\_FlipNormals} \\
+Harmonize Normals & 协调法线 & \cmd{Mesh\_HarmonizeNormals} \\
+Import Mesh... & 导入网格… & \cmd{Mesh\_Import} \\
+Intersection & 交集 & \cmd{Mesh\_Intersection} \\
+Merge & 合并 & \cmd{Mesh\_Merge} \\
+Mesh From Geometry & 来自几何体的网格 & \cmd{Mesh\_FromGeometry} \\
+Mesh From Shape & 来自形状的网格 & \cmd{Mesh\_FromPartShape} \\
+Refinement & 精制 & \cmd{Mesh\_RemeshGmsh} \\
+Regular Solid & 常规实体 & \cmd{Mesh\_BuildRegularSolid} \\
+Remove Components & 删除组件 & \cmd{Mesh\_RemoveComponents} \\
+Remove Components Manually & 手动移除组件 & \cmd{Mesh\_RemoveCompByHand} \\
+Scale & 缩放 & \cmd{Mesh\_Scale} \\
+Section From Plane & 平面剖切 & \cmd{Mesh\_SectionByPlane} \\
+Segment & 段 & \cmd{Mesh\_PolySegm} \\
+Segmentation & 段 & \cmd{Mesh\_Segmentation} \\
+Segmentation From Best-Fit Surfaces & 从最佳拟合曲面进行分割 & \cmd{Mesh\_SegmentationBestFit} \\
+\bottomrule
+\end{longtable}
+\section{BIM（BIM）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Arc Tools & 圆弧工具 & \cmd{BIM\_ArcTools} \\
+Array Tools & 阵列工具 & \cmd{BIM\_ArrayTools} \\
+Axis Tools & 轴线工具 & \cmd{BIM\_AxisTools} \\
+Boolean Tools & 布尔工具 & \cmd{BIM\_BooleanTools} \\
+Cloning Tools & 克隆工具 & \cmd{BIM\_CloneTools} \\
+Create 2D Views & 创建 2D 视图 & \cmd{BIM\_Create2DViews} \\
+Extrude Tools & 拉伸工具 & \cmd{BIM\_ExtrudeTools} \\
+Generic 3D Tools & 通用 3D 工具 & \cmd{BIM\_GenericTools} \\
+IFC Management & IFC 管理 & \cmd{BIM\_IfcManageTools} \\
+Offset Tools & 偏移工具 & \cmd{BIM\_OffsetTools} \\
+Report Tools & 报表工具 & \cmd{BIM\_ReportTools} \\
+Spline Tools & 样条曲线工具 & \cmd{BIM\_SplineTools} \\
+2D Drawing & 2D 绘图 & \cmd{BIM\_DrawingView} \\
+2D Offset & 2D 偏移 & \cmd{BIM\_Offset2D} \\
+Aligned Dimension & 对齐标注 & \cmd{BIM\_DimensionAligned} \\
+Beam & 梁 & \cmd{BIM\_Beam} \\
+BIM Examples & BIM 示例 & \cmd{BIM\_Examples} \\
+BIM Help & BIM 帮助 & \cmd{BIM\_Help} \\
+BIM Setup & BIM 设置 & \cmd{BIM\_Setup} \\
+BIM Tutorial & BIM 教程 & \cmd{BIM\_Tutorial} \\
+BIM Welcome Screen & BIM欢迎屏幕 & \cmd{BIM\_Welcome} \\
+Box & 立方体 & \cmd{BIM\_Box} \\
+Clone & 克隆 & \cmd{BIM\_Clone} \\
+Column & 柱 & \cmd{BIM\_Column} \\
+Compound & 组合 & \cmd{BIM\_Compound} \\
+Convert to BIM & 转换为 BIM & \cmd{BIM\_Convert} \\
+Copy & 复制 & \cmd{BIM\_Copy} \\
+Covering & 覆盖层 & \cmd{BIM\_Covering} \\
+Difference & 差集 & \cmd{BIM\_Cut} \\
+Door & 门 & \cmd{BIM\_Door} \\
+\bottomrule
+\end{longtable}
+\section{Surface（Surface）}
+\begin{longtable}{@{}p{0.34\linewidth}p{0.26\linewidth}p{0.32\linewidth}@{}}
+\toprule English & 中文界面 & Command ID \\ \midrule \endhead
+Blend Curve & 混合曲线 & \cmd{Surface\_BlendCurve} \\
+Curve on Mesh & 网格上的曲线 & \cmd{Surface\_CurveOnMesh} \\
+Extend Face & 延伸面 & \cmd{Surface\_ExtendFace} \\
+Fill Boundary Curves & 填充边界曲线 & \cmd{Surface\_GeomFillSurface} \\
+Filling & 填充 & \cmd{Surface\_Filling} \\
+Sections & 截面 & \cmd{Surface\_Sections} \\
+Surface Cut & 曲面切割 & \cmd{Surface\_Cut} \\
+\bottomrule
+\end{longtable}

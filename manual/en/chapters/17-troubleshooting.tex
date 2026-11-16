@@ -1,0 +1,87 @@
+\chapter{Troubleshooting and Data Safety}
+
+\section{Startup problems}
+
+\begin{description}
+  \item[Splash screen stuck on ``Extracting the CAD engine\ldots{}''] The first start, or the first start after an update,
+        needs to unpack about 1 GB of runtime. Keep the screen awake and make sure at least 2 GB of free space remains.
+        If there is still no progress after 3 minutes, force-stop the app and open it again; if it keeps failing,
+        uninstall and reinstall (documents on the storage card are not affected).
+  \item[Red text ``CAD engine failed to start: \ldots{}''] Note the error message after the red text. Common causes:
+        not enough storage, a device ABI mismatch (this APK supports arm64 only), or a broken system WebView/runtime.
+        Try rebooting the device first; if it keeps failing, report the error message.
+  \item[The app closes immediately after starting] Check whether a repackaged build whose signature conflicts with
+        the official one is installed; uninstall it and reinstall the package from the appropriate channel.
+\end{description}
+
+\section{Feature failures}
+
+Red text or an exclamation mark in the feature tree means the feature cannot be computed. Work through these steps in order:
+
+\begin{enumerate}
+  \item Double-click the feature to open its dialog and read the error at the top (for example ``Cannot find the geometry on the datum feature'' or ``The geometry does not exist on the base feature'');
+  \item Check its \textbf{references}: is the profile closed, does it self-intersect, do the referenced faces and edges still exist (changing an earlier feature may have invalidated the references);
+  \item Use \ui{Suppress} to skip it temporarily and check whether later features depend on it;
+  \item Go back to the sketch and work through the \ui{Constraints} list (conflicting, redundant, malformed), or delete the extra line segments;
+  \item Once fixed, long-press the feature and choose \ui{Recompute object}.
+\end{enumerate}
+
+\section{Sketch problems}
+
+\begin{description}
+  \item[The status bar keeps showing ``Under-constrained: N degrees of freedom''] You are still N constraints short.
+        Common omissions: a point not fixed near the origin, a missing horizontal or vertical constraint, a missing dimension.
+        Go through the \ui{Constraints} list one by one.
+  \item[Conflicting] Two constraints contradict each other (for example you gave both horizontal and vertical distances
+        and an angle as well). Delete one of them. Conflicting constraints are shown in red, and the \ui{Constraints}
+        panel can show only the conflicting or redundant ones.
+  \item[Redundant] A constraint is repeated (the same edge constrained twice); delete the extra one.
+  \item[The sketch flips] When a sketch is under-constrained, dragging geometry or changing a dimension can flip the whole
+        shape. Constrain the sketch to ``fully constrained'' and add a lock to the key points.
+  \item[Driving or reference dimensions] A dimension can be switched to ``reference (driven)'': it only shows the measured
+        value and does not take part in constraining, which is useful for checking.
+\end{description}
+
+\section{Files and export}
+
+\begin{description}
+  \item[A file opens blank or reports an error] Make sure the format is supported; for \file{.FCStd}, save with a similar
+        FreeCAD version. A complex STEP/IGES downloaded from the web can take a long time to import.
+  \item[No solids after exporting STEP] The model may contain only meshes or surfaces; check first that it is a valid solid with ``Part → Check geometry''.
+  \item[The STL surface is very rough] Reduce the deviation when exporting (0.01--0.05 mm), or refine the mesh first.
+  \item[The exported PDF is a blank page] The drawing page has no views yet, or the view scale is so large that it runs off the sheet; check the page and view properties.
+\end{description}
+
+\section{Crashes and recovery}
+
+MobileCAD has crash recovery: it saves a recovery copy every 60 seconds. After a crash, reopen the app and it offers to restore. Recommendations:
+\begin{itemize}
+  \item save manually at important milestones with \menupath{File → Save};
+  \item use \menupath{File → Save a copy} to take version snapshots;
+  \item if the recovery prompt does not appear, check \file{files/recovery/} in the app's private directory (root or a debug build required).
+\end{itemize}
+
+\section{Update problems}
+
+\begin{description}
+  \item[``Update failed: checksum mismatch''] The download is corrupt; just retry. The app verifies SHA-256.
+  \item[``Update not installed''] You must allow MobileCAD to install unknown apps: follow the prompt into system settings, grant permission, and come back.
+  \item[The F-Droid build does not offer updates] That is normal: the F-Droid build updates through F-Droid, and the app shows ``updates come from the installation source''.
+\end{description}
+
+\section{Performance and memory}
+
+\begin{itemize}
+  \item In large assemblies, hide unrelated objects first; on complex models, avoid keeping several live-preview dialogs open at once;
+  \item An FEM solve saturates the CPU, so watch for heat and throttling; start with a few thousand elements;
+  \item when free storage drops below 2 GB the system may reclaim background apps, so save before switching apps.
+\end{itemize}
+
+\section{Feedback and help}
+
+\begin{itemize}
+  \item Project repository: \url{https://github.com/LucasCoraca/mobilecad} (in an issue, include the device model, Android version,
+        MobileCAD version, FreeCAD commit, reproduction steps, and a screenshot or screen recording);
+  \item Problems in FreeCAD itself (geometry kernel, algorithms) can also be reported to the upstream FreeCAD project;
+  \item Corrections to this manual: open an issue in the repository and tag it ``manual''.
+\end{itemize}

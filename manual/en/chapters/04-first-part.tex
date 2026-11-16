@@ -1,0 +1,196 @@
+\chapter{Your first part: a bracket in twenty minutes}
+
+This chapter is one complete, reproducible exercise. Work through it and you will use the most important
+modelling chain in the app: \textbf{Sketch → Pad → Fillet → Hole → Save}. When you have finished, you can
+already build simple parts with MobileCAD.
+
+\begin{practice}[Goal]
+A rectangular bracket 60 × 40 mm and 12 mm thick, with R6 fillets at the four corners, a ⌀10 through hole in
+the centre and one ⌀5 mounting hole on each side.
+\end{practice}
+
+\section{Step 1: Create a document}
+
+On launch you get an empty document called “Unnamed”. If a document is already open, create a new one with
+\menupath{File → New} (\cmd{Std\_New}). Save it once and give it a name:
+
+\begin{enumerate}
+  \item \menupath{File → Save} (\cmd{Std\_Save});
+  \item in the system file picker choose a folder (Documents, for example) and enter \file{bracket} as the
+        file name;
+  \item tap OK. The document name in the top bar becomes \file{bracket}.
+\end{enumerate}
+
+\begin{tip}[Why save first?]
+MobileCAD autosaves at intervals and restores from a recovery copy after a crash, but saving first gives this
+session a definite home and makes it easy to use Save a copy later to compare design variants.
+\end{tip}
+
+\section{Step 2: Create a sketch and choose a datum plane}
+
+\begin{enumerate}
+  \item Make sure the \ui{Part} tab is selected at the bottom, then tap \ui{Sketch} in the top toolstrip;
+  \item in the tool panel tap \ui{New Sketch} (command \cmd{Sketcher\_NewSketch});
+  \item a \ui{Sketch plane} chooser appears: \ui{Top (XY)}, \ui{Front (XZ)}, \ui{Right (YZ)}. Choose
+        \ui{Top (XY)}.
+\end{enumerate}
+
+\screenshot{ui-sketch-plane-zh.jpg}{Choosing a datum plane when you create a sketch. Later you can use the “Attachment” property to move the sketch onto a face of the body or another datum plane.}
+
+\section{Step 3: Draw a rectangle}
+
+In sketch mode the toolstrip changes to sketch tools: four toolsets, \ui{Draw}, \ui{Constrain}, \ui{Modify}
+and \ui{View}, plus \ui{Construction: off}, \ui{Constraints} (the constraints list), the common
+\ui{Polyline}, \ui{Rectangle}, \ui{Circle}, \ui{3-point arc}, \ui{Dimension}, \ui{Trim}, \ui{Select} and
+\ui{Delete}, and at the far right ✓ (Leave sketch) and ✗ (Cancel sketch).
+
+\begin{enumerate}
+  \item Tap \ui{Rectangle};
+  \item tap once near the origin (the first corner), move your finger and tap again (the opposite corner). Do
+        not aim for exact sizes; the shape only has to be roughly right — the next step locks it down with
+        dimensions.
+\end{enumerate}
+
+\screenshot{ui-sketch-tools-zh.jpg}{The sketch tool panel: the “Sketch” toolset lists every sketch command in sections for geometry, constraints, editing and view; once you enter a sketch, the top toolstrip switches to the four sketch groups Draw / Constrain / Modify / View.}
+
+\section{Step 4: Add dimensions and make the sketch fully constrained}
+
+\begin{enumerate}
+  \item Tap \ui{Dimension} (\cmd{Sketcher\_Dimension}), tap the rectangle's two horizontal edges or two corners
+        in turn, drag to a good position and tap to place the dimension;
+  \item the Numpad appears once the dimension is placed; type \file{60} and tap ✓ to confirm;
+  \item dimension the other direction in the same way and enter \file{40};
+  \item watch the status in the bottom-left corner: when it reads \ui{Fully constrained}, every degree of
+        freedom in the sketch is constrained. If it reads “N degrees of freedom”, constraints are still
+        missing and the model can still be dragged out of shape.
+\end{enumerate}
+
+\begin{tip}[Why does full constraint matter?]
+Fully constrained means the geometry is mathematically unique. Later features (Pad, Pocket) depend on this
+sketch, and an under-constrained sketch can “jump” when a parameter changes, which makes features fail. Make it
+a habit: \textbf{do not leave a sketch until the status bar reads “Fully constrained”}.
+\end{tip}
+
+\section{Step 5: Leave the sketch}
+
+Tap ✓ at the far right of the toolstrip (its hint is “Leave sketch”). The view returns to 3D and the feature
+tree gains a \ui{Sketch}, nested inside a new \ui{Body} — that is the Part Design rule: every feature belongs
+to a body.
+
+\section{Step 6: Pad}
+
+\begin{enumerate}
+  \item Select the sketch you just drew in the tree;
+  \item tap \ui{Features} → \ui{Pad} in the toolstrip (\cmd{PartDesign\_Pad});
+  \item the feature dialog opens with \ui{Profile} already filled in. Tap the \ui{Length} row and type
+        \file{12} on the Numpad;
+  \item want to see the extrusion direction straight away? Flip the \ui{Reversed} switch;
+  \item tap ✓ in the title bar to confirm. The block appears.
+\end{enumerate}
+
+\begin{warn}[What if the feature fails?]
+If a red error appears below the dialog (for example “cannot find the geometry on the base feature”), the
+profile has a problem: it is not closed, it self-intersects or it has extra lines. Cancel, go back to the
+sketch, check for conflicts in the \ui{Constraints} list, remove the extra segments with \ui{Trim} and try
+again.
+\end{warn}
+
+\section{Step 7: Fillet the corners}
+
+\begin{enumerate}
+  \item Tap \ui{Features} → \ui{Fillet} in the toolstrip (\cmd{PartDesign\_Fillet});
+  \item the \ui{Base} row already points at the current body. Tap \ui{Edges} (or tap the four vertical edges
+        directly on the model);
+  \item enter \file{6} in \ui{Radius};
+  \item tap ✓. The four vertical edges become R6 fillets.
+\end{enumerate}
+
+\begin{tip}[The edge table in fillets and chamfers]
+The Fillet and Chamfer dialogs let you give each edge its own radius: every edge you add gets a row, and you
+can tap the value in a row to change it. To change them all at once, use the \ui{Radius for all} button.
+\end{tip}
+
+\section{Step 8: The central through hole}
+
+There are two ways to do this; the first is recommended:
+
+\subsection{Method A: the Hole feature}
+
+\begin{enumerate}
+  \item Select the \textbf{top face} first (tap the upper surface);
+  \item tap \ui{Features} → \ui{Hole} (\cmd{PartDesign\_Hole});
+  \item in the dialog set \ui{Diameter} to \file{10} and \ui{Depth type} to \ui{Through all};
+  \item tap ✓.
+\end{enumerate}
+
+\begin{tip}[Standard threads and counterbores]
+The \ui{Threaded} switch on the Hole feature generates threaded holes to ISO standards (choose thread type,
+size and class). \ui{Hole type} offers counterbore, countersink, counterdrill and other shapes, and shows the
+matching diameter, depth and angle parameters automatically.
+\end{tip}
+
+\subsection{Method B: a sketch plus a Pocket}
+
+Create a new sketch on the top face → draw a ⌀10 circle → leave the sketch → select the sketch and tap
+\ui{Pocket} (\cmd{PartDesign\_Pocket}) → set the depth to “Through all”. Both methods give the same result, but
+Method B is more flexible (you can cut non-circular holes).
+
+\section{Step 9: Two mounting holes (exercise)}
+
+Using the same approach, cut a ⌀5 through hole on each side. Hints:
+\begin{itemize}
+  \item draw the circle with the \ui{Circle} tool, add a \ui{Dimension} constraint for the diameter (enter
+        \file{5}), then position it with a \ui{Distance Dimension} constraint;
+  \item you can also cut one hole first and copy it with \ui{Polar Pattern} or \ui{Linear Pattern};
+  \item when you are done the tree should read, in order: Sketch → Pad → Fillet → Hole → Sketch → Pocket →
+        Fillet…
+\end{itemize}
+
+\section{Step 10: Go back and change parameters}
+
+This is the heart of parametric CAD:
+
+\begin{enumerate}
+  \item Double-tap \ui{Pad} in the feature tree → change the length from 12 to 20 → ✓. The whole model updates,
+        including the later fillets and holes;
+  \item double-tap the first \ui{Sketch} → change 60 to 80 → leave the sketch and the pad grows automatically;
+  \item if a later feature fails because of a size change (a hole ending up outside the body, for example),
+        the tree shows a red error; double-tap that feature to see why, then change a constraint or a position.
+\end{enumerate}
+
+\section{Step 11: Save and export}
+
+\begin{itemize}
+  \item \menupath{File → Save}: saves as \file{.FCStd}, FreeCAD's native format, which keeps the whole history;
+  \item \menupath{File → Save a copy}: writes a snapshot;
+  \item \menupath{File → Export}: choose STEP, IGES, STL, OBJ, 3MF and others for 3D printing or another CAD
+        program.
+\end{itemize}
+
+\begin{tip}[Advice for 3D printing]
+Before exporting STL, check that the solid is valid with \ui{Part → Check Geometry}. STL precision depends on
+the “Deviation” parameter: about 0.05 mm for figurine-style models on a tablet, 0.01 mm for mechanical parts.
+\end{tip}
+
+\section{Summary}
+
+You have now walked the main trunk of CAD:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Concept} & \textbf{What it is in MobileCAD} \\
+\midrule
+Sketch & A 2D profile plus constraints and dimensions; stable only once fully constrained \\
+Pad / Pocket & Add or remove material along the normal of a closed profile \\
+Fillet / Chamfer & Dress an edge; lives in the feature history \\
+Hole & A standardised hole, with threads and counterbores \\
+Feature tree & The modelling history; double-tap any step to change it \\
+Tip & Marks how far the body has been computed; roll it back to replay the history \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The next chapter covers sketches in depth: every drawing tool, every constraint type, conflict tracking and
+B-splines.

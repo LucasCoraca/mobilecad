@@ -1,0 +1,50 @@
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\markboth{Preface}{Preface}
+
+MobileCAD puts FreeCAD's modelling engine on a phone: the same geometry kernel (Open CASCADE), the same
+parametric modelling system, the same document format (\file{.FCStd}), wrapped in an interface made for
+fingers. It is not a viewer for drawings; it is a complete CAD application that really models, assembles,
+produces drawings, runs finite element analysis and generates toolpaths.
+
+This manual has one goal: \textbf{to take you from opening the app for the first time to completing a
+moderately complex product design on your own}. So it is not a feature list. It is organised in the order
+“get it running, go deeper, then bring it all together”:
+
+\begin{itemize}
+  \item \textbf{Chapters 1--4}: what it is, installing it, reading the interface, and finishing a first part.
+        By the end of Chapter 4 you can already draw something.
+  \item \textbf{Chapters 5--7}: Sketch, Part Design and the Part workbench — the core of parametric modelling,
+        and the largest part of the book.
+  \item \textbf{Chapters 8--14}: the other workbenches: Draft, Drawing (TechDraw), variables and expressions,
+        assembly, FEM, CAM and BIM.
+  \item \textbf{Chapters 15--17}: file exchange, efficiency tips and troubleshooting.
+  \item \textbf{Appendices}: a command reference, a glossary and answers to common questions.
+\end{itemize}
+
+\section*{How to read it}
+\begin{itemize}
+  \item New to CAD: read in order, and do the \emph{exercise} in every chapter.
+  \item Have used desktop FreeCAD: see Chapter 3 for the interaction differences and Chapters 5--7 for the
+        mobile-only dialogs and the Tip mechanism; look up the rest as needed.
+  \item Just need to solve a problem: go straight to the contents, the command reference in Appendix A and
+        the FAQ in Appendix C.
+\end{itemize}
+
+\section*{Conventions}
+\begin{itemize}
+  \item \ui{Bold} text is a button, label or menu item in the interface, for example \ui{Pad} or
+        \ui{More options}.
+  \item \cmd{Monospaced} text is a FreeCAD command ID, for example \cmd{PartDesign\_Pad}, so that source and
+        manual can be compared.
+  \item \menupath{Menu → Submenu} is a navigation path, for example \menupath{File → Save}.
+  \item \textbf{Interface labels are quoted in English}, for example \ui{Pad} or \ui{Pocket}; the Chinese
+        interface names the same commands in Chinese. Section 3.7 shows how to switch languages.
+\end{itemize}
+
+\section*{About this manual}
+This manual was written by checking every item against the MobileCAD source (the Kotlin app layer, the Python
+bridge and the FreeCAD engine); command names, dialog fields and messages all come from the source. The
+screenshots come from a real device (Samsung Galaxy Tab S9+, Android 16) and from the project's official
+artwork. If you find something that no longer matches the current version, please open an issue in the project
+repository — CAD software moves fast, and the manual moves with it.

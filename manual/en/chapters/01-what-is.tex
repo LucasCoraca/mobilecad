@@ -1,0 +1,117 @@
+\chapter{What is MobileCAD}
+
+\section{In one sentence}
+
+MobileCAD is \textbf{an Android front end for the FreeCAD engine}: it packs the desktop FreeCAD modelling
+kernel, workbenches and Python ecosystem into a single APK, then rewrites the whole user interface in
+Kotlin + Jetpack Compose — for touch screens, for tablets and for phones.
+
+That means two things:
+
+\begin{enumerate}
+  \item What you get is not a “simplified” modeller. Parametric sketching, solid modelling, surfaces,
+        assembly, drawings, FEM, CAM, BIM, meshes and point clouds all rest on FreeCAD's native C++
+        implementation;
+  \item The document format is fully interchangeable with FreeCAD. A part you modelled on the phone in a
+        spare moment opens on the desktop and can be changed further, and the reverse is true as well.
+\end{enumerate}
+
+\begin{tip}[One engine, two interfaces]
+Desktop FreeCAD draws its interface with Qt; MobileCAD draws it with Compose but does \emph{not} start
+FreeCAD's Qt interface. It calls FreeCAD's App layer directly (\file{FreeCAD.so}, \file{Part.so},
+\file{PartDesign.so}, …) and uses a “Qt emulation layer” written in Python so that FreeCAD's own task panels
+(Pad parameters, BIM wall parameters, FEM constraints, …) still run — they are simply rendered as Compose
+widgets. So every dialog you see has its logic in FreeCAD itself.
+\end{tip}
+
+\section{Capability map}
+
+MobileCAD reproduces \textbf{980 of FreeCAD's 984 commands across 22 workbenches} (the parity matrix in the
+source is \file{research/PARITY.md}). The only commands not ported are desktop window-management ones with no
+phone counterpart. Grouped by purpose:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Category} & \textbf{Workbenches and capabilities} \\
+\midrule
+Parametric modelling & \textbf{Sketch} (Sketcher): geometry, constraints, dimensions, construction lines,
+B-splines; \textbf{Part Design}: Pad, Pocket, Revolution, Loft, Pipe, Helix, Hole, Fillet, Chamfer, Draft,
+Thickness, Pattern, Mirrored, datum geometry \\
+Solids and surfaces & \textbf{Part}: primitives, booleans, extrude/revolve/sweep/loft, offset, check,
+measure; \textbf{Surface} \\
+Assembly & \textbf{Assembly}: 13 joint types, grounding, solving, conflict diagnostics, BOM, snapshots,
+simulation \\
+Drawing & \textbf{Drawing} (TechDraw): pages and templates, projection groups, sections, detail views,
+dimensions, symbols, export to PDF/SVG/DXF \\
+Data and expressions & \textbf{Variables} (Spreadsheet): spreadsheets, aliases, cross-object expressions,
+unit systems \\
+Simulation and manufacturing & \textbf{FEM} (the CalculiX solver runs on the device); \textbf{CAM} (jobs,
+tools, toolpaths, post-processing) \\
+Architecture and exchange & \textbf{BIM} (walls, slabs, columns, windows, stairs, roofs, IFC import and
+export); \textbf{Mesh}, \textbf{Points}, \textbf{OpenSCAD}, \textbf{Reverse Engineering}, \textbf{Robot},
+\textbf{Inspection}, \textbf{Material} \\
+Core tools & \textbf{Std}: file, edit, view, measure, macros, dependency graph, drawing export, preferences
+and more \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tip}[Is every one of those commands used often?]
+No. Many of the 984 commands are synonyms or fine-grained operations of specialist workbenches. About
+\textbf{40} are genuinely frequent in everyday modelling: the dozen or so drawing and constraint tools in
+Sketch, Pad/Pocket/Fillet/Pattern in Part Design, and opening, saving and exporting files. This book covers
+those in depth; for the rest, use Chapter 8 and the command reference in Appendix A.
+\end{tip}
+
+\section{How it relates to desktop FreeCAD}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lXX@{}}
+\toprule
+ & \textbf{Desktop FreeCAD} & \textbf{MobileCAD} \\
+\midrule
+Geometry kernel & Open CASCADE & The same (the same cross-compiled libraries) \\
+Document format & \file{.FCStd} & The same; files open in either direction \\
+Python console & Yes & No (but macros and Python features still run) \\
+Task panels & Qt dialogs & The same Python panels, rendered as touch controls \\
+Interface & Qt Widgets, two columns full of panels & Compose, one workspace plus floating panels \\
+Input & Mouse and keyboard, shortcuts & Finger gestures + Numpad + on-screen keyboard; hardware keyboards
+supported \\
+Draft / CAM / FEM & Complete & Complete (the solvers ship inside the APK) \\
+Desktop window management & Multiple windows, docking & None (not needed on mobile) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{warn}[Keeping versions aligned]
+Every MobileCAD version is bound to one FreeCAD commit. This manual corresponds to \textbf{FreeCAD main
+e95a31c}; the subtitle in the app's top bar shows it, for example “Part · based on FreeCAD main e95a31c”. When
+you open the same document in desktop FreeCAD, use a similar version, so that new features (some PartDesign
+parameters, for instance) are not lost in an older one.
+\end{warn}
+
+\section{Requirements and performance expectations}
+
+\begin{itemize}
+  \item \textbf{System}: Android 8.0 or later on an \textbf{arm64} device (phones and tablets; Quest headsets
+        running Android use a separate MobileCAD XR build).
+  \item \textbf{Storage}: the APK is about 165 MB; once the first launch has unpacked the runtime, it occupies
+        about 1 GB. Set aside 2 GB or more.
+  \item \textbf{Memory}: 6 GB or more for smooth modelling; a tablet with 8--12 GB handles assemblies of
+        several hundred features with ease.
+  \item \textbf{Performance}: solid modelling is on a par with desktop FreeCAD. FEM solving is limited by phone
+        thermals, so keep meshes to about a third of the size you would use on the desktop. Display of large
+        assemblies is optimised for mobile (the viewport redraws on demand and uses off-screen caching).
+\end{itemize}
+
+\section{License, privacy and data}
+
+MobileCAD is free software under the \textbf{GPL-3.0-or-later} and includes FreeCAD (LGPL), Open CASCADE
+(LGPL), Qt (LGPL), Gmsh, CalculiX, IfcOpenShell and other components. All computation happens locally on the
+device: \textbf{documents are never uploaded and no cloud is involved}. The only network access is the
+“Check for updates” action you trigger yourself (it reads version information from GitHub Releases) and any
+web page you open from BIM or Help. The full list of licenses is under
+\menupath{Help → About MobileCAD → Open-source licenses}.

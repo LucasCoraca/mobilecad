@@ -1,0 +1,67 @@
+\chapter{Frequently Asked Questions}
+\markboth{Appendix C Frequently Asked Questions}{Appendix C Frequently Asked Questions}
+
+\begin{description}[style=nextline,leftmargin=0pt]
+
+\item[How does it relate to desktop FreeCAD?]
+The same engine and the same document format. MobileCAD rewrites the interface (Kotlin + Compose) and emulates Qt
+in Python so that FreeCAD's own task panels can run on a touch screen. The geometry algorithms and file formats
+are completely identical to FreeCAD's.
+
+\item[Can it replace CAD on a computer?]
+For medium-complexity design, edit, and drawing work, yes. For very large assemblies (thousands of parts),
+complex surface reconstruction, and large-scale FEM, the desktop version is still the better tool. A sensible
+division of labour: phone or tablet for ideas, edits, on-site measurements, and drawing reviews; desktop for
+heavy computation and batch work.
+
+\item[Does it support DWG?]
+No. DWG needs an external converter (ODA/LibreDWG), which is not packaged in the APK. Save the DWG as \textbf{DXF}
+and import that instead.
+
+\item[Is there a Python console and plugin support?]
+There is no interactive console and no add-on manager. But \textbf{macros still run} (\cmd{Std\_DlgMacroExecute}),
+and FreeCAD's Python commands work as usual---the BIM/CAM/FEM interfaces are themselves written in Python.
+
+\item[Where are files stored? Is there autosave?]
+You choose the location through the system file picker; the app does not force a directory. Autosave is a
+``crash recovery copy'', not a real save: it writes to the app's private directory every 60 seconds and is restored
+after a crash. Keep saving manually anyway.
+
+\item[Can I open two documents at once?]
+No. MobileCAD is a single-document interface; opening a new file replaces the current view.
+
+\item[Why are some menu items greyed out?]
+They are desktop window-management commands (multiple windows, docked panels, toolbar customisation, macro recording,
+and so on) that have no mobile equivalent. Tapping one shows ``This command is not yet available on mobile''.
+
+\item[How do I enable the Chinese interface?]
+By default it follows the system: a Chinese system shows Simplified Chinese. You can also pin it in
+\menupath{Edit → Preferences → Language} to \ui{Simplified Chinese}, \ui{English}, or \ui{System language}.
+
+\item[Which devices are supported?]
+Android 8.0 or later on arm64. Phones and tablets both work; headsets such as Quest use the MobileCAD XR build.
+The download is about 165 MB and the runtime about 1 GB.
+
+\item[Does it work offline?]
+Yes. Modelling, assembly, drawings, FEM, and CAM are all done locally. It only goes online for ``Check for updates''
+and when you open the web help or donation links.
+
+\item[How large an FEM model can it solve?]
+It depends on the device's memory and your patience. On a phone, keep the element count within a few hundred
+thousand; verify with a coarse mesh first, then refine locally. Only the CalculiX solver is supported; the Netgen
+mesher is not available.
+
+\item[Can I print drawings directly?]
+Drawing pages can be exported as PDF/SVG/DXF; mobile has no system print dialog, so ``print'' means exporting the
+current page as PDF.
+
+\item[Can GPL-licensed software be used commercially?]
+Yes. GPL-3.0 allows commercial use, but if you distribute a modified program you must also provide the corresponding
+source code. Internal use is unrestricted.
+
+\item[How do I report a problem or contribute translations?]
+Open an issue at \url{https://github.com/LucasCoraca/mobilecad} (include the device model, Android version, app version,
+FreeCAD commit, reproduction steps, and screenshots). The translation word list is in
+\file{app/app/src/main/assets/i18n/}; Chinese entries can be submitted directly as a pull request.
+
+\end{description}

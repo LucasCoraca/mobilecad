@@ -1,0 +1,106 @@
+\chapter{Variables and expressions: teaching the model to calculate}
+
+The next step in parametric modelling is to write design intent into \textbf{variables}: gather length,
+width, hole diameter and pattern count into a single spreadsheet, and let every dimension reference it.
+Change one place and the whole design updates. That is what the ``Variables'' tab (the Spreadsheet
+workbench) is for.
+
+\section{Opening and creating}
+
+\begin{enumerate}
+  \item Switch to the \ui{Variables} tab at the bottom; the empty state shows \ui{No spreadsheet yet} and
+        \ui{Create spreadsheet};
+  \item Tap \ui{Create spreadsheet} (\cmd{Spreadsheet\_CreateSheet});
+  \item The sheet replaces the 3D view; a \ui{Spreadsheet} object appears in the tree (default name
+        \file{Spreadsheet}).
+\end{enumerate}
+
+\section{Cells and input}
+
+\begin{itemize}
+  \item \textbf{Select}: tap a cell. \textbf{Range}: touch and hold to anchor the start, then tap the
+        opposite corner; you get an area such as \file{A1:C4};
+  \item \textbf{Edit}: double-tap a cell, or use the \ui{Edit} button on the right of the formula bar
+        above the grid;
+  \item Input comes in three kinds:
+    \begin{itemize}
+      \item Text: just type it;
+      \item A number with a unit: \file{25 mm}, \file{30 °};
+      \item A formula: starts with \file{=}, for example \file{=A2*2} or \file{=Sheet2.B3};
+    \end{itemize}
+  \item The left side of the formula bar shows the current selection and the right side its content (with
+        the cell's alias in parentheses if it has one, for example ``B3 (Thickness)'').
+\end{itemize}
+
+\section{Aliases: naming parameters}
+
+\begin{enumerate}
+  \item Select a cell;
+  \item Run \ui{Set alias} (\cmd{Spreadsheet\_SetAlias});
+  \item Type a name (for example \file{Thickness}).
+\end{enumerate}
+
+After that you can write \file{=Sheet.Thickness} in \textbf{any} numeric property (\file{Sheet} is the
+spreadsheet's object name and can be changed in the tree). If the alias is unique in the whole document,
+you can also shorten it to \file{=Thickness}.
+
+\section{Expressions: usable anywhere}
+
+Property rows (including values in the feature dialog, sketch dimensions, FEM loads, assembly offsets,
+and so on) all accept expressions:
+
+\begin{itemize}
+  \item Enter a plain ``number + unit'': it is stored as a value;
+  \item Enter anything else (an operation or a reference): it is stored as an \textbf{expression}, and the
+        property row shows a blue \file{=...};
+  \item Lengths and angles are both supported; vector components (for example the X/Y/Z of a placement)
+        follow the same rules.
+\end{itemize}
+
+\begin{lstlisting}
+=Sheet.Thickness            // refer to a variable
+=Sheet.Width - 2 * 3 mm     // leave a margin
+=10 mm + 5 mm               // arithmetic directly
+\end{lstlisting}
+
+\section{Formatting and data exchange}
+
+The toolbar also provides six alignments, bold/italic/underline, merge/split cells, column width and row
+height, insert/delete rows and columns, and \ui{Import}/\ui{Export} of CSV/TSV (the separator follows the
+extension: comma, semicolon or tab).
+
+\section{Unit system}
+
+\menupath{Edit → Preferences → Unit system} switches FreeCAD's unit scheme and number of decimal places.
+It affects \textbf{display and input parsing}; internally the app always uses millimetres and kilograms,
+so switching leaves existing values unchanged---only the way they are displayed changes.
+
+\begin{tip}[Treat the parameter sheet as a design specification]
+Build a sheet for every model: \file{Length}, \file{Width}, \file{Height}, \file{HoleDia},
+\file{PatternCount}, \ldots{} and write comment rows beside them explaining what each one means. When you
+come back to change the design three months later, you will thank yourself.
+\end{tip}
+
+\begin{practice}[Exercise: make the bracket configurable]
+\begin{enumerate}
+  \item On the Variables tab, create a sheet; put \file{Width} in A1 (value 60 mm), \file{Height} in A2
+        (40 mm) and \file{Hole} in A3 (10 mm);
+  \item Select B1/B2/B3 and give them the aliases \file{Width}, \file{Height} and \file{Hole};
+  \item Go back to the bracket sketch and change the two dimensions to \file{=Sheet.Width} and
+        \file{=Sheet.Height};
+  \item Change the hole diameter to \file{=Sheet.Hole};
+  \item Return to the Variables tab and change B1 to 100 mm---the bracket widens automatically, and the
+        holes and fillets update with it.
+\end{enumerate}
+\end{practice}
+
+\section{Limitations}
+
+\begin{itemize}
+  \item Formula entry is a pop-up plus the numeric keypad; there is no function-completion drop-down as in
+        the desktop version;
+  \item The cell type (text/number/formula) is decided from what you type; there is no explicit type
+        setting;
+  \item Large sheets have no filtering, sorting or charts; this is essentially a ``parameter table'', not
+        Excel.
+\end{itemize}

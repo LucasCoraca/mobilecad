@@ -1,0 +1,120 @@
+\chapter{Files, Formats, and Data Safety}
+
+MobileCAD has no cloud of its own: files are files, read and written through Android's system file picker (SAF),
+and you decide where they live. This chapter explains the formats, the save workflow, automatic recovery, and
+the usual pitfalls.
+
+\section{The native document: FCStd}
+
+\begin{itemize}
+  \item \file{.FCStd} is FreeCAD's native document: it saves \textbf{the entire modelling history} (sketches, features,
+        expressions, assemblies, drawings), stays small, and can be fully restored;
+  \item Saving keeps a \file{.fcstd1} backup;
+  \item The headless engine does not write \file{GuiDocument.xml} (interface and display information) by default;
+        MobileCAD \textbf{preserves and writes back} colours, transparency, face colours, and visibility---so when you save
+        the file back and open it on the desktop, the appearance is not lost;
+  \item When you open a \file{.FCStd} that contains an assembly, the app switches to the ``Assembly'' page automatically.
+\end{itemize}
+
+\section{Import and export}
+
+\subsection{Import}
+
+\ui{File → Import} or \ui{Part → Import}; the format is detected by content sniffing:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Format} & \textbf{Handled by} \\
+\midrule
+STEP / IGES & Part import (Import)\\
+STL / PLY / OFF / AMF / 3MF & Mesh\\
+BREP & Part\\
+IFC & NativeIFC (BIM)\\
+DXF / SVG / OBJ / DAE / CSG / 3DS / SHP, etc. & Importers registered by FreeCAD \\
+FEM results (\file{.frd}, Z88, Fenics) & FEM result import \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Export}
+
+\ui{File → Export}: \textbf{the extension is the format}---
+
+\begin{itemize}
+  \item Solids: STEP (\file{.step/.stp}), IGES, BREP, STL, OBJ, PLY, OFF, AMF, 3MF;
+  \item Buildings: IFC, IFCJSON;
+  \item 2D and drawings: DXF, SVG (flattened), PDF;
+  \item Other: WebGL (\file{.html}), CSG/SCAD, JSON;
+  \item Images: screenshots as PNG; drawing pages as PDF/SVG/DXF; spreadsheets as CSV/TSV; CAM G-code; robot \file{.src}.
+\end{itemize}
+
+\begin{warn}[Two things that do not work]
+\begin{itemize}
+  \item \textbf{DWG cannot be opened}: FreeCAD's DWG import relies on an external ODA/LibreDWG/QCAD converter,
+        which the APK does not include; convert the file to DXF first.
+  \item \textbf{glTF import may be unavailable}: the runtime lacks the corresponding import module; convert to
+        STEP/STL first if you need it.
+\end{itemize}
+\end{warn}
+
+\section{The system file picker (SAF)}
+
+Every file operation goes through Android's SAF:
+
+\begin{enumerate}
+  \item When you trigger open, save, import, or export, the app first records the request (\ui{FileRequest}) and then
+        brings up the system picker;
+  \item \textbf{Open}: copies the selected file into the app cache and hands it to the engine; the app requests
+        persistent read permission so that ``Recent files'' still work after a restart;
+  \item \textbf{Save}: the engine writes a cache file first, then writes it back through an output stream to the URI you chose;
+  \item The file picker does not filter extensions (it shows \file{*/*} only), so \textbf{always type the extension
+        yourself when saving};
+  \item If the file has no extension when you open it (for example a content provider returns \file{document:1234}),
+        the app sniffs the content: STEP header, IGES, BREP, STL length check, \file{Document.xml} in FCStd, 3MF, SVG, DXF, OBJ.
+\end{enumerate}
+
+\begin{tip}[Two ways to save]
+\begin{itemize}
+  \item \menupath{File → Save}: \textbf{overwrites silently} when the location is known, without opening the picker;
+  \item \menupath{File → Save as}: always opens the picker so you can specify a new location or name.
+\end{itemize}
+\end{tip}
+
+\section{Recent files and other document commands}
+
+\begin{itemize}
+  \item \ui{Recent files}: keeps at most \textbf{8} entries in the app configuration; reopen documents quickly from here;
+  \item \ui{Save a copy} (SaveCopy): exports a copy of the current document (keeping the view data as well);
+  \item \ui{Merge projects} (MergeProjects): merges the objects of another \file{.FCStd} into the current document;
+  \item \ui{Document information} (ProjectInfo): view or edit the title, author, company, licence, comments, and so on
+        (6 of them are editable);
+  \item \ui{Revert}: discards unsaved changes and reloads the version on disk.
+\end{itemize}
+
+\section{Autosave and crash recovery}
+
+\begin{itemize}
+  \item Every \textbf{60 seconds}, and whenever the app goes to the background, a modified document gets a recovery
+        copy in the app's private directory \file{files/recovery/} (\file{recovery.FCStd} plus a JSON file recording
+        the URI, name, and time);
+  \item The recovery copy is deleted after a normal save;
+  \item After the app crashes, the next start opens the recovery copy automatically and shows
+        \ui{Recovered unsaved work from HH:mm}; save it to a real file immediately.
+\end{itemize}
+
+\section{Single document and memory}
+
+MobileCAD is a \textbf{single-document interface}: opening a new file replaces the current view (the old document
+stays in memory and may be reclaimed by the system). For large projects:
+\begin{itemize}
+  \item one \file{.FCStd} per project, split into several files if necessary and brought together with ``Merge projects'';
+  \item save often, and use ``Save a copy'' at important milestones;
+  \item save before switching apps.
+\end{itemize}
+
+\section{Units}
+
+All lengths are stored internally in millimetres and masses in kilograms. \menupath{Preferences → Unit system}
+changes only the display and input parsing (to inches, for example); it does not change the model's actual dimensions.

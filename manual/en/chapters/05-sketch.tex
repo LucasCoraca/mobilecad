@@ -1,0 +1,313 @@
+\chapter{Sketch: where all parametric modeling starts}
+
+The Sketch workbench is the foundation of PartDesign: \textbf{2D profiles + constraints + dimensions}. This chapter takes
+the Sketch workbench apart piece by piece --- how many taps each drawing tool needs, how to use each constraint, how to
+track down a conflict, and how to edit a B-spline.
+
+\section{Entering and leaving a sketch}
+
+\subsection{Creating a sketch}
+
+\begin{enumerate}
+  \item Tap \ui{Sketch} on the toolbar (Sketcher tool group) → \ui{New sketch} (\cmd{Sketcher\_NewSketch});
+  \item If a plane or datum plane is already selected, the sketch attaches to it directly; otherwise the \ui{Sketch plane}
+        picker opens: \ui{Top (XY)}, \ui{Front (XZ)}, \ui{Right (YZ)};
+  \item The sketch lands in the \textbf{active body} (Body), with the ``FlatFace'' attachment mode. A curved surface
+        cannot be a sketch plane.
+\end{enumerate}
+
+\subsection{Editing and leaving}
+
+\begin{itemize}
+  \item To edit an existing sketch, double-tap it in the tree, or select it and tap \ui{Edit sketch} (\cmd{Sketcher\_EditSketch});
+  \item \ui{✓ Leave sketch}: saves your changes and recomputes (the button is at the far right of the toolbar);
+  \item \ui{✗ Cancel sketch}: \textbf{rolls back} to the state the sketch had when it was opened. The two buttons are
+        20 dp apart, so that you do not hit the wrong one.
+\end{itemize}
+
+\begin{warn}[Undo stops at the sketch boundary]
+Once you are inside a sketch, undo can only go back to the point before the sketch was opened --- every edit inside the
+sketch belongs to one transaction. To drop the whole session, use ✗ Cancel sketch; a cancelled sketch can still be
+brought back with Redo.
+\end{warn}
+
+\section{The sketch toolbar}
+
+Inside a sketch, the top toolbar turns into four groups:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Group} & \textbf{Contents} \\
+\midrule
+\ui{Draw} & All drawing tools --- polyline, line, rectangle, circle, arc and the rest (FreeCAD's Geometries toolbar)\\
+\ui{Constrain} & All constraint commands (the Constraints toolbar)\\
+\ui{Modify} & Trim, extend, split, fillet, chamfer, move, rotate, scale, array, external geometry, B-spline tools \\
+\ui{View} & Align view, section, grid, rendering order, arc overlay, B-spline information layer \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+To the right of the groups sit fixed buttons: \ui{Construction: on/off}, \ui{Constraints} (opens the constraint list),
+\ui{Polyline}, \ui{Rectangle}, \ui{Circle}, \ui{3-point arc}, \ui{Dimension}, \ui{Trim}, \ui{Select}, \ui{Delete},
+\ui{Finish}, and ✓ / ✗ at the far right. The tool panel is also split into sections by FreeCAD toolbar, and has
+\ui{More tools (N)}.
+
+\screenshot{ui-sketch-tools-zh.jpg}{Sketch mode: the four groups plus the fixed buttons on the top toolbar; the status bar at the bottom reads ``Fully constrained''; the pill that exits the current tool (Polyline) sits in the bottom-right corner.}
+
+\section{All drawing tools}
+
+Each drawing tool needs a number of taps; multi-point tools (polyline, B-spline) end with a \textbf{double-tap} or a tap
+on \ui{Finish}.
+
+\begin{longtable}{@{}p{0.20\linewidth}p{0.12\linewidth}p{0.60\linewidth}@{}}
+\toprule \textbf{Tool} & \textbf{Points} & \textbf{Operation} \\ \midrule \endhead
+Line & 2 & Start point → end point \\
+Polyline & multi-point & Tap segment by segment; tap the start point again to close; double-tap or ``Finish'' to end \\
+Rectangle & 2 & Two opposite corners \\
+Centered rectangle & 2 & Center → corner (adds a construction line and symmetry automatically)\\
+Circle & 2 & Center → radius point \\
+3-point circle & 3 & Three points on the circle \\
+Arc & 3 & Center → start → end (counter-clockwise)\\
+3-point arc & 3 & Start → end → a point on the arc \\
+Point & 1 & Places one point \\
+Slot & 3 & Two centers → radius point \\
+Polygon & 2 & Center → corner (the number of sides is set by the command: 3--8)\\
+Ellipse & 3 & Center → end of the major axis → a point on the ellipse \\
+Ellipse by 3 points & 3 & Three points on the ellipse \\
+Arc of ellipse & 4 & Center, major axis, start, end \\
+Arc of hyperbola & 4 & Focus, vertex, start, end \\
+Arc of parabola & 4 & Focus, vertex, start, end \\
+Rounded rectangle & 2 & Two opposite corners (with rounded corners)\\
+Arc slot & 4 & Two points on the arc + two radius points \\
+Text & 2 & Draw a handle line first, then type the text \\
+B-spline & multi-point & Control-point, periodic, or by-knot interpolation; double-tap or ``Finish'' to end \\
+\bottomrule
+\end{longtable}
+
+\subsection{Action tools (they draw no new geometry)}
+
+Trim, dimension, fillet, chamfer, extend, split, join curves, symmetry, move, copy, rotate, scale, rectangular array,
+external projection/intersection, insert knot, increase/decrease multiplicity and paste all work by tapping existing
+geometry and then acting on it; see 5.10 and 5.12 for details.
+
+\section{Snapping and automatic constraints}
+
+A sketch has a master switch, \cmd{Sketcher\_Snap} (the \ui{Snap / auto-constraint} entry in the tool panel). While it
+is on, taps snap automatically and \textbf{the right constraints are added for you}:
+
+\begin{itemize}
+  \item On an endpoint, a circle center or the origin → \textbf{Coincident};
+  \item On a model vertex or circle center → coincident, and the element is projected into the sketch implicitly;
+  \item On the intersection of two curves → ``point on object'' on both;
+  \item On the midpoint of a line segment → symmetry about its two endpoints; on the midpoint of an arc → ``point on object'';
+  \item On a curve or a coordinate axis → ``point on object'';
+  \item Nearly horizontal or vertical to the previous point (2° tolerance) → a horizontal or vertical constraint is added,
+        and a green alignment dashed line appears.
+\end{itemize}
+
+The constraint that is about to be added is written next to the cursor (for example ``coincident + horizontal''), and
+redundant constraints are removed automatically once it is applied. Turning snapping off also turns inference off; the
+grid is controlled separately by \cmd{Sketcher\_Grid}.
+
+\begin{tip}[Auto-constraints cut both ways]
+They make sketching fast, but they can add constraints you do not want without your noticing, so that a later dimension
+change makes the shape jump. Make a habit of opening the \ui{Constraints} list after drawing and deleting the
+superfluous coincident, horizontal or vertical constraints.
+\end{tip}
+
+\section{All constraint types}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Constraint} & \textbf{Use and effect} \\
+\midrule
+Coincident & Two points (or a point and a curve endpoint) coincide \\
+Point on object & A point lies on a curve or axis \\
+Horizontal/Vertical & A line is horizontal or vertical; \cmd{HorVer} decides from the current direction \\
+Parallel / Perpendicular & The relation between two lines \\
+Tangent & Two curves touch tangentially, or a curve is tangent where it meets an endpoint \\
+Equal & Equal length, equal radius \\
+Symmetric & Two points are symmetric about a point or a line \\
+Block & Pins existing geometry so that later operations cannot drag it \\
+Lock & Constrains a point by its X and Y distance from the origin at the same time \\
+Distance / Distance X / Distance Y & A length or a coordinate component \\
+Radius / Diameter & Size of a circle or arc; \cmd{Radiam} switches between them in one tap \\
+Angle & The angle between two lines, or of one line relative to the X axis \\
+Group & Treats several pieces of geometry as one (used together with Block)\\
+Snell's law (SnellsLaw) & Optical refraction constraint \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Two ways to apply a constraint}
+
+\begin{enumerate}
+  \item \textbf{Select the elements, then tap the constraint}: tap one or more pieces of geometry (points, lines,
+        circles), then tap the constraint command; it applies at once.
+  \item \textbf{Tap the constraint, then tap the elements (armed mode)}: tap a constraint command with nothing selected
+        and the status bar tells you which elements to tap in turn; once you have tapped enough, the constraint is
+        applied and you can go on to the next one. If an element is of the wrong type, it shows
+        \ui{Not a valid selection for X} and clears the selection.
+\end{enumerate}
+
+\section{Dimensions: one unified Dimension command}
+
+\cmd{Sketcher\_Dimension} works out from the current selection what to dimension --- a length, a radius, a diameter or an
+angle --- then opens the number pad with the current value filled in. X/Y distances swap the two points automatically so
+that the result is positive; point-to-line perpendicular distance is supported as well.
+
+\begin{itemize}
+  \item \textbf{Changing a dimension}: long-press the dimension label (haptic feedback) → number pad; or open the
+        constraint list and tap the ✎ at the end of the row; you can also just drag the label elsewhere;
+  \item \textbf{Driving / reference}: \ui{Make reference (driven)} in the row menu makes the dimension measure only,
+        without taking part in the solve (it turns grey and is marked ``(reference)'');
+  \item \textbf{Naming a constraint}: give it a name and you can refer to it in expressions, for example
+        \file{=Sketch.Constraints.Width * 2}.
+\end{itemize}
+
+\section{The constraint list and conflict hunting}
+
+Tap \ui{Constraints} on the toolbar to open the list (the title shows the total number of constraints):
+
+\begin{itemize}
+  \item Filter at the top: \ui{All} / \ui{Conflicts / redundant};
+  \item Each row shows the number, the name, the value and the relation (such as ``Line3 ↔ Circle5'');
+  \item Colours: \textbf{red = conflicting}, \textbf{orange = redundant}, \textbf{grey = deactivated} (marked ``(off)'');
+  \item Row menu: \ui{Deactivate/Activate}, \ui{Make reference (driven)} / \ui{Make driving}, \ui{Rename}, \ui{Delete}.
+\end{itemize}
+
+\begin{practice}[The standard conflict workflow]
+\begin{enumerate}
+  \item Open the constraint list from the status bar and filter by \ui{Conflicts / redundant};
+  \item For a red conflict, deactivate one of the two and see whether the sketch recovers, then decide which one to delete;
+  \item For an orange redundancy, just delete it --- it only repeats another constraint;
+  \item Run \ui{Validate Sketch}: it fills in missing coincidences, adds horizontal/vertical constraints and removes
+        redundancies automatically;
+  \item Go back to \ui{All} and check that the status bar reads ``Fully constrained'' again.
+\end{enumerate}
+\end{practice}
+
+\section{Construction geometry}
+
+Construction geometry only helps you draw; it does not take part in the resulting shape (it is drawn as a cyan dashed
+line).
+
+\begin{itemize}
+  \item \textbf{With no curve selected}, tap \ui{Construction: off} to switch to ``the next shape you draw is a
+        construction line'';
+  \item \textbf{With curves selected}, the same switch converts the selected curves between construction and normal;
+  \item External geometry (edges projected in) can also be toggled between ``reference'' and ``defining''.
+\end{itemize}
+
+\section{Editing tools}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Tool} & \textbf{How it works} \\
+\midrule
+Trim & Tap the segment you want to remove; one segment per tap \\
+Extend & Tap near the end to be extended, then enter the increment (10 mm by default)\\
+Split & Tap where the curve should break; one curve becomes two \\
+Join curves & Tap the endpoints of the two curves in turn \\
+Sketch fillet / chamfer & Tap a \textbf{vertex} and enter the radius or size (2 mm by default)\\
+Move / Copy & Select geometry, then tap twice to define the displacement vector \\
+Rotate & Select geometry → tap the center → enter the angle (90° by default)\\
+Scale & Select geometry → tap the center → enter the factor (2 by default)\\
+Symmetric & Select geometry → tap the symmetry line or the symmetry point \\
+Rectangular array & Select geometry → tap twice to set direction and spacing → enter rows and columns (2 × 2 by default)\\
+Offset & Select geometry and tap the tool; positive values grow outward, negative ones shrink inward \\
+Paste & Copy or cut first, then tap the target point with the paste tool \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{warn}[These tools all have preconditions]
+Symmetric, move, rotate, scale, array and offset all require \textbf{geometry to be selected first}; otherwise they only
+say ``select geometry first''. Fillet and chamfer act on a vertex, not on any two curves; trim and split handle one curve
+at a time.
+\end{warn}
+
+\section{External geometry: referencing edges on the model}
+
+\ui{External projection} projects edges and vertices of the model into the sketch as drawing references;
+\ui{External intersection} takes the faces or edges that intersect the sketch plane instead.
+
+\begin{itemize}
+  \item Pick the tool, then tap an edge or vertex on the model;
+  \item Across bodies, the app switches to an element in the same body, or creates a SubShapeBinder; when that would be a
+        circular reference it reports an error;
+  \item Projected geometry is ``reference'' by default (it does not form the shape) and can be switched to ``defining''
+        (it does).
+\end{itemize}
+
+\section{B-splines and curve editing}
+
+Four ways to create one: \textbf{control-point}, \textbf{periodic} (at least 3 points), \textbf{by-knot interpolation} and
+\textbf{periodic interpolation}. The degree is $\min(3, n-1)$.
+
+\begin{itemize}
+  \item \ui{Insert knot}: tap a position on the curve; the knot is inserted at the nearest point;
+  \item \ui{Increase/decrease knot multiplicity}: you must tap a knot, otherwise it says \ui{Select a B-spline knot};
+  \item \ui{Convert to NURBS}, \ui{Increase/decrease degree} and \ui{Join curves} work on the whole curve;
+  \item \ui{B-spline info} in the View group can show, one at a time: degree, control polygon, curvature comb, knot
+        multiplicity and pole weights.
+\end{itemize}
+
+\section{Numeric input in a sketch}
+
+While you draw, an \ui{Type:} row appears at the bottom of the view, where you can type exact values for the shape in
+progress:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Shape} & \textbf{You can type} \\
+\midrule
+Line / Polyline & Length, angle \\
+Rectangle / Centered rectangle & Width, height \\
+Circle & Diameter \\
+Arc / Polygon & Radius \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+The direction follows the last finger position. Slot, ellipse, B-spline and the like have no input field: draw first,
+then add dimensions. The values you type become FreeCAD expressions: a plain number with a unit is stored as a value,
+anything else (with arithmetic) as an expression.
+
+\section{Sketch view helpers}
+
+In the \ui{View} group: \ui{Align view to sketch} (looks straight at the sketch), \ui{Section view}, \ui{Grid},
+\ui{Rendering order}, \ui{Arc overlay}, \ui{B-spline info}. Grid spacing and visibility are controlled by FreeCAD's sketch
+grid settings.
+
+\begin{practice}[Exercise: a fully constrained hexagon]
+\begin{enumerate}
+  \item Create a sketch and choose the XY plane;
+  \item Tap \ui{Polygon} (6 sides), place the center near the origin and pull out the circumscribed circle;
+  \item Add a \ui{Dimension}: the radius of the circumscribed circle (20 mm, for example); then add \ui{Lock} to the
+        center point (X/Y distance 0 from the origin);
+  \item Watch the status bar: it reads ``Fully constrained''; all six sides should turn black (defined);
+  \item Try dragging any vertex --- when the sketch is fully constrained it does not move;
+  \item Long-press the radius dimension and change it to 30: the whole hexagon grows.
+\end{enumerate}
+\end{practice}
+
+\section{Common problems}
+
+\begin{description}
+  \item[The sketch stays at ``under-constrained, N degrees of freedom''] You are N constraints short. Common causes: no fixed position (missing X/Y distance), a missing horizontal/vertical constraint, or a missing dimension.
+  \item[The shape flips after a dimension change] An under-constrained sketch can mirror as a whole. Constrain it fully and add ``Block'' to the key points.
+  \item[A multi-point tool draws but creates nothing] Polyline and B-spline need a double-tap or a tap on ``Finish'' to commit.
+  \item[A cross-body reference reports an error] A sketch can live in one body only; to reference another body, create a SubShapeBinder first or use external geometry.
+  \item[I want to undo the whole sketch] Use ✗ Cancel sketch rather than undoing over and over.
+\end{description}
+
+Next chapter: turning sketches into solids --- the PartDesign workbench.

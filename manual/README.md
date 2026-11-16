@@ -11,9 +11,16 @@
 | `chapters/` | 各章（前言、17 章正文） |
 | `appendix/` | 附录 A 命令速查、B 中英术语、C 常见问题 |
 | `figures/` | 截图（应用实机截图 + 项目官方素材） |
-| `MobileCAD-manual-zh-Hans.pdf` | 编译好的 PDF（约 90 页） |
+| `MobileCAD-manual-zh-Hans.pdf` | 编译好的 PDF（89 页） |
+| `en/` | 英文版（同一内容的英文重写 + i18n 机制说明），见 `en/README.md` |
+| `en/MobileCAD-manual-en.pdf` | 英文版 PDF（89 页） |
 
 ## 编译
+
+中文版：`cd manual && xelatex main.tex`（两遍）。英文版：`cd manual/en && xelatex main.tex`（两遍），
+分别依赖 ctex / xeCJK 与中文字体。
+
+### 环境
 
 需要 XeLaTeX 与 `ctex`、`fontawesome5`、`newunicodechar`、`tcolorbox`、`seqsplit`、`longtable` 等宏包
 （TeX Live / MacTeX 完整安装均自带）。macOS 使用系统字体 Songti SC / Heiti SC；其它系统请修改

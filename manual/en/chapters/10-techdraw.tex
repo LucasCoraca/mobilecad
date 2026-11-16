@@ -1,0 +1,172 @@
+\chapter{Drawing (TechDraw): From 3D to 2D Blueprints}
+
+The TechDraw workbench turns a 3D model into deliverable 2D drawings: views, sections, detail
+enlargements, dimensions and symbols, exported at the end as PDF/SVG/DXF. It is the last stop of the
+whole workflow (modelling → assembly → drawings).
+
+\section{Pages and Templates}
+
+\begin{enumerate}
+  \item Switch to \ui{Drawing} at the bottom; the empty state shows \ui{No drawing yet} and
+        \ui{New drawing page};
+  \item Tap \ui{New drawing page} (command \cmd{TechDraw\_PageDefault});
+  \item The page uses the default template from the preferences; if none is set, it uses the A4
+        landscape \file{Default\_Template\_A4\_Landscape.svg};
+  \item Template fields (author, date, title, scale, drawing number) can be filled in automatically
+        (from the document's CreatedBy/Company/Label), and you can also tap a field to change its
+        value.
+\end{enumerate}
+
+Page objects appear in the feature tree; tap a page row to switch to it. Double-tap a view to open
+its properties (scale, direction, X/Y position and so on); \ui{Redraw Page} redraws every view.
+
+\section{View Types}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{View} & \textbf{Action} \\
+\midrule
+View & Select parts (multiple selection allowed) → choose a direction (front, top, right, rear, bottom, left or isometric) → it is placed at the page center \\
+Projection group & Select parts → choose the projection directions (front/top/right by default) → they are laid out automatically as a standard third-angle set \\
+Section view & Select the base view first → choose a direction (right/left/up/down) → the cut goes through the center of the view; the symbol is labelled A/B/C automatically and placed 60 mm to the right (or below) \\
+Complex section & Select the base view → select the cutting sketch/wire → offset strategy \\
+Detail view & Select the base view → tap the circle center on the page → radius (default 10) → a 2× enlargement with a letter label is generated at +80/+40 mm \\
+Active view & A screenshot of the current 3D viewport (100 mm wide)\\
+Image & Inserts an image (fixed 100 × 100 mm)\\
+Symbol / Surface finish & Chosen from the resource SVGs and inserted at the page center \\
+Text Annotation / Rich Text & Enter the text first, then tap the position \\
+Balloon & Select a view → tap the point to point at → tap the balloon position; the number is automatic \\
+Leader & Select a view → tap the arrow point → keep tapping → finish \\
+Weld symbol & Select a leader → choose a type (the type parameter has no effect in the current version)\\
+Clip group & Drag a box and add/remove views (the current version does not actually clip)\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+There are also: \ui{Move View}, \ui{Share View} (the same view on several pages), \ui{View Stacking
+Order}, \ui{Lock}.
+
+\section{Dimensions}
+
+On the page, tap an edge/vertex/face of a view, then tap a dimension command.
+
+\subsection{Smart Dimension}
+
+\ui{Dimension} decides automatically from the selection:
+
+\begin{itemize}
+  \item one face → area;
+  \item two edges → angle;
+  \item three vertices → 3-point angle;
+  \item a circle/arc edge → asks whether you want the diameter or the radius;
+  \item anything else → asks for length/horizontal/vertical.
+\end{itemize}
+
+\subsection{Dedicated Dimensions}
+
+Length, horizontal, vertical, angle, 3-point angle, area, radius, diameter, arc length, extent… every
+command validates the selection, and a wrong selection shows
+\ui{Incorrect selection: select …}. There are also chain, coordinate and chamfer dimensions, plus
+``align/stack'' actions based on the selected dimensions.
+
+Dimensions are placed automatically (generally 7 mm offset, radius 1.1r, angle 15 mm), and
+\textbf{there is no ``tap to place the dimension'' step}; after placement you can drag the text to
+adjust its position.
+
+\subsection{Format}
+
+Increase/decrease the decimals, add a ⌀/□/n× prefix, remove the prefix, a custom printf format,
+HoleShaftFit (fits such as H7/g6), \ui{Repair Dimension References} (re-points a dimension at new
+references).
+
+\section{Decoration}
+
+\begin{itemize}
+  \item centerlines (face/two lines/two points), cosmetic vertex/midpoint/quadrant, cosmetic
+        line/circle/arc, parallel/perpendicular cosmetic lines, the eraser and \ui{Show All};
+  \item line attributes (line style 1--5, line width 0.18--0.7);
+  \item hatch (Hatch, using SVG patterns) and geometric hatch (Geometric Hatch, 11 PAT patterns).
+\end{itemize}
+
+\begin{warn}[Decorative geometry shows only partly on the page]
+In the current version, centerlines and cosmetic lines added with the cosmetic commands \textbf{are
+not drawn on the page}; hatching is always drawn as diagonal lines, and line style/line width have
+no effect. When you produce drawings, rely mainly on the view outlines + dimensions and treat
+decoration as a supplement.
+\end{warn}
+
+\section{Exporting and Printing}
+
+\begin{itemize}
+  \item \ui{Export as SVG}: template + outlines + dimensions + text + balloons (leaders, symbols,
+        images and hatch are missing for now);
+  \item \ui{Export as DXF}: the common 2D CAD format;
+  \item \ui{Export as PDF}: a vector drawing that converts the page's millimetres at 72 dpi; the
+        entry is \ui{Export Page as PDF} in \ui{More tools};
+  \item \ui{Print all} takes the same path as the PDF export: \textbf{only the current page is
+        exported}, and the system print dialog is not shown.
+\end{itemize}
+
+\section{Page Interaction}
+
+\begin{itemize}
+  \item \textbf{Pan}: drag with one finger on an empty part of the page; \textbf{zoom}: pinch with two
+        fingers (anchored at the midpoint between them); \ui{Fit} in the top-right corner fits the
+        whole page to the screen, and switching pages fits automatically;
+  \item \textbf{Move}: drag a selected view/dimension/balloon (a view changes X/Y, a dimension
+        changes its text position, a balloon changes its bubble position); one drag is one undoable
+        step;
+  \item \textbf{Selection priority}: vertex 12 dp → edge 10 dp → dimension/balloon anchor 18 dp →
+        face interior (smallest face first) → view frame; to select a whole view, tap an empty spot
+        inside it or tap it in the tree;
+  \item \textbf{Highlighting}: view edges turn dark blue and bold, vertices are blue dots, faces are
+        semi-transparent blue and the view gets a dashed frame; pre-selected vertices are cyan;
+  \item Messages: ``Select a view (or its edges / vertexes) on the page first'', ``Create a page
+        first'' and so on.
+\end{itemize}
+
+\begin{practice}[Exercise: three views + dimensions + PDF]
+\begin{enumerate}
+  \item Open the bracket from Chapter 4 (save it first);
+  \item Switch to \ui{Drawing} → \ui{New drawing page};
+  \item \ui{Projection group} → select the bracket → choose the projections \ui{Front}/\ui{Top}/\ui{Right}
+        → the three views are generated;
+  \item Tap a view edge (it turns blue and bold) → add overall dimensions with
+        \ui{Length}/\ui{Horizontal}/\ui{Vertical}; a circular edge → \ui{Diameter}; two edges →
+        \ui{Angle}; drag the dimension text to reposition it;
+  \item \ui{More tools → Export Page as PDF} → choose where to save;
+  \item Open the PDF to check: drawing, views and dimensions are all there.
+\end{enumerate}
+\end{practice}
+
+\begin{practice}[Exercise: sections and detail enlargements]
+\begin{enumerate}
+  \item Select the front view → \ui{Section view} → direction ``right'' → an A-A section is generated;
+  \item Select the section view, tap a face inside it → \ui{Geometric hatch} → pick a pattern (for
+        example Steel);
+  \item Select the base view → \ui{Detail view} → tap the center of the enlargement → radius 10 →
+        you get a 2× Detail A;
+  \item Add diameters and centerlines on the detail view.
+\end{enumerate}
+\end{practice}
+
+\section{Limitations Visible in the Source}
+
+\begin{itemize}
+  \item printing exports only the current page and has no system print dialog;
+  \item the SVG export lacks leaders, symbols, images, hatch and cosmetic geometry;
+  \item the page does not draw centerlines/cosmetic geometry/threads/decoration lines, line style and
+        line width have no effect, and hatching is always diagonal;
+  \item a broken view has no break definition; a clip group does not clip; an image is fixed at
+        100×100 mm;
+  \item a section view can only cut through the view center in four directions and has no depth
+        parameter; a detail view is always a 2× circle;
+  \item the projection group has no first-angle/third-angle switch; a view has no ``current view
+        direction'' or arbitrary direction;
+  \item dimensions cannot be placed by tapping; an axial length degrades to a length; arc length is
+        shown as a linear dimension; area/arc length annotations are drawn as rectangular balloons;
+  \item the page scale/size can only be changed through the template or the properties; \ui{Lock}
+        does not prevent dragging.
+\end{itemize}

@@ -1,0 +1,88 @@
+\chapter{CAM and BIM: Machining and Architecture}
+
+These two workbenches are aimed at professional use: CAM generates numerical-control toolpaths, and BIM builds
+building information models. Their commands all come from FreeCAD's official Python modules and behave as
+they do on the desktop, but the mobile port makes its own trade-offs in each.
+
+\section{CAM: from model to G-code}
+
+\subsection{A typical workflow}
+
+\begin{enumerate}
+  \item Open \menupath{More ▾ → CAM};
+  \item \ui{Job} (\cmd{CAM\_Job}): creates a machining job from the selected solids (if nothing is selected,
+        all visible solids are used); the default template sets up the job coordinate system and output settings;
+  \item The job panel has three pages: \ui{Setup}, \ui{Output}, and \ui{Tools};
+  \item Tools: \ui{Tool controller} → \ui{New tool} / \ui{Load from library} (the tool library ships with the app);
+  \item Operations: \ui{Profile}, \ui{Pocket shape}, \ui{Mill facing},
+        \ui{Helix}, \ui{Adaptive}, \ui{Slot}, \ui{Drilling},
+        \ui{Engrave}, \ui{Pocket 3D};
+  \item Dress-up: Dogbone, RampEntry, Tags, LeadInOut,
+        array/mirror, boundary, Z correction, axis mapping, drag knife, plunge milling, and more;
+  \item \ui{Sanity}: checks whether the toolpath is empty and whether feed rates or spindle speeds are missing;
+  \item \ui{Post-process} (\cmd{CAM\_Post}): choose a post-processor (fanuc, grbl, linuxcnc, centroid, estlcam, and others),
+        generate the G-code, and save it through the system file picker.
+\end{enumerate}
+
+\subsection{Scope and limitations}
+
+\begin{itemize}
+  \item The post-processor scripts ship with the app and cover the common 3-axis and 4-axis controllers;
+  \item \textbf{There is no material-removal simulation}: the CAMSimulator that
+        \cmd{CAM\_Simulator}/\cmd{CAMotics} depend on is not packaged, so you can only inspect the toolpath
+        curves in the 3D view and run the basic checks with \ui{Sanity};
+  \item Complex 3D toolpaths (Adaptive, Pocket 3D) are slow to compute on a phone; preview them first with a coarse tolerance.
+\end{itemize}
+
+\begin{practice}[Exercise: Mill a pocket]
+Create a block with a filleted pocket → CAM job → New tool: φ6 flat-end mill → choose the pocket floor for the Pocket operation →
+set the step-over and step-down → Sanity → post-process (grbl) → save \file{pocket.nc}.
+\end{practice}
+
+\section{BIM: buildings and IFC}
+
+The BIM workbench mirrors FreeCAD's BIM module (131 commands), including:
+
+\begin{itemize}
+  \item \textbf{Architectural elements}: Site, Building, Level, Space,
+        Wall, CurtainWall, Column, Beam, Slab, Door,
+        Window, Covering, Pipe, Stairs, Roof,
+        Panel, Frame, Fence, Truss, Equipment, Rebar;
+  \item \textbf{Structural elements}: columns, beams, and slabs; structural systems; rebar; trusses; frames; curtain walls;
+  \item \textbf{Materials}: Material, MultiMaterial, BIM Material;
+  \item \textbf{Annotations and sheets}: dimensions, text, axis grids, sections, 2D views, sheets;
+  \item \textbf{Management}: project setup, project manager, IFC manager, layers, materials, preflight checks.
+\end{itemize}
+
+\subsection{IFC import and export}
+
+\begin{itemize}
+  \item IfcOpenShell 0.8.4 ships with the app;
+  \item \textbf{Open IFC} (\file{.ifc}): opens the file as a project document in NativeIFC mode;
+  \item \textbf{Import IFC}: inserts the model into the current document as objects (on mobile the default is the
+        ``solid shape'' strategy and all children are imported, because a phone cannot expand and load them
+        on demand the way the desktop can);
+  \item \textbf{Export IFC}: to \file{.ifc} or \file{.ifcJSON}; there are also commands such as ``Create IFC project'',
+        ``Save IFC'', ``Expand'', ``Update'', and ``Compare'';
+  \item Note: IFC uses the full schema, so both files and memory use are large; on a phone, import partial or
+        simplified models first.
+\end{itemize}
+
+\section{Robot}
+
+The Robot workbench is for kinematics demonstrations and trajectory planning:
+
+\begin{itemize}
+  \item The default robot is a KUKA IR500 (the DH parameters are built in; the VRML model is not packaged,
+        so the robot is drawn from its kinematic chain);
+  \item You can create trajectories and waypoints (TCP or picked points), generate a trajectory from an edge,
+        dress up or compound trajectories, home the robot, and set the tool shape;
+  \item \ui{Simulation} runs 60 frames using inverse kinematics;
+  \item You can export a KUKA \file{.src} program (through the system save dialog).
+\end{itemize}
+
+\section{Other specialist workbenches}
+
+\ui{Inspection} and \ui{Material} were introduced in Chapter 8, and \ui{Reverse Engineering} is there too.
+Like CAM and BIM, these workbenches cover the full command set, but the mobile screen and memory limit them
+to viewing, checking, and small edits; for large projects it is still better to finish on the desktop.

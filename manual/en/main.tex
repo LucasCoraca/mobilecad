@@ -1,0 +1,168 @@
+% MobileCAD user manual (English) — build with XeLaTeX:
+%   xelatex main.tex && xelatex main.tex
+\documentclass[11pt,openany,oneside]{book}
+
+\usepackage[a4paper,top=2.4cm,bottom=2.4cm,left=2.5cm,right=2.5cm,headheight=22pt]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{multicol}
+\usepackage{caption}
+\usepackage{amssymb}
+\usepackage{seqsplit}
+\usepackage{fontawesome5}
+\usepackage{newunicodechar}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\setCJKmainfont{Songti SC}
+\usepackage{microtype}
+\usepackage[hidelinks,bookmarksnumbered=true]{hyperref}
+\hypersetup{pdftitle={MobileCAD User Manual},pdfauthor={MobileCAD manual},pdfsubject={Parametric CAD on Android},pdfkeywords={MobileCAD,FreeCAD,Android,CAD,tutorial}}
+
+\graphicspath{{../figures/}}
+
+% symbols used by the text (the UI's check/cross/menu glyphs)
+\newfontfamily\symfont{Apple Symbols}
+\newunicodechar{✓}{\faCheck}
+\newunicodechar{✗}{\faTimes}
+\newunicodechar{✕}{\faTimes}
+\newunicodechar{✎}{\faPen}
+\newunicodechar{☰}{{\symfont ☰}}
+\newunicodechar{▸}{{\symfont ▸}}
+\newunicodechar{▾}{{\symfont ▾}}
+\newunicodechar{◀}{{\symfont ◀}}
+\newunicodechar{▶}{{\symfont ▶}}
+\newunicodechar{▲}{{\symfont ▲}}
+\newunicodechar{▼}{{\symfont ▼}}
+\newunicodechar{↶}{{\symfont ↶}}
+\newunicodechar{↷}{{\symfont ↷}}
+\newunicodechar{↔}{{\symfont ↔}}
+\newunicodechar{□}{\ensuremath{\square}}
+\newunicodechar{≥}{\ensuremath{\geq}}
+\newunicodechar{≤}{\ensuremath{\leq}}
+\newunicodechar{ν}{\ensuremath{\nu}}
+\newunicodechar{φ}{\ensuremath{\varphi}}
+
+\definecolor{mcblue}{HTML}{1651B0}
+\definecolor{mclight}{HTML}{E8F0FB}
+\definecolor{mcgray}{HTML}{5B6770}
+\definecolor{mcorange}{HTML}{C25E00}
+\definecolor{mcgreen}{HTML}{1E7B34}
+\definecolor{mcred}{HTML}{A32020}
+\definecolor{codebg}{HTML}{F6F7F9}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{mcgray}\leftmark}
+\fancyhead[R]{\small\color{mcgray}MobileCAD User Manual}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\newcommand{\ui}[1]{\textbf{#1}}
+\newcommand{\cmd}[1]{\texttt{\small\seqsplit{#1}}}
+\newcommand{\file}[1]{\texttt{\small\seqsplit{#1}}}
+\newcommand{\kbd}[1]{\colorbox{codebg}{\texttt{\small #1}}}
+\newcommand{\menupath}[1]{\textsf{#1}}
+\newcommand{\term}[1]{\textbf{\color{mcblue}#1}}
+
+\captionsetup{font=small,labelfont={bf,color=mcblue},skip=6pt}
+\setlist{itemsep=2pt,topsep=3pt,parsep=0pt}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{2}
+\setlength{\emergencystretch}{2.5em}
+\tolerance=3000
+
+\newtcolorbox{tip}[1][Tip]{
+  enhanced,breakable,colback=mclight,colframe=mcblue!35,
+  fonttitle=\bfseries\small,coltitle=white,colbacktitle=mcblue,
+  title={#1},left=6pt,right=6pt,top=4pt,bottom=4pt,arc=2mm
+}
+\newtcolorbox{warn}[1][Watch out]{
+  enhanced,breakable,colback=orange!6,colframe=mcorange!45,
+  fonttitle=\bfseries\small,coltitle=white,colbacktitle=mcorange,
+  title={#1},left=6pt,right=6pt,top=4pt,bottom=4pt,arc=2mm
+}
+\newtcolorbox{practice}[1][Exercise]{
+  enhanced,breakable,colback=mcgreen!5,colframe=mcgreen!45,
+  fonttitle=\bfseries\small,coltitle=white,colbacktitle=mcgreen,
+  title={#1},left=6pt,right=6pt,top=4pt,bottom=4pt,arc=2mm
+}
+
+\lstdefinestyle{mc}{
+  backgroundcolor=\color{codebg},basicstyle=\ttfamily\small,
+  keywordstyle=\color{mcblue},stringstyle=\color{mcgreen},
+  commentstyle=\color{mcgray}\itshape,numbers=none,
+  frame=single,rulecolor=\color{mclight},framesep=3pt,
+  breaklines=true,showstringspaces=false,columns=fullflexible,
+  xleftmargin=2pt,xrightmargin=2pt,aboveskip=4pt,belowskip=4pt
+}
+\lstset{style=mc}
+
+\newcommand{\screenshot}[3][0.92]{%
+  \begin{figure}[htbp]\centering
+    \includegraphics[width=#1\linewidth]{#2}
+    \caption{#3}
+  \end{figure}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{2.2cm}
+{\Huge\bfseries\color{mcblue} MobileCAD\par}
+\vspace{0.5cm}
+{\LARGE User Manual\par}
+\vspace{0.3cm}
+{\large From zero to full command of parametric CAD on a tablet\par}
+\vspace{1.6cm}
+\includegraphics[width=0.22\linewidth]{logo.jpg}\par
+\vspace{1.6cm}
+{\large The FreeCAD engine on Android tablets and phones\par}
+\vspace{0.3cm}
+{\large For MobileCAD 0.5.x (FreeCAD main e95a31c)\par}
+\vfill
+{\small Written against the application's source; every exercise can be done in the app.\par}
+{\small Manual version 1.0 · November 2026\par}
+\vspace{0.6cm}
+{\small License: GNU General Public License v3.0 or later\par}
+\end{titlepage}
+
+\frontmatter
+\tableofcontents
+\input{chapters/00-preface}
+\input{chapters/00c-i18n}
+
+\mainmatter
+\input{chapters/01-what-is}
+\input{chapters/02-first-run}
+\input{chapters/03-interface}
+\input{chapters/04-first-part}
+\input{chapters/05-sketch}
+\input{chapters/06-partdesign}
+\input{chapters/07-part}
+\input{chapters/08-other-workbenches}
+\input{chapters/09-draft}
+\input{chapters/10-techdraw}
+\input{chapters/11-spreadsheet}
+\input{chapters/12-assembly}
+\input{chapters/13-fem}
+\input{chapters/14-cam-bim}
+\input{chapters/15-files}
+\input{chapters/16-efficiency}
+\input{chapters/17-troubleshooting}
+
+\appendix
+\input{appendix/a-commands}
+\input{appendix/b-glossary}
+\input{appendix/c-faq}
+
+\end{document}

@@ -1,0 +1,159 @@
+\chapter{Surfaces, Meshes, Point Clouds and Other Workbenches}
+
+This chapter covers the workbenches you do not need every day but that save the day when it matters:
+patching surfaces, repairing meshes, fitting point clouds, OpenSCAD, reverse engineering, inspection
+and materials. They all live under \ui{More ▾}.
+
+\section{Surface}
+
+The Surface workbench has 7 commands, and they all work the same way: select the boundaries, create
+the object, then tune the parameters in the dialog:
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Command} & \textbf{What it does} \\
+\midrule
+Filling & Surrounds a patch of surface with a set of boundary curves; you can set the degree (default 3), the number of points on the curves (15) and the number of iterations (2)\\
+GeomFillSurface & Builds a transitional surface between 2, 3 or 4 boundaries; the fill type can be chosen\\
+Sections & Builds a surface through several sections (like a loft, but it produces only a surface)\\
+ExtendFace & Extends an existing face along the U/V directions (0.05× by default); can be symmetric\\
+BlendCurve & A tangent transition curve between two edges\\
+CurveOnMesh & Click control points on a mesh to project a spline curve onto it\\
+Cut & Cuts two shapes against each other\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+A surface object is not a solid: thicken it with \ui{Part → Thickness} when you need to, or turn it
+into a solid with \ui{Convert to solid} (after sewing).
+
+\begin{practice}[Exercise: patching a hole in a shell]
+Select the ring of edges around the hole → \ui{Filling} → adjust the degree until the surface is
+smooth → \ui{OK} → select the surface and the shell → \ui{Part → Convert to solid}.
+\end{practice}
+
+\section{Mesh}
+
+The Mesh workbench deals with triangle meshes: imported STL files, 3D scan results, and models
+tessellated for analysis.
+
+\subsection{Creating meshes}
+
+\begin{itemize}
+  \item \ui{Mesh from shape} (Standard): linear deflection 0.1, angular deflection 28.65°;
+  \item \ui{Mefisto} mesher: subdivides by maximum edge length (default 1.0);
+  \item \ui{Mesh From Geometry}: tessellates a shape;
+  \item \ui{Regular solid}: cube, cylinder, cone, sphere, ellipsoid, torus;
+  \item \ui{Remesh with Gmsh}: uses the built-in Gmsh (algorithm + maximum/minimum size + surface detection angle).
+\end{itemize}
+
+\subsection{Modifying and repairing}
+
+Harmonizing/flipping normals, filling holes (by number of edges or by picking), adding a triangle
+(three points), removing components, smoothing (Taubin/Laplace/median, 4 passes), decimating
+(0.9 reduction), scaling, merging and splitting by components.
+
+\subsection{Booleans and cutting}
+
+Union/intersection/difference (at least two meshes, using the mesh kernel's own booleans); polygon
+cut, trim, segment, cut by plane, cross-section (draw a polygon in the view first, then choose
+whether to keep the inside or the outside); trim with a plane offset; sections (axis + number of
+sections).
+
+\subsection{Analyzing}
+
+\ui{Mesh analysis} summarizes: number of points, number of faces, whether the mesh is a closed solid,
+non-manifold edges, self-intersections and flipped faces, and offers one-tap repair buttons (Repair
+all, remove duplicate points, fix degenerations, remove non-manifold, fix orientation, fix
+self-intersections, remove wrinkles). There are also face evaluation, curvature, curvature info,
+solid evaluation and bounding box.
+
+\begin{practice}[Exercise: repairing an STL and converting it to a solid]
+Import the STL → \ui{Mesh analysis} → look at the non-manifold edges/self-intersections → tap
+\ui{Repair all} → \ui{Smooth} once → \ui{Part → Shape from mesh} (sewing tolerance 0.1) →
+\ui{Convert to solid} → \ui{Refine shape} → export STEP.
+\end{practice}
+
+\section{Points}
+
+\begin{itemize}
+  \item \ui{Import points}: supports the usual point cloud text and binary formats;
+  \item \ui{Export points}: \file{.asc} is recommended;
+  \item \ui{Convert to points}: generates a point cloud from a shape or a mesh (point distance 0.1);
+  \item \ui{Structured points}: arranges the point cloud into a regular grid (the column width can be set);
+  \item \ui{Merge}: merges several point clouds into one;
+  \item \ui{Poly cut}: draw a polygon in the view and keep the points outside or inside.
+\end{itemize}
+
+A point cloud is both the measured geometry for Inspection and the input for fitting surfaces in
+reverse engineering.
+
+\section{OpenSCAD}
+
+The OpenSCAD workbench offers 15 commands, but \textbf{the app does not bundle an OpenSCAD
+executable}, and you need to know this:
+
+\begin{itemize}
+  \item \textbf{Pure Python, works}: mirror/scale/resize mesh feature, refine shape, increase
+        tolerance, edges to faces, expand placements, explode group, replace object, remove object
+        and children, color shapes;
+  \item \textbf{Needs an external binary, fails on mobile}: add OpenSCAD element, hull, Minkowski
+        sum, mesh boolean. They report ``OpenSCAD executable unavailable''.
+  \item The second toolbar reuses Part commands directly: check geometry, primitives, shape builder,
+        cut/union/intersection, extrude, revolve.
+\end{itemize}
+
+\section{Reverse Engineering}
+
+13 of the 15 commands work; the core idea is fitting geometry from points or meshes:
+
+\begin{itemize}
+  \item \ui{Approximate plane/sphere/cylinder}: least-squares fitting that outputs the
+        corresponding surface;
+  \item \ui{Approximate surface}: a B-spline surface; you can set the U/V degrees and the number of
+        poles;
+  \item \ui{Approximate curve}, \ui{Polynomial surface} (only reports the coefficients and the
+        residual);
+  \item \ui{Mesh boundary}: extracts a wire from the mesh boundary;
+  \item \ui{Segmentation}: splits automatically by curvature tolerance (0.1) and minimum faces per
+        segment (20);
+  \item \ui{Segmentation from best-fit surfaces}: segments according to plane/cylinder/sphere fits;
+  \item \ui{Manual segmentation}: draw polygons on the mesh to create segments;
+  \item Missing: Poisson reconstruction and view triangulation.
+\end{itemize}
+
+\begin{practice}[Exercise: reverse engineering a scan]
+Import the point cloud → \ui{Poly cut} to remove clutter → \ui{Approximate sphere} or
+\ui{Approximate surface} → thicken the result or turn it into a solid → export.
+\end{practice}
+
+\section{Inspection}
+
+Used for comparing surfaces:
+
+\begin{itemize}
+  \item \ui{Visual inspection}: select the measured geometry and the nominal geometry (multiple
+        selection), set the search distance (default 0.05) and generate an inspection group; it
+        paints a blue→green→red deviation map on the measured part;
+  \item \ui{Inspection…}: tap the model to read the distance at that point; beyond the search radius
+        it reports that there is no distance.
+\end{itemize}
+
+\section{Material}
+
+\begin{itemize}
+  \item \ui{Edit material}: opens the material library, where you edit the physical and appearance
+        properties item by item; ``Save as new material'' puts it in the user library;
+  \item \ui{Set material}: assigns a material to an object (and colors it according to its
+        appearance);
+  \item \ui{Inspect material}/\ui{Inspect appearance}: reads the current values;
+  \item \ui{Color per face}: colors a single face;
+  \item \ui{Texture mapping}: maps a texture onto an object.
+\end{itemize}
+
+\begin{tip}[Mass properties need a density]
+\ui{Part → Mass properties} relies on the material's \textbf{density} to compute mass, center of
+mass and moments of inertia. Set the material first, then compute the mass.
+\end{tip}

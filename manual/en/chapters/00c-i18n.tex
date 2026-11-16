@@ -1,0 +1,48 @@
+\chapter*{A note on the interface language (i18n)}
+\addcontentsline{toc}{chapter}{A note on the interface language (i18n)}
+\markboth{A note on the interface language}{A note on the interface language}
+
+MobileCAD 0.5.18 is the first build whose interface can be Chinese: it follows the device language, and
+\menupath{Preferences → Language} pins English or Simplified Chinese. The screenshots in this manual show the
+Chinese build, because the manual was written together with that localisation.
+
+This page explains the mechanism briefly, so the manual can also serve as an i18n walkthrough.
+
+\section*{How the language is chosen}
+\begin{itemize}
+  \item On start, \file{I18n.init(context)} reads the saved choice (\ui{system}, \ui{en} or \ui{zh-Hans}); with
+        \ui{system} it looks at \file{Locale.getDefault().language} and loads \file{assets/i18n/zh-Hans.tsv} for
+        Chinese, or keeps English for everything else.
+  \item Changing the choice writes a preference and recreates the activity; the document and the engine session
+        survive, so the switch is instant and lossless.
+\end{itemize}
+
+\section*{The catalog}
+\begin{itemize}
+  \item One line per string: \file{English<TAB>translation}, UTF-8, `\#` starts a comment. \textbf{The English text
+        is the key}; a string the catalog does not contain stays English, so a partial catalog can never break the
+        interface.
+  \item Translation happens where the text is drawn: the command catalog is translated once when it is loaded
+        (the English label stays available for tool search), menus, dialogs, banners, messages, task panels,
+        property labels and the NaviCube faces are translated at render time. Document, object and layer names —
+        user data — are never looked up.
+  \item Commands, task-panel fields and property names use FreeCAD's own Chinese wording. That part of the catalog
+        is generated from FreeCAD's \file{src/**/translations/*\_zh-CN.ts} with
+        \file{python3 tools/i18n\_import\_freecad.py <FreeCAD checkout>} (LGPL-2.1-or-later), so both applications
+        speak the same Chinese.
+  \item Adding a language is one more \file{assets/i18n/<code>.tsv} plus its code in \file{I18n.choices}; the
+        fallback and the draw-time lookups stay unchanged.
+\end{itemize}
+
+\section*{Testing a translation quickly}
+\begin{enumerate}
+  \item Set the device language (or \menupath{Preferences → Language}) to the target language and restart.
+  \item Walk through: menus, a tool panel (command names and tooltips), a feature dialog (property labels), a
+        FreeCAD task panel (BIM/FEM/CAM), the constraint list, the language picker itself and the NaviCube.
+  \item Switch to English and back: the interface must redraw and the open document must survive.
+  \item Load a file made before the change: geometry must be identical; only text changed.
+\end{enumerate}
+
+\section*{What stays English}
+Engine-side strings (Python exceptions, some FreeCAD C++ messages), the long \ui{About} text and the license
+screen are not translated yet. They are listed in the manual's FAQ and are good first contributions.

@@ -1,0 +1,101 @@
+\chapter{Efficiency Tips: Work Like a Pro}
+
+This chapter collects operating habits that make a big difference once you know them. Each one is short,
+but together they can double your modelling speed.
+
+\section{Using gestures efficiently}
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Situation} & \textbf{Tip} \\
+\midrule
+Finger covers the target & Long-press to enter the \textbf{Precision pointer}: a crosshair appears 60 dp above your finger, and lifting the finger completes the pick \\
+Cannot hit a small element & Zoom in with two fingers first, then tap; picking has a priority order (vertex 12 dp → edge 10 dp → face) \\
+Need to rotate the sketch view & In a sketch one finger draws, and it takes \textbf{three fingers} to rotate; alternatively tap the navigation cube \\
+Clear the selection by accident & A double tap means ``clear selection'', so avoid double taps while making precise selections \\
+Want a right-click & \textbf{Two-finger tap} on the view opens a menu equivalent to the desktop right-click menu \\
+Select many objects at once & \textbf{Two-finger long-press} starts box selection; drag a rectangle, and use the selection filter to box only faces or only objects \\
+Leave the current tool & The toolstrip at the bottom-right has ✕ (the same as Esc); or press the back button \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{The back button is a universal Esc}
+
+Remember this one rule: \textbf{the back button closes one layer at a time}, starting from the innermost---numpad,
+text input, picker, menu, tool panel, Draft, assembly joint, task panel, feature dialog, sketch. Once everything
+is closed, the app goes to the background instead of quitting. So whenever you are stuck in a mode, pressing back
+repeatedly always gets you back to normal.
+
+\section{Selection and selection filters}
+
+\begin{itemize}
+  \item A tap \textbf{adds to the selection}, and tapping the same element again removes it; the ✕ on the selection bar removes one item; a double tap clears everything.
+  \item To select only faces or only edges, use the selection filters in \menupath{Tools} (or commands such as \cmd{Part\_FaceSelection}):
+        a ``faces only'' strip appears in the bottom-right corner of the view, and you tap ✗ to clear the filter.
+  \item Selection history: \menupath{Edit → Selection back/forward} (\cmd{Std\_SelBack}/\cmd{Std\_SelForward}) moves back and forth between selection sets.
+\end{itemize}
+
+\section{Use expressions instead of numbers}
+
+Every numeric input accepts an expression: type it straight into the top field of the numpad, or start it with \file{=}. For example:
+
+\begin{lstlisting}
+=60 mm / 2          // 30 mm
+=Sheet.Thickness*2  // refers to a spreadsheet alias (Chapter 11)
+=10 mm + 5 mm       // arithmetic with units
+\end{lstlisting}
+
+The benefit: change one variable and every dimension that references it changes as well. In complex models,
+put the key dimensions in a spreadsheet (the Variables tab) and reference them with expressions---that is the
+most trouble-free approach.
+
+\section{Replay the modelling history with Tip}
+
+A body's \ui{Tip} marker decides how far the model is computed. Long-press a feature in the tree and choose
+\ui{Roll tip to here}; the model rolls back to the state at that step, so you can inspect intermediate results
+and make changes to early features. Roll forward to the last feature again to restore the full model.
+
+Together with \ui{Suppress} you can leave a feature out temporarily and compare the result with and without it;
+errors caused by that feature disappear along with it.
+
+\section{Tool search and recent tools}
+
+\begin{itemize}
+  \item \ui{Search all tools} at the top of the tool panel is a global search: type the command's Chinese name,
+        its English name (pad), or its command ID (PartDesign\_Pad) and it matches;
+  \item ``Recent tools'' on the right of the toolstrip keeps 6 commands, so the ones you use repeatedly stay at hand;
+  \item Long-pressing a button in the tool panel does not pop up a description; the name shown is the FreeCAD command name,
+        which you can look up in Appendix A and in the online documentation.
+\end{itemize}
+
+\section{Keep your most-used panels in the Variables tab}
+
+A spreadsheet is more than arithmetic: write your design parameters (length, width, height, hole diameter,
+pattern count) into one table and reference it everywhere while modelling. Change one cell and the whole
+model updates. This is the cockpit of parametric design.
+
+\section{Performance and smoothness}
+
+\begin{itemize}
+  \item \textbf{Hide what you are not looking at}: in a large assembly, hide unrelated components (long-press in the tree → Hide) and the view redraws noticeably faster;
+  \item \textbf{Keep fewer dialogs open at once}: feature dialogs preview in real time and keep recomputing on complex models;
+  \item \textbf{Model in parts}: one body with hundreds of features is worse than several bodies brought together in an assembly;
+  \item \textbf{FEM meshes}: on mobile, run a coarse mesh first and refine once the boundary conditions are confirmed; plug in the charger and keep the screen awake while solving;
+  \item \textbf{Storage}: the runtime keeps about 1 GB resident, and when free space drops below 2 GB the system may kill background apps.
+\end{itemize}
+
+\section{Hardware keyboards and mice}
+
+With a keyboard or mouse connected to the tablet, you can type straight into input fields and the layout is not
+rebuilt (plugging in a keyboard does not interrupt what you are doing). The left mouse button acts as a tap, the right
+button as a context menu, and the wheel as zoom (the same as a two-finger pinch). Multi-finger trackpad gestures are
+handled by the system.
+
+\section{Autosave and recovery}
+
+MobileCAD writes the current document to a recovery copy every 60 seconds and every time it goes to the background.
+If the app crashes, the next start opens the recovery copy automatically and shows ``Recovered unsaved work from HH:mm'';
+save it to a real file at once. The recovery copy is deleted after a normal save.

@@ -1,0 +1,101 @@
+\chapter{Assembly: putting parts together}
+
+The Assembly workbench connects several parts with \textbf{joints}, solves their relative positions and
+checks the degrees of freedom. It corresponds to the Assembly workbench of desktop FreeCAD, and the solver
+is OndselSolver.
+
+\section{Creating an assembly and inserting parts}
+
+\begin{enumerate}
+  \item Switch to the \ui{Assembly} tab;
+  \item Tap \ui{Create assembly} (\cmd{Assembly\_CreateAssembly})---this creates the assembly container and
+        the joint group;
+  \item Tap \ui{Insert part} (\cmd{Assembly\_InsertLink}):
+        the dialog lists the bodies (Body), parts (App::Part) and shapes (Part::Feature) \textbf{that are not
+        already in the current assembly}; select one to insert it as a link (App::Link);
+  \item \textbf{The first part you insert is grounded automatically} (fixed), matching the behaviour of
+        desktop FreeCAD.
+\end{enumerate}
+
+In the tree you will see \ui{Assembly} → \ui{Origin}, \ui{Joints} and the individual components.
+
+\section{Joints}
+
+\subsection{The 13 joint types}
+
+Fixed, Revolute, Cylindrical, Slider, Ball, Distance, Parallel, Perpendicular, Angle, RackPinion, Screw,
+Gears and Belt, plus \ui{Rigid group}.
+
+\begin{tip}[There is no separate ``planar'' joint]
+In this version of the engine, a planar constraint is expressed as a combination of
+``parallel/perpendicular + distance''.
+\end{tip}
+
+\subsection{Picking the connectors}
+
+\begin{enumerate}
+  \item Tap a joint tool (for example \ui{Revolute joint});
+  \item On the first part, tap a \textbf{face, edge or vertex}---you must pick a sub-element; tapping the
+        part itself gives ``Pick a face, edge or vertex'';
+  \item Tap the second connector on \textbf{another part} (tapping the same part gives a warning);
+  \item With both points picked, the joint is created immediately and the joint dialog opens.
+\end{enumerate}
+
+Connectors are generated from the ``element + nearest vertex'' pair (the same algorithm as desktop
+TaskAssemblyCreateJoint). In the dialog you can reselect Reference1/2, change the joint type, and change
+\ui{Offset}, \ui{Rotation} and \ui{Reverse}; the assembly re-solves automatically after a change.
+
+\section{Solving and dragging}
+
+\begin{itemize}
+  \item \ui{Solve assembly} (\cmd{Assembly\_SolveAssembly}): computes all joints and the degrees of freedom;
+        on failure it reports \ui{Assembly solver failed (code)};
+  \item \textbf{Drag a part}: drag a component directly in the 3D view; the app applies the displacement
+        first and then solves---just like the desktop dragger;
+  \item \ui{Grounded}: select the part and tap \ui{Toggle grounded}; run it again to release the part.
+\end{itemize}
+
+\section{Diagnosis}
+
+When an assembly goes wrong, use these commands to select the objects at fault:
+
+\begin{itemize}
+  \item \ui{Select conflicting constraints}, \ui{Select redundant constraints},
+        \ui{Select malformed constraints};
+  \item \ui{Select components with DoFs}, \ui{Select component joints}, \ui{Select linked object}.
+\end{itemize}
+
+They read the last conflicting/redundant/malformed list recorded by the engine and select the objects
+involved, so you can locate them in the tree.
+
+\section{Output and other tools}
+
+\begin{itemize}
+  \item \ui{BOM} (\cmd{Assembly\_CreateBom}): creates a bill-of-materials object (columns can be added,
+        removed and dragged) that can be exported;
+  \item \ui{Snapshot} (\cmd{Assembly\_CreateSnapshot}): freezes a copy of the current assembly;
+  \item \ui{Exploded view} (\cmd{Assembly\_CreateView}): creates an exploded view;
+  \item \ui{Simulation} (\cmd{Assembly\_CreateSimulation}): motion simulation;
+  \item \ui{Export ASMT}: the assembly exchange format (opens the system save dialog).
+\end{itemize}
+
+\begin{practice}[Exercise: build a hinge]
+\begin{enumerate}
+  \item Create two parts (a base and a lid) and save both in the same document;
+  \item Assembly → Create assembly → Insert part (the base, grounded automatically) → Insert part (the lid);
+  \item Tap a coaxial edge on each part → \ui{Revolute joint};
+  \item \ui{Solve assembly}; drag the lid and check that it rotates about the axis instead of drifting;
+  \item If the lid also moves in other directions when dragged, check whether a ``coincident/distance''
+        constraint is missing, or add parallel/perpendicular constraints to remove the remaining degrees of
+        freedom.
+\end{enumerate}
+\end{practice}
+
+\section{Limitations}
+
+\begin{itemize}
+  \item A joint needs two sub-element picks; you cannot select a whole part;
+  \item There is no separate ``planar'' joint (use a combination of constraints instead);
+  \item Solving a large assembly takes longer as the number of parts grows; on a phone, assemble sub-groups
+        first and then the complete assembly.
+\end{itemize}
