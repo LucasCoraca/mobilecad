@@ -9,7 +9,7 @@ track down a conflict, and how to edit a B-spline.
 \subsection{Creating a sketch}
 
 \begin{enumerate}
-  \item Tap \ui{Sketch} on the toolbar (Sketcher tool group) → \ui{New Sketch} (\cmd{Sketcher\_NewSketch});
+  \item Tap \ui{Sketch} in the toolstrip (Sketcher tool group) → \ui{New Sketch} (\cmd{Sketcher\_NewSketch});
   \item If a plane or datum plane is already selected, the sketch attaches to it directly; otherwise the \ui{Sketch plane}
         picker opens: \ui{Top (XY)}, \ui{Front (XZ)}, \ui{Right (YZ)};
   \item The sketch lands in the \textbf{active body} (Body), with the ``FlatFace'' attachment mode. A curved surface
@@ -20,7 +20,7 @@ track down a conflict, and how to edit a B-spline.
 
 \begin{itemize}
   \item To edit an existing sketch, double-tap it in the tree, or select it and tap \ui{Edit sketch} (\cmd{Sketcher\_EditSketch});
-  \item \ui{✓ Leave sketch}: saves your changes and recomputes (the button is at the far right of the toolbar);
+  \item \ui{✓ Leave sketch}: saves your changes and recomputes (the button is at the far right of the toolstrip);
   \item \ui{✗ Cancel sketch}: \textbf{rolls back} to the state the sketch had when it was opened. The two buttons are
         20 dp apart, so that you do not hit the wrong one.
 \end{itemize}
@@ -31,9 +31,9 @@ sketch belongs to one transaction. To drop the whole session, use ✗ Cancel ske
 brought back with Redo.
 \end{warn}
 
-\section{The sketch toolbar}
+\section{The sketch toolstrip}
 
-Inside a sketch, the top toolbar turns into four groups:
+Inside a sketch, the top toolstrip turns into four groups:
 
 \begin{center}
 \small
@@ -51,10 +51,10 @@ Inside a sketch, the top toolbar turns into four groups:
 
 To the right of the groups sit fixed buttons: \ui{Construction: on/off}, \ui{Constraints} (opens the constraint list),
 \ui{Polyline}, \ui{Rectangle}, \ui{Circle}, \ui{3-point arc}, \ui{Dimension}, \ui{Trim}, \ui{Select}, \ui{Delete},
-\ui{Finish}, and ✓ / ✗ at the far right. The tool panel is also split into sections by FreeCAD toolbar, and has
+\ui{Finish}, and ✓ / ✗ at the far right. The tool panel is likewise split into sections by FreeCAD toolbar and has
 \ui{More tools (N)}.
 
-\screenshot{ui-sketch-tools-zh.jpg}{Sketch mode: the four groups plus the fixed buttons on the top toolbar; the status bar at the bottom reads ``Fully constrained''; the pill that exits the current tool (Polyline) sits in the bottom-right corner.}
+\screenshot{ui-sketch-tools-zh.jpg}{Sketch mode: the four groups plus the fixed buttons on the top toolstrip; the status bar at the bottom reads ``Fully constrained''; the pill that exits the current tool (Polyline) sits in the bottom-right corner.}
 
 \section{All drawing tools}
 
@@ -164,19 +164,19 @@ that the result is positive; point-to-line perpendicular distance is supported a
   \item \textbf{Changing a dimension}: long-press the dimension label (haptic feedback) → number pad; or open the
         constraint list and tap the ✎ at the end of the row; you can also just drag the label elsewhere;
   \item \textbf{Driving / reference}: \ui{Make reference (driven)} in the row menu makes the dimension measure only,
-        without taking part in the solve (it turns grey and is marked ``(reference)'');
+        without taking part in the solve (it turns gray and is marked ``(reference)'');
   \item \textbf{Naming a constraint}: give it a name and you can refer to it in expressions, for example
         \file{=Sketch.Constraints.Width * 2}.
 \end{itemize}
 
 \section{The constraint list and conflict hunting}
 
-Tap \ui{Constraints} on the toolbar to open the list (the title shows the total number of constraints):
+Tap \ui{Constraints} in the toolstrip to open the list (the title shows the total number of constraints):
 
 \begin{itemize}
   \item Filter at the top: \ui{All} / \ui{Conflicts / redundant};
   \item Each row shows the number, the name, the value and the relation (such as ``Line3 ↔ Circle5'');
-  \item Colours: \textbf{red = conflicting}, \textbf{orange = redundant}, \textbf{grey = deactivated} (marked ``(off)'');
+  \item Colors: \textbf{red = conflicting}, \textbf{orange = redundant}, \textbf{gray = deactivated} (marked ``(off)'');
   \item Row menu: \ui{Deactivate/Activate}, \ui{Make reference (driven)} / \ui{Make driving}, \ui{Rename}, \ui{Delete}.
 \end{itemize}
 
@@ -240,8 +240,8 @@ at a time.
 
 \begin{itemize}
   \item Pick the tool, then tap an edge or vertex on the model;
-  \item Across bodies, the app switches to an element in the same body, or creates a SubShapeBinder; when that would be a
-        circular reference it reports an error;
+  \item For a cross-body reference, the app switches to an element in the same body, or creates a SubShapeBinder; when
+        that would be a circular reference it reports an error;
   \item Projected geometry is ``reference'' by default (it does not form the shape) and can be switched to ``defining''
         (it does).
 \end{itemize}
@@ -255,8 +255,8 @@ Four ways to create one: \textbf{control-point}, \textbf{periodic} (at least 3 p
   \item \ui{Insert knot}: tap a position on the curve; the knot is inserted at the nearest point;
   \item \ui{Increase/decrease knot multiplicity}: you must tap a knot, otherwise it says \ui{Select a B-spline knot};
   \item \ui{Convert to NURBS}, \ui{Increase/decrease degree} and \ui{Join curves} work on the whole curve;
-  \item \ui{B-spline info} in the View group can show, one at a time: degree, control polygon, curvature comb, knot
-        multiplicity and pole weights.
+  \item \ui{B-spline info} in the View group can show any of: degree, control polygon, curvature comb, knot multiplicity and
+        pole weights.
 \end{itemize}
 
 \section{Numeric input in a sketch}

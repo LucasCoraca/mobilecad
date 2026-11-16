@@ -1,13 +1,13 @@
 \chapter{The Part workbench: solids, Booleans and shaping}
 
 The \textbf{Part} workbench is not the same as Part Design: it keeps no feature history and works directly on
-\textbf{shapes} --- building primitives, running Booleans, extruding/revolving/lofting/sweeping, filleting. It is the
+\textbf{shapes} --- building primitives, running Booleans, extruding, revolving, lofting, sweeping and filleting. It is the
 right tool for a quick blank, for handling imported STEP/IGES, for one-off geometry operations, and for merging several
 solids into one.
 
 \section{Getting there}
 
-The toolbar of the \ui{Part} tab at the bottom has five groups: \ui{Sketch}, \ui{Features}, \ui{Part}, \ui{Surface},
+The toolstrip of the \ui{Part} tab at the bottom has five groups: \ui{Sketch}, \ui{Features}, \ui{Part}, \ui{Surface},
 \ui{Draft}. The \ui{Part} group expands into three sections: \ui{Solids}, \ui{Part Tools}, \ui{Boolean Tools}. You can also
 reach the same workbench from \menupath{More ▾ → Part}.
 
@@ -87,7 +87,7 @@ the one being arrayed; path and point arrays take the second selected object as 
 \begin{itemize}
   \item \ui{Check geometry} (\cmd{Part\_CheckGeometry}) and \ui{Shape info} share one information panel: BOP check
         result, counts of solids/shells/faces/wires/edges/vertices, volume/area/length, bounding box, center of mass;
-  \item Measure is not on the Part toolbar: \menupath{Tools → Measure} --- select one element for its
+  \item Measure is not on the Part toolstrip: \menupath{Tools → Measure} --- select one element for its
         coordinates/edge length/radius/area/volume, two for the minimum distance, $\Delta$X/$\Delta$Y/$\Delta$Z and the
         angle between two straight edges or two faces;
   \item \ui{Mass properties}: volume, area, density, mass, center of mass, moments of inertia (mass needs a material
@@ -101,7 +101,7 @@ the one being arrayed; path and point arrays take the second selected object as 
   \item \ui{Shape builder} (\cmd{Part\_Builder}): two points make an edge, edges make a wire, points/edges make a face,
         faces make a shell, shells make a solid;
   \item \ui{Convert to solid}: shell/compound → solid;
-  \item \ui{Compound}, \ui{Explode compound}, \ui{Compound filter}, \ui{Tolerance set};
+  \item \ui{Compound}, \ui{Explode compound}, \ui{Compound filter}, \ui{Set Tolerance};
   \item \ui{Defeaturing}: tap faces to remove the features they carry;
   \item \ui{Refine shape}, \ui{Reverse shapes}, \ui{Simple copy/transformed copy/element copy};
   \item Selection filtering: vertex/edge/face selection, \ui{Selection filter}, \ui{Drag a box to select faces}.
@@ -129,7 +129,7 @@ the one being arrayed; path and point arrays take the second selected object as 
 \end{enumerate}
 \end{practice}
 
-\section{Division of labour with Part Design}
+\section{Division of labor with Part Design}
 
 \begin{center}
 \small
