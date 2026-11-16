@@ -1,25 +1,25 @@
-\chapter{PartDesign: turning sketches into solids}
+\chapter{Part Design: turning sketches into solids}
 
-PartDesign is MobileCAD's most-used workbench. Its core idea is \textbf{history}: a body (Body) is built from a chain of
+Part Design is MobileCAD's most-used workbench. Its core idea is \textbf{history}: a body (Body) is built from a chain of
 features, and each feature does one thing to the result of the previous step. Change any step and the steps after it
 recompute automatically.
 
 \section{Three key ideas: body, feature, Tip}
 
 \begin{description}
-  \item[Body] The container for features, and the unit of work in PartDesign. Every sketch and feature belongs to a body.
+  \item[Body] The container for features, and the unit of work in Part Design. Every sketch and feature belongs to a body.
         When you create a feature and there is no body yet, the app creates one and puts the new feature in it.
   \item[Feature] One step in the history: pad, pocket, fillet, array, and so on.
   \item[Tip] The marker for ``how far the body has been computed''. A blue rollback bar runs through the tree; long-press
         a feature and choose \ui{Roll tip to here} to return to the state at that step (replaying the modeling process).
 \end{description}
 
-\textbf{Active body} (Active Body): with several bodies, new features go into the ``active'' one (its label is bold in the
+\textbf{Active body}: with several bodies, new features go into the ``active'' one (its label is bold in the
 tree). Double-tap a body, or right-click \ui{Toggle active body}, to switch.
 
 \section{How a feature gets prepared}
 
-Most PartDesign commands read the selection and act on it, which saves a lot of dialog work:
+Most Part Design commands read the selection and act on it, which saves a lot of dialog work:
 
 \begin{itemize}
   \item Select a \textbf{sketch} and tap Pad or Pocket → the profile is filled in;
@@ -28,7 +28,7 @@ Most PartDesign commands read the selection and act on it, which saves a lot of 
         ``select a sketch or a plane first'';
   \item Fillet/chamfer/draft/thickness: if you select a whole feature, they apply to all edges or faces automatically
         (\ui{UseAllEdges}); if nothing is selected, they wait at the Tip for you to tap edges;
-  \item Defaults: Pad 10 mm, Pocket 5 mm, Revolution 360° (axis: the sketch V axis), Mirror on the V axis, LinearPattern
+  \item Defaults: Pad 10 mm, Pocket 5 mm, Revolution 360° (axis: the sketch V axis), Mirror defaults to the V axis, LinearPattern
         100 mm × 2 along X, PolarPattern 360° × 2 about the Z axis.
 \end{itemize}
 
@@ -37,11 +37,11 @@ Most PartDesign commands read the selection and act on it, which saves a lot of 
 \small
 \begin{longtable}{@{}p{0.17\linewidth}p{0.10\linewidth}p{0.65\linewidth}@{}}
 \toprule \textbf{Feature} & \textbf{Command} & \textbf{Key parameters} \\ \midrule \endhead
-Pad & Pad & Profile, type (length/two lengths/to last/to face/to shape/dimension), length, length 2, offset, midplane, reverse, draft angle, refine \\
-Revolution & Revolution & Profile, reference axis, type (angle/two angles/to last/to face), angle, angle 2, midplane, reverse, refine \\
+Pad & Pad & Profile, type (length/two lengths/to last/to face/to shape/dimension), length, length 2, offset, midplane, reversed, draft angle, refine \\
+Revolution & Revolution & Profile, reference axis, type (angle/two angles/to last/to face), angle, angle 2, midplane, reversed, refine \\
 Loft & Additive Loft & Profile, sections (several), ruled, closed, refine \\
 Pipe / Sweep & Additive Pipe & Profile, path, mode, transition, transformation, refine \\
-Helix & Additive Helix & Profile, reference axis, mode, pitch, height, turns, angle, growth, left-handed, reverse, refine \\
+Helix & Additive Helix & Profile, reference axis, mode, pitch, height, turns, angle, growth, left-handed, reversed, refine \\
 Additive primitives & Additive Box/Cylinder/Sphere/Cone/Torus/Ellipsoid/Prism/Wedge & Length, width, height/radius/angle and so on; created on the face when one is selected \\
 \bottomrule
 \end{longtable}
@@ -50,9 +50,9 @@ Additive primitives & Additive Box/Cylinder/Sphere/Cone/Torus/Ellipsoid/Prism/We
 
 \begin{itemize}
   \item \ui{Pocket}: the mirror image of Pad --- it scoops the profile inward. The depth types likewise include through all;
-  \item \ui{Hole}: the standard hole feature. Parameters: profile, \ui{Thread}, thread type/size/class/fit, diameter,
+  \item \ui{Hole}: the standard hole feature. Parameters: profile, \ui{Threaded}, thread type/size/class/fit, diameter,
         direction, hole cut type (counterbore/countersink/counterdrill) with its diameter/depth/angle, depth type/depth,
-        drill point angle, taper, reverse;
+        drill point angle, taper, reversed;
   \item \ui{Groove}: cuts an annular groove around an axis;
   \item \ui{Subtractive loft/pipe/helix} take the same parameters as the additive versions, only in the opposite direction;
   \item \ui{Subtractive primitives}: the subtractive versions of the 8 primitives.
@@ -68,8 +68,8 @@ profile --- then change the hole diameter. This saves the ``draw a circle first'
 \begin{description}
   \item[Fillet] Parameters: base, edges (an edge table, with a radius per edge), use all edges, refine. Drag the arrow to change the radius directly on the model.
   \item[Chamfer] Parameters: base, chamfer type (equal distance/two distances/distance + angle), size, size 2, angle, flip direction, use all edges.
-  \item[Draft] Parameters: base, neutral plane, pull direction, angle, reverse.
-  \item[Thickness] Parameters: base, thickness value, mode (skin/pipe/rectangular), join type (arc/tangent/intersection), reverse, intersection.
+  \item[Draft] Parameters: base, neutral plane, pull direction, angle, reversed.
+  \item[Thickness] Parameters: base, thickness value, mode (skin/pipe/rectangular), join type (arc/tangent/intersection), reversed, intersection.
   \item[Defeaturing] Removes existing faces or fillets and restores the geometry underneath.
 \end{description}
 
@@ -83,8 +83,8 @@ profile --- then change the hole diameter. This saves the ``draw a circle first'
 \toprule
 \textbf{Feature} & \textbf{Parameters} \\
 \midrule
-LinearPattern & Original feature, direction (edge/axis), mode (extent/spacing), length, offset, count, reverse, refine \\
-PolarPattern & Original feature, axis, mode (angle/spacing), angle, offset, count, reverse, refine \\
+LinearPattern & Original feature, direction (edge/axis), mode (extent/spacing), length, offset, count, reversed, refine \\
+PolarPattern & Original feature, axis, mode (angle/spacing), angle, offset, count, reversed, refine \\
 Mirrored & Original feature, mirror plane, refine \\
 MultiTransform & Combines several arrays/mirrors (uses the generic object-creation flow)\\
 \bottomrule
@@ -103,7 +103,7 @@ count of 6.
 
 \begin{itemize}
   \item \ui{Datum plane}, \ui{Datum line}, \ui{Datum point}, \ui{Coordinate system};
-  \item Parameters at creation: attachment support (\ui{AttachmentSupport}), map mode (\ui{MapMode}), \ui{Reverse}, offset
+  \item Parameters at creation: attachment support (\ui{AttachmentSupport}), map mode (\ui{MapMode}), \ui{Reversed}, offset
         (\ui{AttachmentOffset}), path parameter (\ui{MapPathParameter});
   \item \ui{Edit attachment} (long-press in the tree) changes only the attachment and does not open the whole feature.
 \end{itemize}
@@ -117,9 +117,9 @@ by a chamfer, for example), the features that depend on it fail.
 \section{Boolean operations}
 
 \begin{itemize}
-  \item \ui{PartDesign → Boolean}: uses the selected objects as tools and fuses, cuts or intersects them with the active body;
+  \item \ui{Part Design → Boolean}: uses the selected objects as tools and fuses, cuts or intersects them with the active body;
   \item The \ui{Fuse/Cut/Common} commands of the \ui{Part} workbench are Booleans between independent solids, not part of
-        the PartDesign history;
+        the Part Design history;
   \item Before a Boolean, check that both shapes are valid solids (\ui{Part → Check geometry}).
 \end{itemize}
 
@@ -164,7 +164,7 @@ Continue with the bracket from chapter 4:
 \begin{enumerate}
   \item \textbf{Add a rib}: create a sketch on the top face of the bracket, draw a line → leave the sketch → \ui{Pad}
         (tick ``symmetric to plane'') to get the rib plate;
-  \item \textbf{Drill a countersunk hole}: select the top face → \ui{Hole} → turn on \ui{Thread} or select
+  \item \textbf{Drill a countersunk hole}: select the top face → \ui{Hole} → turn on \ui{Threaded} or select
         \ui{Countersink} → enter diameter/depth;
   \item \textbf{Array}: select the hole → \ui{LinearPattern}, pick an edge for the direction, count 4, length 40;
   \item \textbf{Chamfer}: select the outer contour edges → \ui{Chamfer}, size 1 mm;
@@ -173,7 +173,7 @@ Continue with the bracket from chapter 4:
   \item Export STEP for a colleague, or go to the ``Drawing'' tab and make a drawing.
 \end{enumerate}
 
-\screenshot[0.72]{tablet-partdesign.jpg}{A real PartDesign model (a screwdriver bit): the tree reads Pad → Groove → Mirrored → Revolution → DatumPlane → Pocket → PolarPattern... Every step can still be changed, which is exactly the power of parametric modeling.}
+\screenshot[0.72]{tablet-partdesign.jpg}{A real Part Design model (a screwdriver bit): the tree reads Pad → Groove → Mirrored → Revolution → DatumPlane → Pocket → PolarPattern... Every step can still be changed, which is exactly the power of parametric modeling.}
 
 \section{Common pitfalls}
 

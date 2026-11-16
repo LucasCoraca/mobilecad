@@ -1,6 +1,6 @@
 \chapter{The Part workbench: solids, Booleans and shaping}
 
-The \textbf{Part} workbench is not the same as PartDesign: it keeps no feature history and works directly on
+The \textbf{Part} workbench is not the same as Part Design: it keeps no feature history and works directly on
 \textbf{shapes} --- building primitives, running Booleans, extruding/revolving/lofting/sweeping, filleting. It is the
 right tool for a quick blank, for handling imported STEP/IGES, for one-off geometry operations, and for merging several
 solids into one.
@@ -35,7 +35,7 @@ helix, spiral, circle, ellipse, vertex, line, polygon.
 
 \begin{tip}[Parameters can be changed at any time]
 After a primitive is created, double-tap the object in the tree to reopen its parameter dialog. Size, angle and radius
-can all be changed, but this will \textbf{not} drive the later features the way PartDesign does --- Part objects are
+can all be changed, but this will \textbf{not} drive the later features the way Part Design does --- Part objects are
 independent shapes.
 \end{tip}
 
@@ -72,7 +72,7 @@ the base first and the tools after; if you get it backwards, undo and start agai
 \begin{itemize}
   \item \ui{Fillet}/\ui{Chamfer}: the app asks for the radius/size first (1 mm by default); with edges selected it works
         on those edges only, otherwise on all edges; \textbf{if the selection contains a body or a feature inside a body,
-        it calls PartDesign's fillet/chamfer instead} (otherwise it would produce a shape that sits outside the history);
+        it calls Part Design's fillet/chamfer instead} (otherwise it would produce a shape that sits outside the history);
   \item \ui{Thickness} (1 mm), \ui{Offset} (3D/2D), \ui{Ruled surface}, \ui{Make face}, \ui{Section};
   \item Right-click a Part fillet/chamfer in the tree and choose \ui{Move into Body} to absorb it into the body history.
 \end{itemize}
@@ -129,7 +129,7 @@ the one being arrayed; path and point arrays take the second selected object as 
 \end{enumerate}
 \end{practice}
 
-\section{Division of labour with PartDesign}
+\section{Division of labour with Part Design}
 
 \begin{center}
 \small
@@ -137,11 +137,11 @@ the one being arrayed; path and point arrays take the second selected object as 
 \toprule
 \textbf{Scenario} & \textbf{Use} \\
 \midrule
-You will keep changing dimensions and want history & PartDesign \\
+You will keep changing dimensions and want history & Part Design \\
 A quick blank or a one-off operation & Part \\
 Working with imported STEP/IGES & Part \\
 Merging several independent solids into one & Part's Boolean/Compound \\
-You need fillets you can go back and edit & PartDesign \\
+You need fillets you can go back and edit & Part Design \\
 \bottomrule
 \end{tabularx}
 \end{center}
