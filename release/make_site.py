@@ -4,6 +4,7 @@ video and the release notes already on the local page (publish.sh prepends a not
     make_site.py --github   -> docs/             (GitHub Pages: downloads from the latest GitHub Release, source = the repo)"""
 import json, os, re, shutil, sys
 R = os.path.dirname(os.path.abspath(__file__)); S = os.path.join(R, '..', 'serve')
+D = os.path.join(R, '..', 'docs')
 TAB = [('tablet-partdesign.jpg', 'Part design', "The screwdriver bit from FreeCAD's PartDesignExample, with its full feature history."),
        ('tablet-feature-dialog.jpg', 'Edit any feature', 'Touch and hold a feature to reopen its dialog. The model updates as you change values.'),
        ('tablet-sketcher.jpg', 'Sketcher', "Constraints, dimensions and snapping, with the sketch's status always in view."),
@@ -24,7 +25,11 @@ def cards(items, kind):
                      '<span class="d">%s</span></figcaption>\n      </figure>' % (k, kind, t, f, t, t, d) for k, (f, t, d) in enumerate(items))
 page = os.path.join(S, 'index.html'); old = open(page).read() if os.path.exists(page) else ''
 notes = '\n'.join(re.findall(r'<p style="font-size:14px"><b>Latest.*?</p>', old, re.S))
-for f, _, _ in TAB + PH: assert os.path.exists(os.path.join(S, 'screens', f)), f
+# screenshots come from serve/screens (release/shot.sh); a checkout without them reuses the ones published in docs/
+SHOTS = os.path.join(S, 'screens') if all(os.path.exists(os.path.join(S, 'screens', f)) for f, _, _ in TAB + PH) else os.path.join(D, 'screens')
+for f, _, _ in TAB + PH: assert os.path.exists(os.path.join(SHOTS, f)), f
+if '--github' in sys.argv:   # the local notes carry hashes of local builds, which never match a GitHub release
+    notes = '    <p class="sub">The notes, APK and checksums of every version are on the <a href="https://github.com/LucasCoraca/mobilecad/releases">Releases page</a>.</p>'
 html = open(os.path.join(R, 'site_template.html')).read()
 html = html.replace('__TAB__', cards(TAB, 'tablet')).replace('__PHONE__', cards(PH, 'phone')).replace('__NOTES__', notes)
 html = html.replace('__SHOTS__', json.dumps({'tab': TAB, 'phone': PH}))
@@ -33,8 +38,9 @@ if '--github' in sys.argv:
     rel = REPO + '/releases/latest'
     links = {'__APK_ARM__': rel + '/download/MobileCAD-arm64.apk', '__APK_X86__': rel + '/download/MobileCAD-x86_64.apk',
              '__SRC__': REPO, '__SRC_DIR__': rel, '__SUMS__': rel + '/download/SHA256SUMS'}
-    out = os.path.join(R, '..', 'docs'); os.makedirs(os.path.join(out, 'screens'), exist_ok=True)
-    for f, _, _ in TAB + PH: shutil.copy(os.path.join(S, 'screens', f), os.path.join(out, 'screens', f))
+    out = D; os.makedirs(os.path.join(out, 'screens'), exist_ok=True)
+    for f, _, _ in TAB + PH:
+        if os.path.realpath(SHOTS) != os.path.realpath(os.path.join(out, 'screens')): shutil.copy(os.path.join(SHOTS, f), os.path.join(out, 'screens', f))
     for f in ('logo.png', 'favicon.png', 'mobilecad-launch.mp4', 'mobilecad-launch-poster.jpg'): shutil.copy(os.path.join(S, f), os.path.join(out, f))
     open(os.path.join(out, '.nojekyll'), 'w').close()
     for k, v in links.items(): html = html.replace(k, v)

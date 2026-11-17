@@ -56,6 +56,7 @@
  .video video { display:block; width:100%; height:auto; }
  .note { border:1px solid var(--line); background:var(--bg2); border-radius:12px; padding:16px 18px; color:var(--muted); font-size:14px; }
  .note b { color:var(--fg); }
+ .fp { word-break:break-all; }
  .notes p { font-size:14px !important; border-left:3px solid var(--line); padding-left:14px; } .notes small { color:var(--soft); }
  footer { border-top:1px solid var(--line); margin-top:48px; padding:22px 0 40px; color:var(--soft); font-size:13px; }
  .lb { position:fixed; inset:0; background:rgba(8,11,15,.92); display:none; z-index:20; align-items:center; justify-content:center; flex-direction:column; padding:20px; }
@@ -82,7 +83,8 @@
       <a class="btn ghost" href="#video">Watch the video</a>
     </div>
     <p class="fine">Android 8 or newer (arm64) · about 1 GB free space · free and open source (GPL-3.0)<br>
-      Installed an earlier test build? This version installs as a separate app; uninstall the old one.</p>
+      Installed an earlier test build? This version installs as a separate app; uninstall the old one.<br>
+      <a href="#verify">Verify your download</a></p>
   </div>
   <div class="stage">
     <button class="frame tablet" data-open="tab:0" aria-label="View the part design screenshot"><img src="screens/tablet-partdesign.jpg" alt="MobileCAD on a tablet"></button>
@@ -125,6 +127,25 @@ __PHONE__
       <a href="https://www.freecad.org">FreeCAD</a> engine. It is not affiliated with, sponsored or endorsed by the FreeCAD project
       or the FreeCAD Project Association. FreeCAD is a trademark of the FreeCAD Project Association. The models shown are
       FreeCAD's own example projects.</div>
+  </section>
+
+  <section id="verify">
+    <h2>Verify your download</h2>
+    <p class="sub">Official copies of MobileCAD come only from this page and the
+      <a href="https://github.com/LucasCoraca/mobilecad/releases">GitHub Releases</a> of the project. A copy found anywhere
+      else may have been modified.</p>
+    <ul>
+      <li><b>Checksum:</b> the SHA-256 of <code>MobileCAD-arm64.apk</code> must match the line for it in the
+        <a href="https://github.com/LucasCoraca/mobilecad/releases/latest/download/SHA256SUMS">SHA256SUMS</a> file of the
+        same release (for example with <code>sha256sum MobileCAD-arm64.apk</code>).</li>
+      <li><b>Signing certificate:</b> every release is signed with the same key. Its certificate SHA-256 is
+        <code class="fp">7192f62e9497f0d05048ea95ba16d468f45bfcab5b8707520d2d34c35713e966</code>
+        (check with <code>apksigner verify --print-certs MobileCAD-arm64.apk</code>). Android refuses to update an
+        installed MobileCAD with a copy signed by a different key, and the app's own updater rejects any download whose
+        checksum does not match.</li>
+    </ul>
+    <p class="sub">If a copy does not match, do not install it. Please
+      <a href="https://github.com/LucasCoraca/mobilecad/issues">open an issue</a> saying where it came from.</p>
   </section>
 
   <section id="source">

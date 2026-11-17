@@ -9,6 +9,18 @@ CAD for Android phones and tablets, built on [FreeCAD](https://www.freecad.org)'
 MobileCAD is an independent project. It is **not affiliated with, sponsored or endorsed by** the FreeCAD project or the
 FreeCAD Project Association; "FreeCAD" is their trademark and is used here only to say what MobileCAD is built on.
 
+## Verifying a download
+
+Official APKs come only from this repository's [Releases](https://github.com/LucasCoraca/mobilecad/releases) (the
+[website](https://lucascoraca.github.io/mobilecad/) links there). Before installing a copy, check that:
+
+- its SHA-256 matches the line for it in that release's `SHA256SUMS`;
+- it is signed with the MobileCAD release key, certificate SHA-256
+  `7192f62e9497f0d05048ea95ba16d468f45bfcab5b8707520d2d34c35713e966`
+  (`apksigner verify --print-certs MobileCAD-arm64.apk`).
+
+Don't install a copy that doesn't match; please open an issue saying where it came from.
+
 ## Contributing
 
 MobileCAD **does not accept code contributions**: because of supply-chain attacks, pull requests are closed unreviewed

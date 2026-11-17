@@ -56,6 +56,7 @@
  .video video { display:block; width:100%; height:auto; }
  .note { border:1px solid var(--line); background:var(--bg2); border-radius:12px; padding:16px 18px; color:var(--muted); font-size:14px; }
  .note b { color:var(--fg); }
+ .fp { word-break:break-all; }
  .notes p { font-size:14px !important; border-left:3px solid var(--line); padding-left:14px; } .notes small { color:var(--soft); }
  footer { border-top:1px solid var(--line); margin-top:48px; padding:22px 0 40px; color:var(--soft); font-size:13px; }
  .lb { position:fixed; inset:0; background:rgba(8,11,15,.92); display:none; z-index:20; align-items:center; justify-content:center; flex-direction:column; padding:20px; }
@@ -82,7 +83,8 @@
       <a class="btn ghost" href="#video">Watch the video</a>
     </div>
     <p class="fine">Android 8 or newer (arm64) · about 1 GB free space · free and open source (GPL-3.0)<br>
-      Installed an earlier test build? This version installs as a separate app; uninstall the old one.</p>
+      Installed an earlier test build? This version installs as a separate app; uninstall the old one.<br>
+      <a href="#verify">Verify your download</a></p>
   </div>
   <div class="stage">
     <button class="frame tablet" data-open="tab:0" aria-label="View the part design screenshot"><img src="screens/tablet-partdesign.jpg" alt="MobileCAD on a tablet"></button>
@@ -181,6 +183,25 @@
       FreeCAD's own example projects.</div>
   </section>
 
+  <section id="verify">
+    <h2>Verify your download</h2>
+    <p class="sub">Official copies of MobileCAD come only from this page and the
+      <a href="https://github.com/LucasCoraca/mobilecad/releases">GitHub Releases</a> of the project. A copy found anywhere
+      else may have been modified.</p>
+    <ul>
+      <li><b>Checksum:</b> the SHA-256 of <code>MobileCAD-arm64.apk</code> must match the line for it in the
+        <a href="https://github.com/LucasCoraca/mobilecad/releases/latest/download/SHA256SUMS">SHA256SUMS</a> file of the
+        same release (for example with <code>sha256sum MobileCAD-arm64.apk</code>).</li>
+      <li><b>Signing certificate:</b> every release is signed with the same key. Its certificate SHA-256 is
+        <code class="fp">7192f62e9497f0d05048ea95ba16d468f45bfcab5b8707520d2d34c35713e966</code>
+        (check with <code>apksigner verify --print-certs MobileCAD-arm64.apk</code>). Android refuses to update an
+        installed MobileCAD with a copy signed by a different key, and the app's own updater rejects any download whose
+        checksum does not match.</li>
+    </ul>
+    <p class="sub">If a copy does not match, do not install it. Please
+      <a href="https://github.com/LucasCoraca/mobilecad/issues">open an issue</a> saying where it came from.</p>
+  </section>
+
   <section id="source">
     <h2>Source code &amp; licenses</h2>
     <p class="sub">MobileCAD is free software under the <a href="https://www.gnu.org/licenses/gpl-3.0.html">GNU GPL v3 or later</a>.</p>
@@ -193,9 +214,7 @@
 
   <section id="notes" class="notes">
     <h2>Release notes</h2>
-<p style="font-size:14px"><b>Latest (Oct 25, 00:45):</b> Sketcher: undo / redo stay inside the open sketch (undoing past your first step no longer deletes the sketch); horizontal / vertical polyline segments work again; OK and Cancel further apart, and a cancelled sketch can be restored with redo.<br><small>MobileCAD-arm64.apk: 175.3 MB, SHA-256 beaacc54468a56b9… · MobileCAD-x86_64.apk: 186.9 MB, SHA-256 52d99631d680d355…</small></p>
-<p style="font-size:14px"><b>Latest (Oct 18, 15:41):</b> Phones: the feature list now closes when you edit a feature or sketch, and opening another file closes any open dialog. Assemblies use FreeCAD's term "joints" everywhere. New screenshot gallery on this page.<br><small>MobileCAD-arm64.apk: 180.3 MB, SHA-256 fa6046cc09e39742… · MobileCAD-x86_64.apk: 186.9 MB, SHA-256 52d99631d680d355…</small></p>
-<p style="font-size:14px"><b>Latest (Oct 18, 14:32):</b> First MobileCAD release: new name and logo, signed release build, About ▸ Open-source licenses, and the full source code below. Features that fail no longer make the model disappear: the last good version is shown in transparent red until you fix them.<br><small>MobileCAD-arm64.apk: 180.3 MB, SHA-256 8927f0a85aeb04e5… · MobileCAD-x86_64.apk: 186.9 MB, SHA-256 04eabed998e77a2e…</small></p>
+    <p class="sub">The notes, APK and checksums of every version are on the <a href="https://github.com/LucasCoraca/mobilecad/releases">Releases page</a>.</p>
   </section>
 
   <footer>MobileCAD · GPL-3.0-or-later · Built on FreeCAD, Open CASCADE and Qt</footer>
