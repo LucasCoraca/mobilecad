@@ -2,19 +2,61 @@
 Only FreeCAD's public App API is used, so documents behave exactly as on desktop and save as native .FCStd."""
 import json, traceback
 import FreeCAD as App
+from . import op_schema
+from .meshcache import MeshCache
+
+BRIDGE_VERSION = 2
 
 _ops = {}
+
 def op(fn):
     _ops[fn.__name__] = fn
     return fn
 
+# Tessellation cache: selecting an object must not re-tessellate the whole model, and editing one
+# feature must keep the other objects' meshes. Keys are (document, object, tolerance, shape stamp);
+# the stamp is FreeCAD's TopoShape.hashCode(), which changes whenever the shape is recomputed.
+_mesh_cache = MeshCache()
+
 def handle(req_json):
+    opname = None
     try:
         req = json.loads(req_json)
-        res = _ops[req.pop('op')](**req)
-        return json.dumps({'ok': True, 'result': res})
+        if not isinstance(req, dict):
+            raise ValueError('request must be a JSON object')
+        opname = req.pop('op', None)
+        fn = _ops.get(opname) if isinstance(opname, str) else None
+        if fn is None:
+            known = ', '.join(sorted(_ops)[:40])
+            raise KeyError('unknown op %r; known (first 40): %s' % (opname, known))
+        kwargs = op_schema.validate(fn, req)
+        return json.dumps({'ok': True, 'result': fn(**kwargs)})
+    except op_schema.BadArguments as e:
+        return json.dumps({'ok': False, 'op': opname, 'error': 'BadArguments: %s' % e})
     except Exception as e:
-        return json.dumps({'ok': False, 'error': '%s: %s' % (type(e).__name__, e), 'trace': traceback.format_exc()})
+        return json.dumps({'ok': False, 'op': opname, 'error': '%s: %s' % (type(e).__name__, e),
+                           'trace': traceback.format_exc()})
+
+@op
+def ping():
+    """bridge/python/FreeCAD versions and cache counters (call right after nativeInit)."""
+    import platform
+    try:
+        fc = list(App.Version())
+    except Exception:
+        fc = []
+    return {'bridge': BRIDGE_VERSION, 'python': platform.python_version(),
+            'freecad': fc[:3], 'ops': len(_ops), 'mesh_cache': _mesh_cache.stats()}
+
+@op
+def describe_ops():
+    """Machine-readable op catalogue (tooling/tests; also documents the bridge surface)."""
+    return [op_schema.describe(fn) for _, fn in sorted(_ops.items())]
+
+@op
+def clear_mesh_cache():
+    _mesh_cache.clear()
+    return _mesh_cache.stats()
 
 # ------------------------------------------------------------------ interface language
 import _i18n
@@ -626,7 +668,19 @@ def tessellate(name, tol=0.05):
     """bytes: [nTriFloats:int32][tris: x y z nx ny nz faceIndex]*  [nEdgeFloats:int32][edges: x1 y1 z1 x2 y2 z2 edgeIndex]*
     [nVertexFloats:int32][vertexes: x y z vertexIndex]*
     Face/edge/vertex indices are 1-based and match FreeCAD sub-element names (Face<i>, Edge<i>, Vertex<i>)."""
-    o = _doc().getObject(name)
+    doc = _doc()
+    o = doc.getObject(name)
+    # Objects whose mesh derives from more than their shape (result fields, deviation colours, toolpaths,
+    # robot poses) bypass the cache; everything else is keyed by the shape stamp.
+    cache_key = None
+    if o is not None and not o.TypeId.startswith(('Inspection::', 'Fem::', 'Robot::', 'Path::')):
+        try:
+            cache_key = (doc.Name, name, float(tol), int(o.Shape.hashCode()))
+            cached = _mesh_cache.get(cache_key)
+            if cached is not None:
+                return cached
+        except Exception:
+            cache_key = None
     tris = array.array('f'); edges = array.array('f'); verts = array.array('f'); cols = array.array('f')
     s = None
     if o.TypeId == 'Inspection::Feature':               # deviation of the actual geometry, coloured per sample point
@@ -731,8 +785,11 @@ def tessellate(name, tol=0.05):
             except Exception: continue
             for a, b in zip(pts, pts[1:]): edges.extend((a.x, a.y, a.z, b.x, b.y, b.z, ei))
         for vi, v in enumerate(s.Vertexes, 1): verts.extend((v.X, v.Y, v.Z, vi))
-    return (struct.pack('<i', len(tris)) + tris.tobytes() + struct.pack('<i', len(edges)) + edges.tobytes()
+    data = (struct.pack('<i', len(tris)) + tris.tobytes() + struct.pack('<i', len(edges)) + edges.tobytes()
             + struct.pack('<i', len(verts)) + verts.tobytes() + struct.pack('<i', len(cols)) + cols.tobytes())
+    if cache_key is not None:
+        _mesh_cache.put(cache_key, data)
+    return data
 
 
 # external programs shipped as native libraries (Gmsh ...): they load the FreeCAD runtime libraries (OCCT ...)
