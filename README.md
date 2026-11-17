@@ -9,6 +9,13 @@ CAD for Android phones and tablets, built on [FreeCAD](https://www.freecad.org)'
 MobileCAD is an independent project. It is **not affiliated with, sponsored or endorsed by** the FreeCAD project or the
 FreeCAD Project Association; "FreeCAD" is their trademark and is used here only to say what MobileCAD is built on.
 
+## Contributing
+
+MobileCAD **does not accept code contributions**: because of supply-chain attacks, pull requests are closed unreviewed
+and every file or code shared in a pull request or issue is treated as a possible attack vector. Ideas, bug reports and
+translation wording are welcome as issues. If one is taken up it is implemented here independently, and you are
+credited. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 MobileCAD is free software: GNU General Public License v3.0 or later (see `LICENSE`). It includes FreeCAD
