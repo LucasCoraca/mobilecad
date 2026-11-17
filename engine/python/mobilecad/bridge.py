@@ -16,7 +16,20 @@ def op(fn):
 # Tessellation cache: selecting an object must not re-tessellate the whole model, and editing one
 # feature must keep the other objects' meshes. Keys are (document, object, tolerance, shape stamp);
 # the stamp is FreeCAD's TopoShape.hashCode(), which changes whenever the shape is recomputed.
-_mesh_cache = MeshCache()
+# Escape hatches (no rebuild): MCR_MESH_CACHE=0 disables it, MCR_MESH_CACHE_ENTRIES/BYTES resize it.
+import os as _os
+
+
+def _env_int(name, default):
+    try:
+        return int(_os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return default
+
+
+_CACHE_DISABLED = str(_os.environ.get('MCR_MESH_CACHE', '1')).lower() in ('0', 'false', 'off', 'no')
+_mesh_cache = MeshCache(max_entries=_env_int('MCR_MESH_CACHE_ENTRIES', 256),
+                        max_bytes=_env_int('MCR_MESH_CACHE_BYTES', 192 * 1024 * 1024))
 
 def handle(req_json):
     opname = None
@@ -46,7 +59,8 @@ def ping():
     except Exception:
         fc = []
     return {'bridge': BRIDGE_VERSION, 'python': platform.python_version(),
-            'freecad': fc[:3], 'ops': len(_ops), 'mesh_cache': _mesh_cache.stats()}
+            'freecad': fc[:3], 'ops': len(_ops), 'mesh_cache': _mesh_cache.stats(),
+            'mesh_cache_disabled': _CACHE_DISABLED}
 
 @op
 def describe_ops():
@@ -81,6 +95,7 @@ def _doc():
 @op
 def new_document(name='Unnamed'):
     d = App.newDocument(name); App.setActiveDocument(d.Name); d.UndoMode = 1
+    _mesh_cache.clear()          # a new document must not inherit another one's meshes
     return d.Name
 
 def _ifc_defaults():
@@ -110,6 +125,7 @@ def open_document(path):
         d.UndoMode = 1
         return d.Name
     d = App.openDocument(path); App.setActiveDocument(d.Name); d.UndoMode = 1
+    _mesh_cache.clear()
     try: _view_data[d.Name] = _read_gui_document(d, path)
     except Exception as e: App.Console.PrintWarning('View data of %s: %s\n' % (path, e))
     try: _keep_gui_files(d, path)
@@ -673,7 +689,7 @@ def tessellate(name, tol=0.05):
     # Objects whose mesh derives from more than their shape (result fields, deviation colours, toolpaths,
     # robot poses) bypass the cache; everything else is keyed by the shape stamp.
     cache_key = None
-    if o is not None and not o.TypeId.startswith(('Inspection::', 'Fem::', 'Robot::', 'Path::')):
+    if (not _CACHE_DISABLED) and o is not None and not o.TypeId.startswith(('Inspection::', 'Fem::', 'Robot::', 'Path::')):
         try:
             cache_key = (doc.Name, name, float(tol), int(o.Shape.hashCode()))
             cached = _mesh_cache.get(cache_key)

@@ -423,6 +423,8 @@ class AppState(private val ctx: Context) {
             } catch (e: Throwable) {
                 message = (e.message ?: e.toString()).lineSequence().first()
                 Log.e("AppState", "engine", e)
+                refreshQueued = false
+                queuedAfter.clear()          // don't retry forever on a broken scene
             } finally {
                 refreshRunning = false
                 if (refreshQueued) {
@@ -436,8 +438,7 @@ class AppState(private val ctx: Context) {
 
     /** Selection-only change: the meshes and the tree are still valid, so only the highlights are updated. */
     fun refreshSelection() {
-        viewport?.updateSelection()
-        sceneVersion.intValue++
+        viewport?.updateSelection()      // no sceneVersion bump: Shell's selection effect handles recomposition
     }
 
     private fun Engine.gatherScene(): Scene {

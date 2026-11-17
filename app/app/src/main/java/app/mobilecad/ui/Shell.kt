@@ -109,8 +109,10 @@ fun Shell(app: AppState) {
     }
     var treeWidth by remember { mutableStateOf(240.dp) }
     val density = androidx.compose.ui.platform.LocalDensity.current
-    val ver = app.sceneVersion.intValue; val sel = app.selection.toList(); val sk = app.sketch; val manip = app.manipulator
-    LaunchedEffect(ver, sel, sk, manip) { view?.sync() }
+    val ver = app.sceneVersion.intValue; val sk = app.sketch; val manip = app.manipulator
+    LaunchedEffect(ver, sk, manip) { view?.sync() }          // geometry/document changed: rebuild GPU buffers
+    val sel = app.selection.toList()
+    LaunchedEffect(sel) { view?.updateSelection() }           // selection only: highlight, no rebuild
 
     // Every file command (Std_Open/Save/SaveAs/SaveCopy/MergeProjects, Part_Import/Export, macros, screenshots, PDF ...)
     // goes through the Storage Access Framework: the picked document is copied to/from the app cache for FreeCAD.
