@@ -402,8 +402,45 @@ class AppState(private val ctx: Context) {
         catch (e: Throwable) { message = (e.message ?: e.toString()).lineSequence().first(); Log.e("AppState", "engine", e) }
     }
 
+    // ------------------------------------------------------------------ scene refresh
+    // Bursts of calls (a command commits, then the UI selects something) are coalesced into one pass;
+    // only the last `after` callback is kept, because it usually just scrolls/selects in the new state.
+    private var refreshRunning = false
+    private var refreshQueued = false
+    private val queuedAfter = mutableListOf<() -> Unit>()
+
+    private class Scene(val objs: List<FcObject>, val meshes: Map<String, FcMesh>, val ghosts: Map<String, String>,
+                        val history: History, val annotations: org.json.JSONObject?)
+
     /** Re-reads the document tree and re-tessellates every displayed shape (as FreeCAD's view providers would). */
-    fun refresh(after: () -> Unit = {}) = eng({
+    fun refresh(after: () -> Unit = {}) {
+        if (refreshRunning) { refreshQueued = true; queuedAfter.add(after); return }
+        refreshRunning = true
+        scope.launch {
+            try {
+                applyScene(withContext(engine.dispatcher) { engine.gatherScene() })
+                after()
+            } catch (e: Throwable) {
+                message = (e.message ?: e.toString()).lineSequence().first()
+                Log.e("AppState", "engine", e)
+            } finally {
+                refreshRunning = false
+                if (refreshQueued) {
+                    refreshQueued = false
+                    val pending = queuedAfter.toList(); queuedAfter.clear()
+                    refresh { pending.forEach { cb -> runCatching(cb) } }
+                }
+            }
+        }
+    }
+
+    /** Selection-only change: the meshes and the tree are still valid, so only the highlights are updated. */
+    fun refreshSelection() {
+        viewport?.updateSelection()
+        sceneVersion.intValue++
+    }
+
+    private fun Engine.gatherScene(): Scene {
         val objs = objects()
         val shown = objs.filter { (it.hasShape || it.invalid) && it.visible && displayable(it, objs) }   // a failed feature has no shape, but shows its ghost
         // a failed feature keeps the model on screen: its last good predecessor, drawn as a red ghost
@@ -411,8 +448,11 @@ class AppState(private val ctx: Context) {
         val m = shown.associate { it.name to tessellate(gh[it.name] ?: it.name) }
         val hist = undoState()
         val ann = if (objs.any { it.type == "App::FeaturePython" || it.type == "App::AnnotationLabel" }) call("annotations") as? org.json.JSONObject else null
-        Triple(objs, m to gh, hist) to ann
-    }) { (t, ann) -> val (objs, mg, ur) = t; val (m, gh) = mg
+        return Scene(objs, m, gh, hist, ann)
+    }
+
+    private fun applyScene(s: Scene) {
+        val objs = s.objs; val m = s.meshes; val gh = s.ghosts; val ur = s.history; val ann = s.annotations
         objects.clear(); objects.addAll(objs); ghosts = gh; meshes = m
         annotations = ann?.let { j -> j.keys().asSequence().associateWith { k -> val o = j.getJSONObject(k)
             val ls = o.getJSONArray("lines"); val seg = FloatArray(ls.length() * 6) { i -> ls.getJSONArray(i / 6).getJSONArray(i % 6 / 3).getDouble(i % 3).toFloat() }
@@ -420,11 +460,10 @@ class AppState(private val ctx: Context) {
                 floatArrayOf(p.getDouble(0).toFloat(), p.getDouble(1).toFloat(), p.getDouble(2).toFloat()) to tx.getString(1) } } } } ?: emptyMap()
         annotationSize = ann?.let { j -> j.keys().asSequence().associateWith { k -> j.getJSONObject(k).optDouble("size", 3.5).toFloat() } } ?: emptyMap()
         setHistory(ur)
-        selection.removeAll { s -> objs.none { it.name == s.obj } }
+        selection.removeAll { ref -> objs.none { it.name == ref.obj } }
         sceneVersion.intValue++
         if (inDrawing) refreshPage()
         if (inSheet) refreshSheet()
-        after()
     }
 
     /** FreeCAD draws features, not their containers: a Body/Part's shape is its Tip's, already shown by the feature. */

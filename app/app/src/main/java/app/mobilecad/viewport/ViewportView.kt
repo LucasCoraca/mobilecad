@@ -111,6 +111,16 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
 
     private val sketch: SketchEditor? get() = app.sketch
 
+    /** Selection-only update: reuse the existing GPU buffers, change highlights and redraw. */
+    fun updateSelection() {
+        renderer.selectedObjs = app.selection.filter { it.sub.isEmpty() }.map { it.obj }.toSet()
+        renderer.selectedFaces = app.selection.filter { it.sub.startsWith("Face") }.map { it.obj to it.sub.removePrefix("Face").toInt() }.toSet()
+        renderer.selectedEdges = app.selection.filter { it.sub.startsWith("Edge") }.map { it.obj to it.sub.removePrefix("Edge").toInt() }.toSet()
+        renderer.boxes = if (!app.selBoundingBox) emptyList() else renderer.objs
+            .filter { o -> app.selection.any { it.obj == o.name } }.map { it.min to it.max }
+        refresh()
+    }
+
     /** Rebuild GPU objects from the engine's tessellation + current selection. */
     fun sync() {
         // the sketch in edit is drawn by its editor (live geometry); its last computed shape is hidden, as on the desktop
@@ -314,11 +324,11 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                         if (now - lastTapT < ViewConfiguration.getDoubleTapTimeout()) { app.draft?.let { t -> if (t.pts.isNotEmpty()) t.pts.removeAt(t.pts.size - 1) }; app.finishDraft(); lastTapT = -10_000L }
                         else { draftSnap(e.x, e.y)?.let { app.draftPoint(it) }; lastTapT = now }
                     } else if (!suppressTap && quick) {
-                        if (now - lastTapT < ViewConfiguration.getDoubleTapTimeout()) { app.clearSelection(); lastTapT = -10_000L; app.refresh() }
+                        if (now - lastTapT < ViewConfiguration.getDoubleTapTimeout()) { app.clearSelection(); lastTapT = -10_000L; app.refreshSelection() }
                         else { tapSelect(e.x, e.y); lastTapT = now }
                     }
                     Mode.PRECISION -> if (app.draft != null) { draftSnap(e.x + offX, e.y + offY)?.let { app.draftPoint(it) }; overlay.pointer = null }
-                        else pick(e.x + offX, e.y + offY, 1f)?.let { app.select(it); sync() }
+                        else pick(e.x + offX, e.y + offY, 1f)?.let { app.select(it); updateSelection() }
                     Mode.BOX -> commitBox()
                     Mode.SKETCH_PLACE -> if (sk != null && !suppressTap) {
                         val dragged = overlay.pointer != null
@@ -361,7 +371,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     private fun planePt(x: Float, y: Float): P2? = sketch?.fromRay(icam.ray(x, y))
 
     // ------------------------------------------------------------------ picking (FreeCAD sub-elements)
-    private fun tapSelect(x: Float, y: Float) { lastTap = x to y; val r = pick(x, y, 8 * dp); if (r != null) { app.select(r); sync() } }
+    private fun tapSelect(x: Float, y: Float) { lastTap = x to y; val r = pick(x, y, 8 * dp); if (r != null) { app.select(r); updateSelection() } }
     private var lastTap: Pair<Float, Float>? = null
 
     /** Std_ClarifySelection: every vertex, edge and face under the last tap, nearest first. */
@@ -565,11 +575,11 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                 while (i + 6 < t.size) { val f = t[i + 6].toInt(); val q = icam.project(t[i], t[i + 1], t[i + 2])
                     inside[f] = (inside[f] ?: true) && q != null && r.contains(q[0], q[1]); i += 7 }
                 inside.filterValues { it }.keys.sorted().forEach { f -> val ref = SelRef(o.name, "Face$f"); if (ref !in app.selection) app.selection.add(ref) } }
-            overlay.box = null; mode = Mode.NONE; sync(); return
+            overlay.box = null; mode = Mode.NONE; updateSelection(); return
         }
         renderer.objs.filter { o -> val c = icam.project((o.min[0] + o.max[0]) / 2, (o.min[1] + o.max[1]) / 2, (o.min[2] + o.max[2]) / 2); c != null && r.contains(c[0], c[1]) }
             .forEach { o -> if (app.selection.none { it.obj == o.name && it.sub.isEmpty() }) app.selection.add(SelRef(o.name)) }
-        overlay.box = null; mode = Mode.NONE; sync()
+        overlay.box = null; mode = Mode.NONE; updateSelection()
     }
 
     // ------------------------------------------------------------------ pointer hover (mouse; MobileCAD XR's controller rays)

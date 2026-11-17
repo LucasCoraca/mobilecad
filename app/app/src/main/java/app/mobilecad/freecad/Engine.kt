@@ -76,6 +76,20 @@ class Engine private constructor(private val ctx: Context) {
         val err = nativeInit(File(root, "python").absolutePath, File(root, "freecad").absolutePath, user.absolutePath)
         if (err.isNotEmpty()) { startupError = err; Log.e("Engine", err); throw EngineException(err) }
         ready = true
+        try {
+            val info = ping()
+            Log.i("Engine", "bridge=${info["bridge"]} python=${info["python"]} freecad=${info["freecad"]} ops=${info["ops"]}")
+        } catch (e: Throwable) {
+            Log.w("Engine", "bridge ping failed: ${e.message}")     // older bridge: keep running
+        }
+    }
+
+    /** Bridge/python/FreeCAD versions and cache counters (mobilecad.bridge.ping). */
+    fun ping(): Map<String, Any?> {
+        val o = call("ping") as JSONObject
+        val out = LinkedHashMap<String, Any?>()
+        for (k in o.keys()) out[k] = if (o.isNull(k)) null else o.get(k)
+        return out
     }
 
     private fun extract(asset: String, dest: File) {
