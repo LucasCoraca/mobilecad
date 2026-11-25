@@ -622,6 +622,34 @@ def _shape(o):
     except Exception:
         return o.Shape
 
+def _pack_shape(s, t):
+    """The faces' triangles and the edges' polylines of shape [s] at deflection [t], as float32 bytes in tessellate's
+    layout. NumPy does the per-vertex work (a large STEP assembly has millions of triangles: a Python loop per vertex
+    took minutes)."""
+    import numpy as np
+    tri, seg = [], []
+    for fi, f in enumerate(s.Faces, 1):
+        try: pts, idx = f.tessellate(t)
+        except Exception: continue
+        if not idx: continue
+        V = np.array([(p.x, p.y, p.z) for p in pts], dtype=np.float64)
+        P = V[np.asarray(idx, dtype=np.int64)]                       # triangles x corners x xyz
+        n = np.cross(P[:, 1] - P[:, 0], P[:, 2] - P[:, 0])
+        ln = np.linalg.norm(n, axis=1); ok = ln > 1e-12; n[ok] /= ln[ok, None]
+        out = np.empty((len(P), 3, 7), dtype=np.float32)
+        out[:, :, 0:3] = P; out[:, :, 3:6] = n[:, None, :]; out[:, :, 6] = fi
+        tri.append(out.reshape(-1))
+    for ei, e in enumerate(s.Edges, 1):
+        try: pts = e.discretize(Deflection=t)
+        except Exception: continue
+        if len(pts) < 2: continue
+        Q = np.array([(p.x, p.y, p.z) for p in pts], dtype=np.float32)
+        out = np.empty((len(Q) - 1, 7), dtype=np.float32)
+        out[:, 0:3] = Q[:-1]; out[:, 3:6] = Q[1:]; out[:, 6] = ei
+        seg.append(out.reshape(-1))
+    cat = lambda a: np.concatenate(a).tobytes() if a else b''
+    return cat(tri), cat(seg)
+
 def tessellate(name, tol=0.05):
     """bytes: [nTriFloats:int32][tris: x y z nx ny nz faceIndex]*  [nEdgeFloats:int32][edges: x1 y1 z1 x2 y2 z2 edgeIndex]*
     [nVertexFloats:int32][vertexes: x y z vertexIndex]*
@@ -717,19 +745,10 @@ def tessellate(name, tol=0.05):
     else:
         s = _shape(o)
     if s is not None and not s.isNull():
-        bb = s.BoundBox; t = max(tol, bb.DiagonalLength * 0.0005) if bb.isValid() else tol
-        for fi, f in enumerate(s.Faces, 1):
-            try: pts, idx = f.tessellate(t)
-            except Exception: continue
-            for a, b, c in idx:
-                p0, p1, p2 = pts[a], pts[b], pts[c]
-                n = (p1 - p0).cross(p2 - p0)
-                if n.Length > 1e-12: n.normalize()
-                for p in (p0, p1, p2): tris.extend((p.x, p.y, p.z, n.x, n.y, n.z, fi))
-        for ei, e in enumerate(s.Edges, 1):
-            try: pts = e.discretize(Deflection=t)
-            except Exception: continue
-            for a, b in zip(pts, pts[1:]): edges.extend((a.x, a.y, a.z, b.x, b.y, b.z, ei))
+        # desktop's deflection (Part::Tools::getDeflection with the default MeshDeviation 0.2), not finer than [tol]
+        bb = s.BoundBox; t = max(tol, (bb.XLength + bb.YLength + bb.ZLength) / 300.0 * 0.2) if bb.isValid() else tol
+        tb, eb = _pack_shape(s, t)
+        tris.frombytes(tb); edges.frombytes(eb)
         for vi, v in enumerate(s.Vertexes, 1): verts.extend((v.X, v.Y, v.Z, vi))
     return (struct.pack('<i', len(tris)) + tris.tobytes() + struct.pack('<i', len(edges)) + edges.tobytes()
             + struct.pack('<i', len(verts)) + verts.tobytes() + struct.pack('<i', len(cols)) + cols.tobytes())

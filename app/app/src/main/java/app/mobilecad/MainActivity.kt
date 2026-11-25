@@ -18,6 +18,8 @@ class MainActivity : ComponentActivity() {
         // --es update_feed URL: check for updates against a test feed (GitHub release JSON) instead of GitHub
         i?.getStringExtra("update_feed")?.let { u -> if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) {
             app.updater.testFeed = u; app.updater.check(manual = true) }; return }
+        // --es fcimport /path/file.step: File ▸ Import, as the menu does
+        i?.getStringExtra("fcimport")?.let { p -> if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) app.whenReady { app.importFile(java.io.File(p)) }; return }
         // --es fcopen /path/file.FCStd: open a document as File ▸ Open would (screenshots, tests)
         i?.getStringExtra("fcopen")?.let { p -> if (applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0) app.whenReady { app.open(p) }; return }
         val src = i?.getStringExtra("fcscript") ?: i?.getStringExtra("fcscript64")?.let { String(android.util.Base64.decode(it, 0)) } ?: return

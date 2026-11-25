@@ -137,7 +137,7 @@ fun Shell(app: AppState) {
             "propfile" -> { val keep = File(ctx.filesDir, "imports").apply { mkdirs() }.let { File(it, f.name) }; f.copyTo(keep, overwrite = true)
                 app.step("Edit ${r.names[1]}", { setProperty(r.names[0], r.names[1], keep.absolutePath) }) { app.edit?.let { app.reloadProps(it) } } }
             "merge" -> { app.busy = tr("Importing %1…", f.name); app.step("Merge ${f.name}", { call("merge_project", mapOf("path" to f.absolutePath)) }) { app.busy = null } }
-            "import" -> { app.busy = tr("Importing %1…", f.name); app.step("Import ${f.name}", { call("import_file", mapOf("path" to f.absolutePath)) }) { app.busy = null } }
+            "import" -> app.importFile(f)
             "sheetimport" -> app.step("Import ${f.name}", { call("sheet_import", mapOf("name" to r.names.firstOrNull(), "path" to f.absolutePath)) })
             "macro" -> app.step("Macro ${f.name}", { call("run_macro", mapOf("path" to f.absolutePath)) })
             "tdimage" -> { val keep = File(ctx.filesDir, "images").apply { mkdirs() }.let { File(it, f.name) }; f.copyTo(keep, overwrite = true)
@@ -210,7 +210,14 @@ fun Shell(app: AppState) {
             ViewportView(c, app).also { it.layoutParams = ViewGroup.LayoutParams(-1, -1); it.onContextMenu = { x, y -> menu = x to y }; view = it; app.viewport = it; it.sync() }
         })
         // a long job (opening / importing a file, drawing a large model): what it is doing, over the view
-        if (stage) app.busy?.let { b -> Row(Modifier.align(Alignment.TopCenter).padding(top = 16.dp).shadow(6.dp, RoundedCornerShape(20.dp))
+        // and the time it has taken so far (a large STEP file can take minutes to read): it is still working
+        val busyOn = app.busy != null
+        val busySince = remember(busyOn) { System.currentTimeMillis() }
+        var busyTick by remember { mutableStateOf(0L) }
+        LaunchedEffect(busyOn) { while (busyOn) { busyTick = System.currentTimeMillis() - busySince; kotlinx.coroutines.delay(1000) } }
+        if (stage) app.busy?.let { b0 -> val sec = busyTick / 1000
+            val b = if (sec >= 5) "$b0  ${sec / 60}:${"%02d".format(sec % 60)}" else b0
+            Row(Modifier.align(Alignment.TopCenter).padding(top = 16.dp).shadow(6.dp, RoundedCornerShape(20.dp))
                 .background(OS.Surface, RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             CircularProgressIndicator(color = OS.Primary, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(10.dp)); Text(b, color = OS.Navy, fontSize = 14.sp) } }

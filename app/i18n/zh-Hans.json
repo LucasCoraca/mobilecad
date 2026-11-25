@@ -834,6 +834,7 @@
 "The selection cannot be suppressed": "所选对象不能被抑制",
 "The selection has no material": "所选对象没有材料",
 "The unsaved work could not be recovered: the app closed again while reopening it.": "无法恢复未保存的工作：重新打开时应用再次关闭。",
+"The unsaved work was not reopened again: the app closed while it was open, before it was changed or saved.": "未再次打开未保存的工作：在其打开期间、尚未修改或保存时，应用已关闭。",
 "Theme": "主题",
 "Theme (current: %1)": "主题（当前：%1）",
 "Thick 0.5": "粗 0.5",

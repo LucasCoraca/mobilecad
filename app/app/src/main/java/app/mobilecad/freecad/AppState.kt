@@ -363,13 +363,19 @@ class AppState(private val ctx: Context) {
         if (attempt.exists()) { attempt.delete(); recoveryFile.delete(); recoveryMeta.delete()
             message = tr("The unsaved work could not be recovered: the app closed again while reopening it."); return }
         if (!recoveryFile.exists()) return
-        attempt.writeText("")
         val meta = runCatching { org.json.JSONObject(recoveryMeta.readText()) }.getOrNull()
+        // a copy is reopened once: if the app closes again before anything is changed in it (Android ends it for
+        // lack of memory with a very large model, for instance), reopening it at every start would never end
+        if (meta?.optBoolean("reopened") == true) { recoveryFile.delete(); recoveryMeta.delete()
+            message = tr("The unsaved work was not reopened again: the app closed while it was open, before it was changed or saved."); return }
+        attempt.writeText("")
         val name = meta?.optString("name")?.ifEmpty { null } ?: "Recovered"
         val copy = java.io.File(ctx.cacheDir, "$name.FCStd"); recoveryFile.copyTo(copy, overwrite = true)
         val time = meta?.optLong("time")?.takeIf { it > 0 }?.let { java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(it)) }
         open(copy.absolutePath, recovered = true) {
-            attempt.delete(); docName = name; docUri = meta?.optString("uri")?.takeIf { it.isNotEmpty() && it != "null" }
+            attempt.delete(); runCatching { recoveryMeta.writeText((meta ?: org.json.JSONObject()).put("reopened", true).toString()) }
+            docName = name; docUri = meta?.optString("uri")?.takeIf { it.isNotEmpty() && it != "null" }
+            autosavedSig = docSig()          // as reopened: its copy is kept, not rewritten (without the mark) until it is changed
             message = if (time != null) tr("Recovered unsaved work from %1 (the app had closed unexpectedly). Save to keep it.", time) else tr("Recovered unsaved work (the app had closed unexpectedly). Save to keep it.")
         }
     }
@@ -426,6 +432,7 @@ class AppState(private val ctx: Context) {
 
     /** Re-reads the document tree and re-tessellates every displayed shape (as FreeCAD's view providers would). */
     fun refresh(after: () -> Unit = {}) = eng({
+        val t0 = System.currentTimeMillis()
         val objs = objects()
         val byName = objs.associateBy { it.name }
         val hiddenBodies = objs.filter { it.type == "PartDesign::Body" && !it.visible }.flatMap { it.group }.toHashSet()
@@ -453,6 +460,7 @@ class AppState(private val ctx: Context) {
             message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", m.size, shown.size) }
         val hist = undoState()
         val ann = if (objs.any { it.type == "App::FeaturePython" || it.type == "App::AnnotationLabel" }) call("annotations") as? org.json.JSONObject else null
+        Log.i("AppState", "refresh: ${objs.size} objects, ${m.size}/${shown.size} drawn, ${System.currentTimeMillis() - t0} ms")
         Triple(objs, m to gh, hist) to ann
     }) { (t, ann) -> val (objs, mg, ur) = t; val (m, gh) = mg
         objects.clear(); objects.addAll(objs); ghosts = gh; meshes = m
@@ -537,6 +545,9 @@ class AppState(private val ctx: Context) {
         recompute(); h
     }) { h -> setHistory(h); refresh() }
 
+    /** Std_Import / Part_Import: the file's contents go into the open document, as one undoable step. */
+    fun importFile(f: java.io.File) { busy = tr("Importing %1…", f.name); step("Import ${f.name}", { call("import_file", mapOf("path" to f.absolutePath)) }) { busy = null } }
+
     fun save(path: String) = eng({ saveDocument(path) }) { message = tr("Saved %1", it) }
     /** Opens a document with the look the desktop saved for it (GuiDocument.xml: colours, transparency, per-face colours,
      *  what is hidden) and frames it.  Nothing of the previous document's look is kept. */
@@ -556,7 +567,7 @@ class AppState(private val ctx: Context) {
         refresh { val asm = objects.any { it.type == "Assembly::AssemblyObject" }
             if (asm && !inAssembly) switchWorkspace("Assembly") else if (!asm && workspace.id != "partstudio" && workspace.id in setOf("Assembly", "TechDraw", "Spreadsheet")) switchWorkspace("partstudio")
             // an opened file has nothing unsaved; a recovered one keeps its recovery copy until it is saved
-            if (recovered) { savedSig = null; autosavedSig = null } else markSaved()
+            if (recovered) { savedSig = null; autosavedSig = docSig() } else markSaved()   // recovered: its copy is kept until a change replaces it
             busy = null; done() }
     } }
 
