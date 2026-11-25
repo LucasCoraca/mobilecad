@@ -42,7 +42,7 @@ android {
         create("arm64") { dimension = "abi"; ndk { abiFilters += "arm64-v8a" }; versionCode = baseVersionCode + 1 }
         create("x86") { dimension = "abi"; ndk { abiFilters += "x86_64" }; versionCode = baseVersionCode + 2 }
     }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; prefab = true }   // prefab: the OpenXR loader for the XR core (cpp/CMakeLists.txt)
     packaging { jniLibs { pickFirsts += "**/libc++_shared.so"; useLegacyPackaging = true } }
     // aapt's default pattern drops asset directories starting with "_" (zipfile/_path, _pyrepl, Python packages ...)
     androidResources { ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:!CVS:!thumbs.db:!picasa.ini:!*~" }
@@ -60,4 +60,6 @@ dependencies {
     implementation("com.caverock:androidsvg-aar:1.4")
     implementation(files("libs/Qt6Android.jar"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    // XR mode on headsets (Meta Quest, other Android OpenXR devices): the Khronos OpenXR loader (Apache-2.0)
+    implementation("org.khronos.openxr:openxr_loader_for_android:1.1.63")
 }

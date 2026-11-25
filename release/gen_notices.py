@@ -76,6 +76,11 @@ C = [
  ('six', 'MIT', 'https://github.com/benjaminp/six', [('six license', lambda: file(TP + '/six.txt'))]),
  ('typing_extensions', 'PSF-2.0', 'https://github.com/python/typing_extensions', [('typing_extensions license', lambda: file(TP + '/typing-extensions.txt'))]),
  ('AndroidX, Jetpack Compose, Kotlin, kotlinx.coroutines', 'Apache-2.0', 'https://source.android.com', [('Apache-2.0', lambda: tar(SRC + '/xerces.tar.gz', 'xerces-c-3.2.5/LICENSE'))]),
+ ('Khronos OpenXR loader 1.1.63 (XR mode)', 'Apache-2.0', 'https://github.com/KhronosGroup/OpenXR-SDK-Source', [('Apache-2.0', lambda: tar(SRC + '/xerces.tar.gz', 'xerces-c-3.2.5/LICENSE'))]),
+ ('WebXR Input Profiles: hand and controller models (XR mode)', 'MIT', 'https://github.com/immersive-web/webxr-input-profiles',
+  [('WebXR Input Profiles license', lambda: file(os.path.join(R, '..', 'app', 'app', 'src', 'main', 'assets', 'models', 'LICENSE-webxr-input-profiles.md')))]),
+ ('cgltf (XR mode)', 'MIT', 'https://github.com/jkuhlmann/cgltf', [('cgltf license', lambda: file(os.path.join(R, '..', 'xr', 'core', 'third_party', 'cgltf.h')).split('/* cgltf is distributed under MIT license:')[1])]),
+ ('stb_image (XR mode)', 'Public domain (or MIT)', 'https://github.com/nothings/stb', []),
  ('AndroidSVG 1.4', 'Apache-2.0', 'https://github.com/BigBadaboom/androidsvg', [('Apache-2.0', lambda: tar(SRC + '/xerces.tar.gz', 'xerces-c-3.2.5/LICENSE'))]),
 ]
 

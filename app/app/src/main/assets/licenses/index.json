@@ -530,6 +530,45 @@
   ]
  },
  {
+  "name": "Khronos OpenXR loader 1.1.63 (XR mode)",
+  "license": "Apache-2.0",
+  "source": "https://github.com/KhronosGroup/OpenXR-SDK-Source",
+  "texts": [
+   {
+    "title": "Apache-2.0",
+    "file": "apache-2-0.txt"
+   }
+  ]
+ },
+ {
+  "name": "WebXR Input Profiles: hand and controller models (XR mode)",
+  "license": "MIT",
+  "source": "https://github.com/immersive-web/webxr-input-profiles",
+  "texts": [
+   {
+    "title": "WebXR Input Profiles: hand and controller models license",
+    "file": "webxr-input-profiles-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "cgltf (XR mode)",
+  "license": "MIT",
+  "source": "https://github.com/jkuhlmann/cgltf",
+  "texts": [
+   {
+    "title": "cgltf license",
+    "file": "cgltf-license.txt"
+   }
+  ]
+ },
+ {
+  "name": "stb_image (XR mode)",
+  "license": "Public domain (or MIT)",
+  "source": "https://github.com/nothings/stb",
+  "texts": []
+ },
+ {
   "name": "FreeCAD icons",
   "license": "LGPL-2.1-or-later; some CC-BY / CC-BY-SA / public domain",
   "source": "https://github.com/FreeCAD/FreeCAD",
