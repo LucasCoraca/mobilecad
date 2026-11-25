@@ -1,0 +1,4 @@
+• XR headsets: MobileCAD now runs on Meta Quest 3 and other Android OpenXR headsets. On a headset it starts in XR mode, with your model standing in the room and the whole interface in a window beside it, used with the controller ray as a touch screen. On phones and tablets nothing changes.
+• Every workbench and tool works the same in XR mode: sketch on the model, pick faces and edges, drag arrows in 3D, dialogs with the number pad.
+• Passthrough on Quest shows your room behind the model; the model stands on a build plate you can pick up and move.
+• This replaces the separate MobileCAD XR app.
