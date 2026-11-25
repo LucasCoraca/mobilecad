@@ -1,0 +1,5 @@
+• Opening or importing a file shows what is happening ("Opening cc_v150.step…", then "Drawing the model: 300 of 10667 parts"), instead of the screen staying unchanged while a large STEP file loads. The file is also copied in the background, so the app no longer freezes.
+• Very large models (e.g. STEP assemblies of thousands of parts) open instead of failing silently: MobileCAD draws as many parts as the device's memory allows and says how many it showed. The app may use more memory than before.
+• If the app closes while reopening unsaved work, it no longer tries the same thing at every start.
+• Open Recent reopens STEP, IGES and other imported files through their importer.
+• Changing the selection no longer rebuilds the whole 3D view.

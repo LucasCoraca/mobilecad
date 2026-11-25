@@ -122,8 +122,7 @@ fun Shell(app: AppState) {
     val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         val r = pending ?: return@rememberLauncherForActivityResult; pending = null
         if (uri == null) { if (r.kind == "panelopen") GuiCommands.panelFile(app, null); return@rememberLauncherForActivityResult }
-        val f = cacheFile(uri, "file"); ctx.contentResolver.openInputStream(uri)?.use { i -> f.outputStream().use { i.copyTo(it) } }
-        when (r.kind) {
+        app.copyIn(ctx, uri, cacheFile(uri, "file")) { f -> when (r.kind) {
             "panelopen" -> GuiCommands.panelFile(app, f.absolutePath)
             "curvenet" -> { val keep = File(ctx.filesDir, "imports").apply { mkdirs() }.let { File(it, f.name) }; f.copyTo(keep, overwrite = true)
                 app.createFeature("Import Curve Net") { call("part_import_curve_net", mapOf("path" to keep.absolutePath)) as String } }
@@ -137,13 +136,13 @@ fun Shell(app: AppState) {
                 app.open(f.absolutePath); app.docUri = uri.toString(); app.addRecent(uri.toString(), f.name) }
             "propfile" -> { val keep = File(ctx.filesDir, "imports").apply { mkdirs() }.let { File(it, f.name) }; f.copyTo(keep, overwrite = true)
                 app.step("Edit ${r.names[1]}", { setProperty(r.names[0], r.names[1], keep.absolutePath) }) { app.edit?.let { app.reloadProps(it) } } }
-            "merge" -> app.step("Merge ${f.name}", { call("merge_project", mapOf("path" to f.absolutePath)) })
-            "import" -> app.step("Import ${f.name}", { call("import_file", mapOf("path" to f.absolutePath)) })
+            "merge" -> { app.busy = tr("Importing %1…", f.name); app.step("Merge ${f.name}", { call("merge_project", mapOf("path" to f.absolutePath)) }) { app.busy = null } }
+            "import" -> { app.busy = tr("Importing %1…", f.name); app.step("Import ${f.name}", { call("import_file", mapOf("path" to f.absolutePath)) }) { app.busy = null } }
             "sheetimport" -> app.step("Import ${f.name}", { call("sheet_import", mapOf("name" to r.names.firstOrNull(), "path" to f.absolutePath)) })
             "macro" -> app.step("Macro ${f.name}", { call("run_macro", mapOf("path" to f.absolutePath)) })
             "tdimage" -> { val keep = File(ctx.filesDir, "images").apply { mkdirs() }.let { File(it, f.name) }; f.copyTo(keep, overwrite = true)
                 app.step("Bitmap image", { call("td_simple", mapOf("page" to r.names.first(), "kind" to "Image", "props" to mapOf("ImageFile" to keep.absolutePath, "Width" to 100.0, "Height" to 100.0))) }) }
-        }
+        } }
     }
     val createFile = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri: Uri? ->
         val r = pending ?: return@rememberLauncherForActivityResult; pending = null
@@ -210,6 +209,11 @@ fun Shell(app: AppState) {
         if (stage) AndroidView(modifier = Modifier.fillMaxSize(), factory = { c ->
             ViewportView(c, app).also { it.layoutParams = ViewGroup.LayoutParams(-1, -1); it.onContextMenu = { x, y -> menu = x to y }; view = it; app.viewport = it; it.sync() }
         })
+        // a long job (opening / importing a file, drawing a large model): what it is doing, over the view
+        if (stage) app.busy?.let { b -> Row(Modifier.align(Alignment.TopCenter).padding(top = 16.dp).shadow(6.dp, RoundedCornerShape(20.dp))
+                .background(OS.Surface, RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+            CircularProgressIndicator(color = OS.Primary, strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(10.dp)); Text(b, color = OS.Navy, fontSize = 14.sp) } }
         // Variables tab: the spreadsheet grid replaces the 3D view
         if (stage) if (app.inSheet) SheetView(app, Modifier.fillMaxSize())
         // Drawing tab: the TechDraw page replaces the 3D view

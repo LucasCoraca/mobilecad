@@ -114,7 +114,13 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     /** Rebuild GPU objects from the engine's tessellation + current selection. */
     fun sync() {
         // the sketch in edit is drawn by its editor (live geometry); its last computed shape is hidden, as on the desktop
-        val objs = app.meshes.filter { (n, _) -> n != sketch?.name }.map { (n, m) -> RenderObj(n, m, app.obj(n)?.type == "Sketcher::SketchObject", app.ghosts[n]) }
+        // an object whose mesh did not change keeps its GPU copy (a selection change rebuilds nothing; a large model is
+        // not held twice while the new set is made)
+        val old = renderer.objs.associateBy { it.name }
+        val objs = ArrayList<RenderObj>()
+        try { for ((n, m) in app.meshes) if (n != sketch?.name) { val isSketch = app.obj(n)?.type == "Sketcher::SketchObject"; val g = app.ghosts[n]
+            objs.add(old[n]?.takeIf { it.mesh === m && it.isSketch == isSketch && it.ghostOf == g } ?: RenderObj(n, m, isSketch, g)) } }
+        catch (e: OutOfMemoryError) { app.message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", objs.size, app.meshes.size) }
         renderer.objs = objs
         sceneBounds(objs)?.let { (mn, mx) -> val c = FloatArray(3) { (mn[it] + mx[it]) / 2 }
             val r = Math.sqrt((0..2).sumOf { ((mx[it] - mn[it]) / 2.0).let { d -> d * d } }).toFloat()

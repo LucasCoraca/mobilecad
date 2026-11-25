@@ -272,10 +272,21 @@ class AppState(private val ctx: Context) {
     /** Std_Revert / Std_RecentFiles: (re)open a document from its content URI. */
     fun reopen(uri: android.net.Uri) {
         val ctx = viewport?.context ?: return
-        val f = java.io.File(ctx.cacheDir, "open.FCStd")
-        try { ctx.contentResolver.openInputStream(uri)?.use { i -> f.outputStream().use { i.copyTo(it) } } }
-        catch (e: Exception) { message = tr("Cannot open: %1", e.message); return }
-        docUri = uri.toString(); open(f.absolutePath)
+        // named as the picked file was: a recent STEP / IFC / DXF ... reopens through its importer, not as an FCStd
+        val name = runCatching { ctx.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+            if (c.moveToFirst()) c.getString(0) else null } }.getOrNull() ?: "open.FCStd"
+        copyIn(ctx, uri, java.io.File(ctx.cacheDir, name)) { f -> docUri = uri.toString(); open(f.absolutePath) }
+    }
+
+    /** Copies a picked document into the app's files off the main thread (a large STEP file takes seconds), showing
+     *  that it is being opened, then hands the copy to [then]. */
+    fun copyIn(ctx: Context, uri: android.net.Uri, f: java.io.File, then: (java.io.File) -> Unit) {
+        busy = tr("Opening %1…", f.name)
+        scope.launch {
+            try { withContext(Dispatchers.IO) { ctx.contentResolver.openInputStream(uri)?.use { i -> f.outputStream().use { i.copyTo(it) } } } }
+            catch (e: Exception) { busy = null; message = tr("Cannot open: %1", e.message); return@launch }
+            busy = null; then(f)
+        }
     }
 
     fun switchWorkspace(id: String) {
@@ -345,13 +356,20 @@ class AppState(private val ctx: Context) {
         }
     }
     private fun recoverIfCrashed() {
+        recoveryDir.listFiles { f -> f.name.startsWith("saving.FCStd.") }?.forEach { it.delete() }   // copies cut short by the crash
+        // a copy whose reopening itself ended the app (e.g. a model too large for the device) is not reopened at every
+        // start, which would keep the app from starting at all
+        val attempt = java.io.File(recoveryDir, "recovering")
+        if (attempt.exists()) { attempt.delete(); recoveryFile.delete(); recoveryMeta.delete()
+            message = tr("The unsaved work could not be recovered: the app closed again while reopening it."); return }
         if (!recoveryFile.exists()) return
+        attempt.writeText("")
         val meta = runCatching { org.json.JSONObject(recoveryMeta.readText()) }.getOrNull()
         val name = meta?.optString("name")?.ifEmpty { null } ?: "Recovered"
         val copy = java.io.File(ctx.cacheDir, "$name.FCStd"); recoveryFile.copyTo(copy, overwrite = true)
         val time = meta?.optLong("time")?.takeIf { it > 0 }?.let { java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault()).format(java.util.Date(it)) }
         open(copy.absolutePath, recovered = true) {
-            docName = name; docUri = meta?.optString("uri")?.takeIf { it.isNotEmpty() && it != "null" }
+            attempt.delete(); docName = name; docUri = meta?.optString("uri")?.takeIf { it.isNotEmpty() && it != "null" }
             message = if (time != null) tr("Recovered unsaved work from %1 (the app had closed unexpectedly). Save to keep it.", time) else tr("Recovered unsaved work (the app had closed unexpectedly). Save to keep it.")
         }
     }
@@ -399,16 +417,40 @@ class AppState(private val ctx: Context) {
     /** Runs [block] on the engine thread, then [then] on the main thread; errors become a user message. */
     fun <T> eng(block: Engine.() -> T, then: (T) -> Unit = {}) = scope.launch {
         try { then(withContext(engine.dispatcher) { engine.block() }) }
-        catch (e: Throwable) { message = (e.message ?: e.toString()).lineSequence().first(); Log.e("AppState", "engine", e) }
+        catch (e: Throwable) { busy = null; message = (e.message ?: e.toString()).lineSequence().first(); Log.e("AppState", "engine", e) }
     }
+
+    /** What a long engine job is doing (opening / importing a file, drawing a large model), shown over the 3D view as
+     *  desktop FreeCAD shows its progress bar; null when idle. */
+    var busy by mutableStateOf<String?>(null)
 
     /** Re-reads the document tree and re-tessellates every displayed shape (as FreeCAD's view providers would). */
     fun refresh(after: () -> Unit = {}) = eng({
         val objs = objects()
-        val shown = objs.filter { (it.hasShape || it.invalid) && it.visible && displayable(it, objs) }   // a failed feature has no shape, but shows its ghost
+        val byName = objs.associateBy { it.name }
+        val hiddenBodies = objs.filter { it.type == "PartDesign::Body" && !it.visible }.flatMap { it.group }.toHashSet()
+        val shown = objs.filter { (it.hasShape || it.invalid) && it.visible && displayable(it, byName, hiddenBodies) }   // a failed feature has no shape, but shows its ghost
         // a failed feature keeps the model on screen: its last good predecessor, drawn as a red ghost
         val gh = shown.filter { it.invalid }.mapNotNull { o -> (call("last_good", mapOf("name" to o.name)) as? String)?.let { o.name to it } }.toMap()
-        val m = shown.associate { it.name to tessellate(gh[it.name] ?: it.name) }
+        // A model too large for the device (e.g. a STEP assembly of thousands of parts) is drawn as far as memory allows,
+        // with a message, instead of failing as a whole or getting the app killed: the meshes fill the Java heap, and the
+        // engine's triangulations the device's memory.  Large models report their progress.
+        val m = LinkedHashMap<String, FcMesh>(); val rt = Runtime.getRuntime()
+        // the view keeps a second copy of every mesh (GPU buffers, also in the Java heap) and builds the new set before
+        // dropping the old one: the meshes may take at most about a quarter of the heap
+        val reserve = maxOf(48L shl 20, rt.maxMemory() * 3 / 4)
+        val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager; val mi = android.app.ActivityManager.MemoryInfo()
+        val report = shown.size >= 200; val opening = busy
+        for ((k, o) in shown.withIndex()) {
+            if (report && k % 50 == 0) busy = tr("Drawing the model: %1 of %2 parts", k, shown.size)
+            if (rt.maxMemory() - (rt.totalMemory() - rt.freeMemory()) < reserve) break
+            // Android ends a foreground app well before the memory runs out: keep a fifth of it free
+            am.getMemoryInfo(mi); if (mi.lowMemory || mi.availMem < mi.threshold + mi.totalMem / 5) break
+            try { m[o.name] = tessellate(gh[o.name] ?: o.name) } catch (e: OutOfMemoryError) { break }
+        }
+        if (report) busy = opening
+        if (m.size < shown.size) { System.gc()
+            message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", m.size, shown.size) }
         val hist = undoState()
         val ann = if (objs.any { it.type == "App::FeaturePython" || it.type == "App::AnnotationLabel" }) call("annotations") as? org.json.JSONObject else null
         Triple(objs, m to gh, hist) to ann
@@ -428,15 +470,15 @@ class AppState(private val ctx: Context) {
     }
 
     /** FreeCAD draws features, not their containers: a Body/Part's shape is its Tip's, already shown by the feature. */
-    private fun displayable(o: FcObject, all: List<FcObject>): Boolean {
+    private fun displayable(o: FcObject, byName: Map<String, FcObject>, hiddenBodies: Set<String>): Boolean {
         // tabs: the Assembly tab shows the assembly's components, other tabs show the parts themselves
         if (inAssembly) return o.assembly != null && o.type == "App::Link"
         if (o.assembly != null) return false
         if (o.type in setOf("PartDesign::Body", "App::Part", "App::Origin", "App::DocumentObjectGroup", "App::Line", "App::Plane", "App::Point")) return false
         // origin features are hidden by default in FreeCAD (and their axes are infinite)
-        if (o.parents.any { p -> all.firstOrNull { it.name == p }?.type == "App::Origin" }) return false
+        if (o.parents.any { p -> byName[p]?.type == "App::Origin" }) return false
         // inside a hidden body → hidden
-        return all.none { p -> p.type == "PartDesign::Body" && o.name in p.group && !p.visible }
+        return o.name !in hiddenBodies
     }
 
     fun obj(name: String) = objects.firstOrNull { it.name == name }
@@ -498,7 +540,9 @@ class AppState(private val ctx: Context) {
     fun save(path: String) = eng({ saveDocument(path) }) { message = tr("Saved %1", it) }
     /** Opens a document with the look the desktop saved for it (GuiDocument.xml: colours, transparency, per-face colours,
      *  what is hidden) and frames it.  Nothing of the previous document's look is kept. */
-    fun open(path: String, recovered: Boolean = false, done: () -> Unit = {}): kotlinx.coroutines.Job { closeTools(); return eng({ val n = openDocument(path); n to call("view_data") as org.json.JSONObject? }) { (n, vd) ->
+    fun open(path: String, recovered: Boolean = false, done: () -> Unit = {}): kotlinx.coroutines.Job { closeTools()
+        busy = tr("Opening %1…", java.io.File(path).name)
+        return eng({ val n = openDocument(path); n to call("view_data") as org.json.JSONObject? }) { (n, vd) ->
         docName = n; selection.clear()
         colors.clear(); transparent.clear(); faceColors.clear(); textures.clear()
         vd?.optJSONObject("colors")?.let { c -> c.keys().forEach { k -> val a = c.getJSONArray(k)
@@ -513,7 +557,7 @@ class AppState(private val ctx: Context) {
             if (asm && !inAssembly) switchWorkspace("Assembly") else if (!asm && workspace.id != "partstudio" && workspace.id in setOf("Assembly", "TechDraw", "Spreadsheet")) switchWorkspace("partstudio")
             // an opened file has nothing unsaved; a recovered one keeps its recovery copy until it is saved
             if (recovered) { savedSig = null; autosavedSig = null } else markSaved()
-            done() }
+            busy = null; done() }
     } }
 
     // ------------------------------------------------------------------ feature dialog

@@ -11,7 +11,8 @@
         android:label="MobileCAD"
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.FC"
-        android:hardwareAccelerated="true">
+        android:hardwareAccelerated="true"
+        android:largeHeap="true">
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTop"
             android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation|smallestScreenSize|screenLayout|density|uiMode|fontScale|layoutDirection"
             android:windowSoftInputMode="adjustResize">
