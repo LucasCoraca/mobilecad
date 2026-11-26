@@ -87,7 +87,10 @@ class AppState(private val ctx: Context) {
     var ready by mutableStateOf(false)
     var docName by mutableStateOf("Unnamed")
     val objects = mutableStateListOf<FcObject>()
-    var meshes by mutableStateOf<Map<String, FcMesh>>(emptyMap())
+    var meshes by mutableStateOf<Map<String, FcPart>>(emptyMap())
+    /** Meshes by shape key (engine thread): kept across refreshes, so an unchanged shape is not triangulated again */
+    private var meshCache = HashMap<String, FcMesh>()
+    @Volatile private var gcSoon = false
     /** Failed features shown as their last good shape (failed name -> object the mesh came from), drawn red and see-through. */
     var ghosts by mutableStateOf<Map<String, String>>(emptyMap())
     val selection = mutableStateListOf<SelRef>()
@@ -442,28 +445,32 @@ class AppState(private val ctx: Context) {
         // A model too large for the device (e.g. a STEP assembly of thousands of parts) is drawn as far as memory allows,
         // with a message, instead of failing as a whole or getting the app killed: the meshes fill the Java heap, and the
         // engine's triangulations the device's memory.  Large models report their progress.
-        val m = LinkedHashMap<String, FcMesh>(); val rt = Runtime.getRuntime()
-        // the view keeps a second copy of every mesh (GPU buffers, also in the Java heap) and builds the new set before
-        // dropping the old one: the meshes may take at most about a quarter of the heap
-        val reserve = maxOf(48L shl 20, rt.maxMemory() * 3 / 4)
+        // Meshes live in native memory (FcMesh), one per distinct shape: an assembly's repeated parts share theirs.  The
+        // view holds a GPU copy of each.  Android ends a foreground app well before the device's memory runs out: drawing
+        // stops while less than a sixth of it is free (plus Android's low-memory threshold).
+        val m = LinkedHashMap<String, FcPart>(); val rt = Runtime.getRuntime()
+        val cache = HashMap<String, FcMesh>(); val old = meshCache
         val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager; val mi = android.app.ActivityManager.MemoryInfo()
         val report = shown.size >= 200; val opening = busy
         for ((k, o) in shown.withIndex()) {
             if (report && k % 50 == 0) busy = tr("Drawing the model: %1 of %2 parts", k, shown.size)
-            if (rt.maxMemory() - (rt.totalMemory() - rt.freeMemory()) < reserve) break
-            // Android ends a foreground app well before the memory runs out: keep a fifth of it free
-            am.getMemoryInfo(mi); if (mi.lowMemory || mi.availMem < mi.threshold + mi.totalMem / 5) break
-            try { m[o.name] = tessellate(gh[o.name] ?: o.name) } catch (e: OutOfMemoryError) { break }
+            if (rt.maxMemory() - (rt.totalMemory() - rt.freeMemory()) < 32L shl 20) break
+            if (k % 16 == 0) { am.getMemoryInfo(mi); if (mi.lowMemory || mi.availMem < mi.threshold + mi.totalMem / 6) break }   // (a call to the system: not per part)
+            // a shape the engine sent before comes back as its key: found in this refresh's meshes, or in the last one's
+            try { m[o.name] = tessellate(gh[o.name] ?: o.name, cache, old) } catch (e: OutOfMemoryError) { break }
         }
+        meshCache = cache
+        runCatching { call("tess_keep", mapOf("keys" to cache.keys.toList())) }
+        // the meshes dropped are freed (native memory) once the collector finds them unreachable: soon after the view lets go
+        gcSoon = old.keys.any { it !in cache } || meshes.values.any { it.mesh.key.isEmpty() && it.mesh.bytes > (1L shl 20) }
         if (report) busy = opening
-        if (m.size < shown.size) { System.gc()
-            message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", m.size, shown.size) }
+        if (m.size < shown.size) message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", m.size, shown.size)
         val hist = undoState()
         val ann = if (objs.any { it.type == "App::FeaturePython" || it.type == "App::AnnotationLabel" }) call("annotations") as? org.json.JSONObject else null
-        Log.i("AppState", "refresh: ${objs.size} objects, ${m.size}/${shown.size} drawn, ${System.currentTimeMillis() - t0} ms")
+        Log.i("AppState", "refresh: ${objs.size} objects, ${m.size}/${shown.size} drawn, ${cache.size} meshes ${cache.values.sumOf { it.bytes } shr 20} MB, ${System.currentTimeMillis() - t0} ms")
         Triple(objs, m to gh, hist) to ann
     }) { (t, ann) -> val (objs, mg, ur) = t; val (m, gh) = mg
-        objects.clear(); objects.addAll(objs); ghosts = gh; meshes = m
+        objects.clear(); objects.addAll(objs); byName = objs.associateBy { it.name }; ghosts = gh; meshes = m
         annotations = ann?.let { j -> j.keys().asSequence().associateWith { k -> val o = j.getJSONObject(k)
             val ls = o.getJSONArray("lines"); val seg = FloatArray(ls.length() * 6) { i -> ls.getJSONArray(i / 6).getJSONArray(i % 6 / 3).getDouble(i % 3).toFloat() }
             val ts = o.getJSONArray("texts"); seg to List(ts.length()) { i -> ts.getJSONArray(i).let { tx -> val p = tx.getJSONArray(0)
@@ -475,6 +482,7 @@ class AppState(private val ctx: Context) {
         if (inDrawing) refreshPage()
         if (inSheet) refreshSheet()
         after()
+        if (gcSoon) { gcSoon = false; scope.launch { kotlinx.coroutines.delay(1500); System.gc() } }
     }
 
     /** FreeCAD draws features, not their containers: a Body/Part's shape is its Tip's, already shown by the feature. */
@@ -489,7 +497,9 @@ class AppState(private val ctx: Context) {
         return o.name !in hiddenBodies
     }
 
-    fun obj(name: String) = objects.firstOrNull { it.name == name }
+    /** objects by name (a large assembly has tens of thousands: looked up per mesh when the view syncs) */
+    private var byName: Map<String, FcObject> = emptyMap()
+    fun obj(name: String) = byName[name]
 
     // ------------------------------------------------------------------ selection
     fun select(ref: SelRef?, additive: Boolean = true) {

@@ -4,6 +4,8 @@
 #include <Python.h>
 #include <android/log.h>
 #include <cstdlib>
+#include <cstring>
+#include <cstdlib>
 #include <dlfcn.h>
 #include <fstream>
 #include <string>
@@ -125,17 +127,36 @@ Java_app_mobilecad_freecad_Engine_nativeCall(JNIEnv* env, jobject, jstring jreq)
     return env->NewStringUTF(out.c_str());
 }
 
-extern "C" JNIEXPORT jbyteArray JNICALL
+// The mesh lives in native memory (a direct ByteBuffer over malloc'd bytes, freed by nativeFree when its FcMesh is
+// collected): a large model's meshes would not fit Android's per-app Java heap, whatever the device's RAM.
+extern "C" JNIEXPORT jobject JNICALL
 Java_app_mobilecad_freecad_Engine_nativeTessellate(JNIEnv* env, jobject, jstring jname, jdouble tol) {
-    std::string name = jstr(env, jname); jbyteArray arr = nullptr;
+    std::string name = jstr(env, jname); void* mem = nullptr; Py_ssize_t n = 0;
     PyGILState_STATE g = PyGILState_Ensure();
     PyObject* r = PyObject_CallFunction(g_tess, "sd", name.c_str(), (double)tol);
     if (r && PyBytes_Check(r)) {
-        Py_ssize_t n = PyBytes_Size(r); arr = env->NewByteArray((jsize)n);
-        env->SetByteArrayRegion(arr, 0, (jsize)n, reinterpret_cast<const jbyte*>(PyBytes_AsString(r)));
+        n = PyBytes_Size(r); mem = malloc(n > 0 ? n : 1);
+        if (mem) memcpy(mem, PyBytes_AsString(r), n);
+        else LOG("tessellate %s: out of memory (%zd bytes)", name.c_str(), n);
     } else LOG("tessellate %s failed: %s", name.c_str(), pyErr().c_str());
     Py_XDECREF(r); PyGILState_Release(g);
-    return arr ? arr : env->NewByteArray(0);
+    if (!mem) return nullptr;
+    return env->NewDirectByteBuffer(mem, (jlong)n);
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_app_mobilecad_freecad_Engine_00024Companion_nativeFree(JNIEnv*, jobject, jlong addr) { free(reinterpret_cast<void*>(addr)); }
+
+// @JvmStatic in the companion: the native method may be bound on either class
+extern "C" JNIEXPORT void JNICALL
+Java_app_mobilecad_freecad_Engine_nativeFree(JNIEnv*, jclass, jlong addr) { free(reinterpret_cast<void*>(addr)); }
+extern "C" JNIEXPORT jlong JNICALL
+Java_app_mobilecad_freecad_Engine_nativeAddress(JNIEnv* env, jclass, jobject buf) {
+    return reinterpret_cast<jlong>(env->GetDirectBufferAddress(buf));
+}
+extern "C" JNIEXPORT jlong JNICALL
+Java_app_mobilecad_freecad_Engine_00024Companion_nativeAddress(JNIEnv* env, jobject, jobject buf) {
+    return reinterpret_cast<jlong>(env->GetDirectBufferAddress(buf));
 }
 
 extern "C" JNIEXPORT jstring JNICALL

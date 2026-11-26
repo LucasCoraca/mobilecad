@@ -13,6 +13,8 @@
 #include <cstdarg>
 #include <cstring>
 #include <functional>
+#include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <thread>
@@ -201,15 +203,33 @@ JNIEXPORT void JNICALL Java_app_mobilecad_xr_XrActivity_nativeBeginScene(JNIEnv*
     const char* t = e->GetStringUTFChars(title, nullptr); std::string s(t); e->ReleaseStringUTFChars(title, t);
     post([s] { Pose keep = gIa.model; gIa.scene.clear(); gIa.scene.title = s; gIa.model = keep; });
 }
-JNIEXPORT void JNICALL Java_app_mobilecad_xr_XrActivity_nativeAddMesh(JNIEnv* e, jobject, jstring name, jfloatArray tris, jfloatArray edges,
+/** One object: the mesh (MobileCAD's FcMesh, in native memory: copied here) at its placement. A mesh with a key
+ *  (its shape) already received is shared, not copied again: an assembly's repeated parts, an unchanged part on the next
+ *  scene. */
+static std::mutex gGeomLock; static std::map<std::string, std::weak_ptr<Geom>> gGeoms;
+JNIEXPORT void JNICALL Java_app_mobilecad_xr_XrActivity_nativeAddMesh(JNIEnv* e, jobject, jstring name, jstring key, jobject vtx, jobject idx,
+                                                                      jintArray faces, jobject lines, jintArray edges, jfloatArray place,
                                                                       jfloat r, jfloat g, jfloat b, jfloat alpha) {
-    const char* n = e->GetStringUTFChars(name, nullptr); std::string sname(n); e->ReleaseStringUTFChars(name, n);
-    jsize nt = e->GetArrayLength(tris), ne = e->GetArrayLength(edges);              // engine layout: [n][tris][n][edges]
-    std::vector<uint8_t> blob(8 + 4 * (nt + ne)); int32_t a = nt, c = ne;
-    memcpy(blob.data(), &a, 4); e->GetFloatArrayRegion(tris, 0, nt, (jfloat*)(blob.data() + 4));
-    memcpy(blob.data() + 4 + 4 * nt, &c, 4); e->GetFloatArrayRegion(edges, 0, ne, (jfloat*)(blob.data() + 8 + 4 * nt));
-    post([sname, blob = std::move(blob), r, g, b, alpha] { float rgb[3] = {r, g, b};
-        if (gIa.scene.addTessellation(sname, blob.data(), blob.size(), rgb)) gIa.scene.meshes.back().alpha = alpha; });
+    auto str = [&](jstring j) { const char* c = e->GetStringUTFChars(j, nullptr); std::string s(c); e->ReleaseStringUTFChars(j, c); return s; };
+    std::string sname = str(name), skey = str(key);
+    std::shared_ptr<Geom> geo;
+    { std::lock_guard<std::mutex> l(gGeomLock); if (!skey.empty()) { auto it = gGeoms.find(skey); if (it != gGeoms.end()) geo = it->second.lock(); } }
+    if (!geo) {
+        geo = std::make_shared<Geom>();
+        // direct byte buffers (sections of the mesh's native memory)
+        auto fl = [&](jobject buf, std::vector<float>& out) { if (!buf) return; auto* p = (const float*)e->GetDirectBufferAddress(buf);
+            jlong n = e->GetDirectBufferCapacity(buf) / 4; if (p && n > 0) out.assign(p, p + n); };
+        fl(vtx, geo->vtx); fl(lines, geo->lines);
+        if (idx) { auto* p = (const uint32_t*)e->GetDirectBufferAddress(idx); jlong n = e->GetDirectBufferCapacity(idx) / 4; if (p && n > 0) geo->idx.assign(p, p + n); }
+        geo->faces.resize(e->GetArrayLength(faces)); e->GetIntArrayRegion(faces, 0, (jsize)geo->faces.size(), geo->faces.data());
+        geo->edges.resize(e->GetArrayLength(edges)); e->GetIntArrayRegion(edges, 0, (jsize)geo->edges.size(), geo->edges.data());
+        geo->bounds();
+        if (!skey.empty()) { std::lock_guard<std::mutex> l(gGeomLock); gGeoms[skey] = geo;
+            for (auto it = gGeoms.begin(); it != gGeoms.end();) it = it->second.expired() ? gGeoms.erase(it) : std::next(it); }
+    }
+    std::vector<float> pl; if (place) { pl.resize(16); e->GetFloatArrayRegion(place, 0, 16, pl.data()); }
+    post([sname, geo, pl, r, g, b, alpha] { float rgb[3] = {r, g, b};
+        gIa.scene.addMesh(sname, geo, pl.empty() ? nullptr : pl.data(), rgb, alpha); });
 }
 /** `place`: a new document - put the model in front of the viewer (an edit of the same document keeps where it is). */
 JNIEXPORT void JNICALL Java_app_mobilecad_xr_XrActivity_nativeEndScene(JNIEnv*, jobject, jboolean place) {

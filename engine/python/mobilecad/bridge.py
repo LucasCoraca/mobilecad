@@ -623,37 +623,98 @@ def _shape(o):
         return o.Shape
 
 def _pack_shape(s, t):
-    """The faces' triangles and the edges' polylines of shape [s] at deflection [t], as float32 bytes in tessellate's
-    layout. NumPy does the per-vertex work (a large STEP assembly has millions of triangles: a Python loop per vertex
-    took minutes)."""
+    """Shape [s] (in its own coordinates) at deflection [t] as indexed arrays: vertices (x y z nx ny nz, smooth normals
+    per face as FreeCAD's view providers compute them), triangle indices, faces (id, first index, index count), edge
+    points (GL_LINES pairs) and edges (id, first point, point count).  NumPy does the per-vertex work (a large STEP
+    assembly has millions of triangles: a Python loop per vertex took minutes)."""
     import numpy as np
-    tri, seg = [], []
+    V, I, F, L, E = [], [], [], [], []; nv = ni = nl = 0
     for fi, f in enumerate(s.Faces, 1):
         try: pts, idx = f.tessellate(t)
         except Exception: continue
         if not idx: continue
-        V = np.array([(p.x, p.y, p.z) for p in pts], dtype=np.float64)
-        P = V[np.asarray(idx, dtype=np.int64)]                       # triangles x corners x xyz
-        n = np.cross(P[:, 1] - P[:, 0], P[:, 2] - P[:, 0])
-        ln = np.linalg.norm(n, axis=1); ok = ln > 1e-12; n[ok] /= ln[ok, None]
-        out = np.empty((len(P), 3, 7), dtype=np.float32)
-        out[:, :, 0:3] = P; out[:, :, 3:6] = n[:, None, :]; out[:, :, 6] = fi
-        tri.append(out.reshape(-1))
+        P = np.array([(p.x, p.y, p.z) for p in pts], dtype=np.float64)
+        T = np.asarray(idx, dtype=np.int64).reshape(-1, 3)
+        n = np.cross(P[T[:, 1]] - P[T[:, 0]], P[T[:, 2]] - P[T[:, 0]])      # area weighted
+        N = np.zeros_like(P)
+        for k in range(3): np.add.at(N, T[:, k], n)
+        ln = np.linalg.norm(N, axis=1); ok = ln > 1e-12; N[ok] /= ln[ok, None]
+        out = np.empty((len(P), 6), dtype=np.float32); out[:, 0:3] = P; out[:, 3:6] = N
+        V.append(out.reshape(-1)); I.append((T + nv).astype(np.uint32).reshape(-1))
+        F.append((fi, ni, T.size)); nv += len(P); ni += T.size
     for ei, e in enumerate(s.Edges, 1):
         try: pts = e.discretize(Deflection=t)
         except Exception: continue
         if len(pts) < 2: continue
         Q = np.array([(p.x, p.y, p.z) for p in pts], dtype=np.float32)
-        out = np.empty((len(Q) - 1, 7), dtype=np.float32)
-        out[:, 0:3] = Q[:-1]; out[:, 3:6] = Q[1:]; out[:, 6] = ei
-        seg.append(out.reshape(-1))
-    cat = lambda a: np.concatenate(a).tobytes() if a else b''
-    return cat(tri), cat(seg)
+        seg = np.empty((len(Q) - 1, 2, 3), dtype=np.float32); seg[:, 0] = Q[:-1]; seg[:, 1] = Q[1:]
+        L.append(seg.reshape(-1)); E.append((ei, nl, 2 * (len(Q) - 1))); nl += 2 * (len(Q) - 1)
+    return _cat(V, np.float32), _cat(I, np.uint32), np.array(F, dtype=np.int32), _cat(L, np.float32), np.array(E, dtype=np.int32)
+
+def _cat(a, dt):
+    import numpy as np
+    return np.concatenate(a).astype(dt, copy=False) if a else np.zeros(0, dt)
+
+def _runs(ids, per):
+    """(id, first, count) of the consecutive runs of [ids] (one per primitive of [per] vertices)."""
+    import numpy as np
+    ids = np.asarray(ids, dtype=np.int64)
+    if not len(ids): return np.zeros((0, 3), np.int32)
+    st = np.flatnonzero(np.r_[True, ids[1:] != ids[:-1]]); en = np.r_[st[1:], len(ids)]
+    return np.stack([ids[st], st * per, (en - st) * per], axis=1).astype(np.int32)
+
+def _encode(key, mat, ref, V=None, I=None, F=None, L=None, E=None, P=None, C=None):
+    """tessellate's bytes, little endian: b'MCM2', flags (1 = same mesh as [key] sent before: no body), key (int32 length,
+    utf-8, padded to 4), the placement (16 float32, column major: world = M * local), then the sections, each [int32
+    count][items]: vertices (x y z nx ny nz), triangle indices (uint32), faces (id first count), edge points (x y z, in
+    pairs), edges (id first count), vertexes (x y z id), colours (r g b per vertex / point).  Face/edge/vertex ids are
+    FreeCAD's 1-based Face<i> / Edge<i> / Vertex<i>."""
+    import numpy as np
+    kb = key.encode(); kb += b'\0' * (-len(kb) % 4)
+    out = [b'MCM2', struct.pack('<ii', 1 if ref else 0, len(key.encode())), kb, np.asarray(mat, dtype=np.float32).tobytes()]
+    if not ref:
+        for a, dt in ((V, np.float32), (I, np.uint32), (F, np.int32), (L, np.float32), (E, np.int32), (P, np.float32), (C, np.float32)):
+            a = np.zeros(0, dt) if a is None else np.asarray(a, dtype=dt).reshape(-1)
+            out += [struct.pack('<i', a.size), a.tobytes()]
+    return b''.join(out)
+
+_IDENT = (1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+# Shapes already sent to the app, by key (their shared geometry, TShape, with the location stripped): another object
+# with the same geometry (an assembly's repeated screws) is sent as that key and its own placement.  Holding the shape
+# keeps its TShape alive, so its address (in the key) is not reused by a different shape.  The app tells which keys it
+# keeps (tess_keep) after each refresh.
+_tess_sent = {}          # key -> a shape with that geometry (its TShape)
+_tess_bucket = {}        # shape type, orientation, face / edge counts, tolerance -> keys
+_tess_count = [0]
+
+def _tess_key(s, tol):
+    """(key, sent before) for shape [s]: shapes sharing their geometry (TopoDS TShape: isPartner) share the key.  OCC's
+    hash code includes the location, so shapes are bucketed by their face count and compared with isPartner (not
+    countElement: it counts FreeCAD's element names, which differ between copies)."""
+    b = '%s:%s:%d:%g' % (s.ShapeType, s.Orientation, len(s.Faces), tol)
+    for k in _tess_bucket.get(b, ()):
+        if _tess_sent[k].isPartner(s): return k, True
+    _tess_count[0] += 1
+    return '%s#%d' % (b, _tess_count[0]), False
+
+def _tess_forget(k):
+    _tess_sent.pop(k, None)
+    b = k.rsplit('#', 1)[0]; ks = _tess_bucket.get(b)
+    if ks and k in ks:
+        ks.remove(k)
+        if not ks: del _tess_bucket[b]
+
+@op
+def tess_keep(keys):
+    keep = set(keys)
+    for k in [k for k in _tess_sent if k not in keep]: _tess_forget(k)
+
+@op
+def tess_drop(keys):
+    for k in keys: _tess_forget(k)
 
 def tessellate(name, tol=0.05):
-    """bytes: [nTriFloats:int32][tris: x y z nx ny nz faceIndex]*  [nEdgeFloats:int32][edges: x1 y1 z1 x2 y2 z2 edgeIndex]*
-    [nVertexFloats:int32][vertexes: x y z vertexIndex]*
-    Face/edge/vertex indices are 1-based and match FreeCAD sub-element names (Face<i>, Edge<i>, Vertex<i>)."""
+    """The object's display mesh as bytes (layout: _encode)."""
     o = _doc().getObject(name)
     tris = array.array('f'); edges = array.array('f'); verts = array.array('f'); cols = array.array('f')
     s = None
@@ -745,13 +806,23 @@ def tessellate(name, tol=0.05):
     else:
         s = _shape(o)
     if s is not None and not s.isNull():
+        import Part, numpy as np
+        # the shape's own geometry (its location stripped) is triangulated once and shared by every object showing it
+        ls = Part.Shape(s); ls.Placement = App.Placement()
+        m = s.Matrix.A; mat = [m[r * 4 + c] for c in range(4) for r in range(4)]
+        key, sent = _tess_key(s, tol)
+        if sent: return _encode(key, mat, True)
         # desktop's deflection (Part::Tools::getDeflection with the default MeshDeviation 0.2), not finer than [tol]
-        bb = s.BoundBox; t = max(tol, (bb.XLength + bb.YLength + bb.ZLength) / 300.0 * 0.2) if bb.isValid() else tol
-        tb, eb = _pack_shape(s, t)
-        tris.frombytes(tb); edges.frombytes(eb)
-        for vi, v in enumerate(s.Vertexes, 1): verts.extend((v.X, v.Y, v.Z, vi))
-    return (struct.pack('<i', len(tris)) + tris.tobytes() + struct.pack('<i', len(edges)) + edges.tobytes()
-            + struct.pack('<i', len(verts)) + verts.tobytes() + struct.pack('<i', len(cols)) + cols.tobytes())
+        bb = ls.BoundBox; t = max(tol, (bb.XLength + bb.YLength + bb.ZLength) / 300.0 * 0.2) if bb.isValid() else tol
+        V, I, F, L, E = _pack_shape(ls, t)
+        P = np.array([(v.X, v.Y, v.Z, vi) for vi, v in enumerate(ls.Vertexes, 1)], dtype=np.float32)
+        _tess_sent[key] = s; _tess_bucket.setdefault(key.rsplit('#', 1)[0], []).append(key)
+        return _encode(key, mat, False, V, I, F, L, E, P)
+    # other objects (meshes, results, paths ...): world coordinates, one vertex per triangle corner
+    import numpy as np
+    T = np.frombuffer(tris.tobytes(), dtype=np.float32).reshape(-1, 7); S = np.frombuffer(edges.tobytes(), dtype=np.float32).reshape(-1, 7)
+    return _encode('', _IDENT, False, T[:, 0:6], np.arange(len(T), dtype=np.uint32), _runs(T[:, 6][::3], 3),
+                   S[:, 0:6], _runs(S[:, 6], 2), np.frombuffer(verts.tobytes(), dtype=np.float32), np.frombuffer(cols.tobytes(), dtype=np.float32))
 
 
 # external programs shipped as native libraries (Gmsh ...): they load the FreeCAD runtime libraries (OCCT ...)

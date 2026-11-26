@@ -39,7 +39,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     /** The camera picking and drawing input go through: [cam], or in MobileCAD XR a controller ray's virtual camera. */
     private var icam = cam
     private val renderer = Renderer(cam)
-    private val gl = GLSurfaceView(ctx).apply { setEGLContextClientVersion(2); setEGLConfigChooser(8, 8, 8, 8, 24, 0); setRenderer(renderer); renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY }
+    private val gl = GLSurfaceView(ctx).apply { setEGLContextClientVersion(2); setEGLConfigChooser(8, 8, 8, 8, 24, 0); setRenderer(renderer); renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY }.also { v -> renderer.requestRender = { v.requestRender() } }
     private val overlay = Overlay(ctx)
     var onContextMenu: (Float, Float) -> Unit = { _, _ -> }
 
@@ -119,7 +119,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
         val old = renderer.objs.associateBy { it.name }
         val objs = ArrayList<RenderObj>()
         try { for ((n, m) in app.meshes) if (n != sketch?.name) { val isSketch = app.obj(n)?.type == "Sketcher::SketchObject"; val g = app.ghosts[n]
-            objs.add(old[n]?.takeIf { it.mesh === m && it.isSketch == isSketch && it.ghostOf == g } ?: RenderObj(n, m, isSketch, g)) } }
+            objs.add(old[n]?.takeIf { it.part === m && it.isSketch == isSketch && it.ghostOf == g } ?: RenderObj(n, m, isSketch, g)) } }
         catch (e: OutOfMemoryError) { app.message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", objs.size, app.meshes.size) }
         renderer.objs = objs
         sceneBounds(objs)?.let { (mn, mx) -> val c = FloatArray(3) { (mn[it] + mx[it]) / 2 }
@@ -143,7 +143,7 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
                 refresh() }; if (ed.pendingNormal) ed.viewNormal() } }
         // fit the first time geometry appears, and whenever the tab (Part / Assembly) changes the scope
         if (app.workspace.id != lastScope) { lastScope = app.workspace.id; fitted = false }
-        if (!fitted && objs.any { it.mesh.tris.isNotEmpty() }) { fitAll(); fitted = true }
+        if (!fitted && objs.any { it.mesh.hasTris }) { fitAll(); fitted = true }
         refresh()
     }
 
@@ -367,25 +367,84 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
     private fun planePt(x: Float, y: Float): P2? = sketch?.fromRay(icam.ray(x, y))
 
     // ------------------------------------------------------------------ picking (FreeCAD sub-elements)
-    private fun tapSelect(x: Float, y: Float) { lastTap = x to y; val r = pick(x, y, 8 * dp); if (r != null) { app.select(r); sync() } }
+    private fun tapSelect(x: Float, y: Float) { lastTap = x to y; val t0 = SystemClock.uptimeMillis(); val r = pick(x, y, 8 * dp); val t1 = SystemClock.uptimeMillis()
+        if (r != null) { app.select(r); sync() }
+        if (renderer.objs.size > 500) android.util.Log.i("ViewportView", "tap: pick ${t1 - t0} ms, select+sync ${SystemClock.uptimeMillis() - t1} ms (${renderer.objs.size} objects)") }
     private var lastTap: Pair<Float, Float>? = null
+
+    // Meshes are in their own coordinates, placed by their object's matrix (repeated parts share one mesh): vertexes and
+    // edge points are taken to world coordinates, the pick ray to the mesh's.  Objects whose box is away from the pointer
+    // are skipped (a large assembly has millions of triangles).
+    private val cornerP = FloatArray(3)
+    /** [o]'s box projected on the screen grown by [r] contains (x, y) (also when part of it is behind the eye). */
+    private fun nearBox(o: RenderObj, x: Float, y: Float, r: Float): Boolean {
+        val a = o.min; val b = o.max; if (a[0] > b[0]) return false
+        var x0 = Float.MAX_VALUE; var y0 = Float.MAX_VALUE; var x1 = -Float.MAX_VALUE; var y1 = -Float.MAX_VALUE
+        for (c in 0 until 8) { val p = icam.project(if (c and 1 == 0) a[0] else b[0], if (c and 2 == 0) a[1] else b[1], if (c and 4 == 0) a[2] else b[2]) ?: return true
+            x0 = minOf(x0, p[0]); y0 = minOf(y0, p[1]); x1 = maxOf(x1, p[0]); y1 = maxOf(y1, p[1]) }
+        return x >= x0 - r && x <= x1 + r && y >= y0 - r && y <= y1 + r
+    }
+    /** The ray (world) meets [o]'s box. */
+    private fun rayBox(o: RenderObj, r: FloatArray): Boolean {
+        val a = o.min; val b = o.max; if (a[0] > b[0]) return false
+        var t0 = -Float.MAX_VALUE; var t1 = Float.MAX_VALUE
+        for (k in 0..2) { val d = r[3 + k]; val q = r[k]
+            if (abs(d) < 1e-12f) { if (q < a[k] || q > b[k]) return false; continue }
+            var u = (a[k] - q) / d; var v = (b[k] - q) / d; if (u > v) { val w = u; u = v; v = w }
+            t0 = maxOf(t0, u); t1 = minOf(t1, v); if (t0 > t1) return false }
+        return t1 >= 0f
+    }
+    /** Where the ray (world) enters [o]'s box (0 when it starts inside), or NaN when it misses it. */
+    private fun rayEnter(o: RenderObj, r: FloatArray): Float {
+        val a = o.min; val b = o.max; if (a[0] > b[0]) return Float.NaN
+        var t0 = -Float.MAX_VALUE; var t1 = Float.MAX_VALUE
+        for (k in 0..2) { val d = r[3 + k]; val q = r[k]
+            if (abs(d) < 1e-12f) { if (q < a[k] || q > b[k]) return Float.NaN; continue }
+            var u = (a[k] - q) / d; var v = (b[k] - q) / d; if (u > v) { val w = u; u = v; v = w }
+            t0 = maxOf(t0, u); t1 = minOf(t1, v); if (t0 > t1) return Float.NaN }
+        return if (t1 < 0f) Float.NaN else maxOf(t0, 0f)
+    }
+    /** The depth along the ray of [o]'s nearest box corner. */
+    private fun nearDepth(o: RenderObj, r: FloatArray): Float {
+        val a = o.min; val b = o.max; var m = Float.MAX_VALUE
+        for (c in 0 until 8) { val x = if (c and 1 == 0) a[0] else b[0]; val y = if (c and 2 == 0) a[1] else b[1]; val z = if (c and 4 == 0) a[2] else b[2]
+            m = minOf(m, (x - r[0]) * r[3] + (y - r[1]) * r[4] + (z - r[2]) * r[5]) }
+        return m
+    }
+    /** Each vertex (FreeCAD Vertex<id>) of [o] in world coordinates. */
+    private inline fun eachVertex(o: RenderObj, f: (id: Int, p: FloatArray) -> Unit) {
+        val v = o.mesh.points; val p = FloatArray(3)
+        for (i in 0 until o.mesh.pointCount) { o.part.world(v.get(i * 4), v.get(i * 4 + 1), v.get(i * 4 + 2), p); f(v.get(i * 4 + 3).toInt(), p) }
+    }
+    /** Each edge segment (of FreeCAD Edge<id>) of [o] in world coordinates; [a] and [b] are reused. */
+    private inline fun eachSegment(o: RenderObj, f: (id: Int, a: FloatArray, b: FloatArray) -> Unit) {
+        val m = o.mesh; val l = m.lines; val e = m.edges; val a = FloatArray(3); val b = FloatArray(3); var k = 0
+        while (k + 2 < e.size) { val id = e[k]; var j = e[k + 1]; val end = j + e[k + 2]
+            while (j + 1 < end) { o.part.world(l.get(j * 3), l.get(j * 3 + 1), l.get(j * 3 + 2), a); o.part.world(l.get(j * 3 + 3), l.get(j * 3 + 4), l.get(j * 3 + 5), b)
+                f(id, a, b); j += 2 }
+            k += 3 }
+    }
+    /** Each triangle of [o] (of FreeCAD Face<id>) the ray [lr] (in the mesh's coordinates) meets, with its distance. */
+    private inline fun eachHit(o: RenderObj, lr: FloatArray, f: (id: Int, t: Float) -> Unit) {
+        val m = o.mesh; val fc = m.faces; var k = 0
+        while (k + 2 < fc.size) { val id = fc[k]; var i = fc[k + 1]; val end = i + fc[k + 2]
+            while (i + 2 < end) { val d = tri(lr, m.vtx, m.idx.get(i), m.idx.get(i + 1), m.idx.get(i + 2)); if (d >= 0f) f(id, d); i += 3 }
+            k += 3 }
+    }
 
     /** Std_ClarifySelection: every vertex, edge and face under the last tap, nearest first. */
     fun pickAll(): List<SelRef> {
         val (x, y) = lastTap ?: return emptyList()
-        val out = ArrayList<Pair<Float, SelRef>>()
+        val out = ArrayList<Pair<Float, SelRef>>(); val r = icam.ray(x, y)
         for (o in renderer.objs) {
-            val v = o.mesh.verts; var i = 0
-            while (i + 3 < v.size) { icam.project(v[i], v[i + 1], v[i + 2])?.let { p -> if (hypot(x - p[0], y - p[1]) < 14 * dp) out.add(0f to SelRef(o.ref, "Vertex${v[i + 3].toInt()}", floatArrayOf(v[i], v[i + 1], v[i + 2]))) }; i += 4 }
-            val a = o.mesh.edges; val seenE = HashSet<Int>(); i = 0
-            while (i + 6 < a.size) { val id = a[i + 6].toInt()
-                if (id !in seenE) { val s1 = icam.project(a[i], a[i + 1], a[i + 2]); val s2 = icam.project(a[i + 3], a[i + 4], a[i + 5])
-                    if (s1 != null && s2 != null && segDist(x, y, s1, s2) < 12 * dp) { seenE.add(id); out.add(1f to SelRef(o.ref, "Edge$id", floatArrayOf(a[i], a[i + 1], a[i + 2]))) } }
-                i += 7 }
-            val r = icam.ray(x, y); val t = o.mesh.tris; val seenF = HashSet<Int>(); i = 0
-            while (i + 20 < t.size) { val id = t[i + 6].toInt()
-                if (id !in seenF) { val d = tri(r, t, i); if (d >= 0f) { seenF.add(id); out.add(2f + d to SelRef(o.ref, "Face$id", floatArrayOf(r[0] + r[3] * d, r[1] + r[4] * d, r[2] + r[5] * d))) } }
-                i += 21 }
+            if (nearBox(o, x, y, 14 * dp)) {
+                eachVertex(o) { id, p -> icam.project(p[0], p[1], p[2])?.let { q -> if (hypot(x - q[0], y - q[1]) < 14 * dp) out.add(0f to SelRef(o.ref, "Vertex$id", p.copyOf())) } }
+                val seenE = HashSet<Int>()
+                eachSegment(o) { id, a, b -> if (id !in seenE) { val s1 = icam.project(a[0], a[1], a[2]); val s2 = icam.project(b[0], b[1], b[2])
+                    if (s1 != null && s2 != null && segDist(x, y, s1, s2) < 12 * dp) { seenE.add(id); out.add(1f to SelRef(o.ref, "Edge$id", a.copyOf())) } } }
+            }
+            if (rayBox(o, r)) { val seenF = HashSet<Int>()
+                eachHit(o, o.part.local(r)) { id, d -> if (seenF.add(id)) out.add(2f + d to SelRef(o.ref, "Face$id", floatArrayOf(r[0] + r[3] * d, r[1] + r[4] * d, r[2] + r[5] * d))) } }
         }
         return out.sortedBy { it.first }.map { it.second }
     }
@@ -402,19 +461,19 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
         val margin = faceT?.let { 4 * 12 * dp * icam.unitsPerPixel() + it * 0.002f } ?: 0f
         fun hidden(px: Float, py: Float, pz: Float) = faceT != null && depth(px, py, pz) > faceT + margin
         var bestV: SelRef? = null; var bv = 12 * dp
-        if (filter == null || filter == "Vertex") for (o in renderer.objs) { val a = o.mesh.verts; var i = 0
-            while (i + 3 < a.size) { val p = icam.project(a[i], a[i + 1], a[i + 2])
-                if (p != null && !hidden(a[i], a[i + 1], a[i + 2])) { val d = hypot(x - p[0], y - p[1]); if (d < bv) { bv = d; bestV = SelRef(o.ref, "Vertex${a[i + 3].toInt()}", floatArrayOf(a[i], a[i + 1], a[i + 2])) } }
-                i += 4 } }
+        // objects behind the face under the pointer are hidden by it: skipped (a large assembly has thousands under the finger)
+        fun behind(o: RenderObj) = faceT != null && nearDepth(o, ray) > faceT + margin
+        if (filter == null || filter == "Vertex") for (o in renderer.objs) { if (behind(o) || !nearBox(o, x, y, bv)) continue
+            eachVertex(o) { id, a -> val p = icam.project(a[0], a[1], a[2])
+                if (p != null && !hidden(a[0], a[1], a[2])) { val d = hypot(x - p[0], y - p[1]); if (d < bv) { bv = d; bestV = SelRef(o.ref, "Vertex$id", a.copyOf()) } } } }
         if (bestV != null || filter == "Vertex") return bestV
         var bestE: SelRef? = null; var bd = maxOf(radius, 10 * dp)
-        for (o in renderer.objs) { val a = o.mesh.edges; var i = 0
-            while (i + 6 < a.size) {
-                val s1 = icam.project(a[i], a[i + 1], a[i + 2]); val s2 = icam.project(a[i + 3], a[i + 4], a[i + 5])
+        for (o in renderer.objs) { if (behind(o) || !nearBox(o, x, y, bd)) continue
+            eachSegment(o) { id, a, b ->
+                val s1 = icam.project(a[0], a[1], a[2]); val s2 = icam.project(b[0], b[1], b[2])
                 if (s1 != null && s2 != null) { val d = segDist(x, y, s1, s2); val t = segT(x, y, s1, s2)
-                    if (d < bd && !hidden(a[i] + (a[i + 3] - a[i]) * t, a[i + 1] + (a[i + 4] - a[i + 1]) * t, a[i + 2] + (a[i + 5] - a[i + 2]) * t)) { bd = d
-                    bestE = SelRef(o.ref, "Edge${a[i + 6].toInt()}", floatArrayOf(a[i] + (a[i + 3] - a[i]) * t, a[i + 1] + (a[i + 4] - a[i + 1]) * t, a[i + 2] + (a[i + 5] - a[i + 2]) * t)) } }
-                i += 7 }
+                    val px = a[0] + (b[0] - a[0]) * t; val py = a[1] + (b[1] - a[1]) * t; val pz = a[2] + (b[2] - a[2]) * t
+                    if (d < bd && !hidden(px, py, pz)) { bd = d; bestE = SelRef(o.ref, "Edge$id", floatArrayOf(px, py, pz)) } } }
         }
         if (filter == "Edge") return bestE
         if (filter == "Face") return face
@@ -435,22 +494,26 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
 
     private fun pickFace(x: Float, y: Float): SelRef? {
         val r = icam.ray(x, y); var best = Float.MAX_VALUE; var hit: SelRef? = null
-        for (o in renderer.objs) { val t = o.mesh.tris; var i = 0
-            while (i + 20 < t.size) {
-                val d = tri(r, t, i); if (d in 0f..best) { best = d; hit = SelRef(o.ref, "Face${t[i + 6].toInt()}", floatArrayOf(r[0] + r[3] * d, r[1] + r[4] * d, r[2] + r[5] * d)) }
-                i += 21 } }
+        // front to back: an object whose box starts beyond the nearest hit so far cannot be nearer
+        val cand = ArrayList<Pair<Float, RenderObj>>()
+        for (o in renderer.objs) { val t = rayEnter(o, r); if (!t.isNaN()) cand.add(t to o) }
+        cand.sortBy { it.first }
+        for ((t0, o) in cand) { if (t0 > best) break
+            eachHit(o, o.part.local(r)) { id, d -> if (d <= best) { best = d; hit = SelRef(o.ref, "Face$id", floatArrayOf(r[0] + r[3] * d, r[1] + r[4] * d, r[2] + r[5] * d)) } } }
         return hit
     }
 
-    private fun tri(r: FloatArray, t: FloatArray, i: Int): Float {
-        val e1x = t[i + 7] - t[i]; val e1y = t[i + 8] - t[i + 1]; val e1z = t[i + 9] - t[i + 2]
-        val e2x = t[i + 14] - t[i]; val e2y = t[i + 15] - t[i + 1]; val e2z = t[i + 16] - t[i + 2]
+    /** Möller–Trumbore: distance along ray [r] to triangle (a, b, c) of vertices [v] (x y z nx ny nz), or -1. */
+    private fun tri(r: FloatArray, v: java.nio.FloatBuffer, a: Int, b: Int, c: Int): Float {
+        val ax = v.get(a * 6); val ay = v.get(a * 6 + 1); val az = v.get(a * 6 + 2)
+        val e1x = v.get(b * 6) - ax; val e1y = v.get(b * 6 + 1) - ay; val e1z = v.get(b * 6 + 2) - az
+        val e2x = v.get(c * 6) - ax; val e2y = v.get(c * 6 + 1) - ay; val e2z = v.get(c * 6 + 2) - az
         val hx = r[4] * e2z - r[5] * e2y; val hy = r[5] * e2x - r[3] * e2z; val hz = r[3] * e2y - r[4] * e2x
-        val a = e1x * hx + e1y * hy + e1z * hz; if (abs(a) < 1e-9f) return -1f
-        val f = 1f / a; val sx = r[0] - t[i]; val sy = r[1] - t[i + 1]; val sz = r[2] - t[i + 2]
+        val det = e1x * hx + e1y * hy + e1z * hz; if (abs(det) < 1e-12f) return -1f
+        val f = 1f / det; val sx = r[0] - ax; val sy = r[1] - ay; val sz = r[2] - az
         val u = f * (sx * hx + sy * hy + sz * hz); if (u < 0f || u > 1f) return -1f
         val qx = sy * e1z - sz * e1y; val qy = sz * e1x - sx * e1z; val qz = sx * e1y - sy * e1x
-        val v = f * (r[3] * qx + r[4] * qy + r[5] * qz); if (v < 0f || u + v > 1f) return -1f
+        val w = f * (r[3] * qx + r[4] * qy + r[5] * qz); if (w < 0f || u + w > 1f) return -1f
         return f * (e2x * qx + e2y * qy + e2z * qz)
     }
 
@@ -502,20 +565,17 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
             if (best == null && "Intersection" in on) intersection(x, y, rad)?.let { best = it; kind = "Intersection" }
             if (best == null && ("Near" in on || "Perpendicular" in on)) {
                 var bestD = rad
-                for (o in renderer.objs) { val a = o.mesh.edges; var j = 0
-                    while (j + 6 < a.size) {
-                        val s1 = icam.project(a[j], a[j + 1], a[j + 2]); val s2 = icam.project(a[j + 3], a[j + 4], a[j + 5])
+                for (o in renderer.objs) { if (!nearBox(o, x, y, bestD)) continue
+                    eachSegment(o) { _, a, b ->
+                        val s1 = icam.project(a[0], a[1], a[2]); val s2 = icam.project(b[0], b[1], b[2])
                         if (s1 != null && s2 != null) { val dd = segDist(x, y, s1, s2)
                             if (dd < bestD) { bestD = dd
-                                val p1 = doubleArrayOf(a[j].toDouble(), a[j + 1].toDouble(), a[j + 2].toDouble()); val p2 = doubleArrayOf(a[j + 3].toDouble(), a[j + 4].toDouble(), a[j + 5].toDouble())
+                                val p1 = doubleArrayOf(a[0].toDouble(), a[1].toDouble(), a[2].toDouble()); val p2 = doubleArrayOf(b[0].toDouble(), b[1].toDouble(), b[2].toDouble())
                                 val dir = DoubleArray(3) { p2[it] - p1[it] }; val l2 = dot(dir, dir).coerceAtLeast(1e-12)
-                                if ("Perpendicular" in on && last != null) {
-                                    val tt = dot(DoubleArray(3) { last[it] - p1[it] }, dir) / l2
-                                    if (tt in 0.0..1.0) { best = DoubleArray(3) { p1[it] + dir[it] * tt }; kind = "Perpendicular"; continue }
-                                }
-                                if ("Near" in on) { val tt = segT(x, y, s1, s2).toDouble(); best = DoubleArray(3) { p1[it] + dir[it] * tt }; kind = "Near" }
-                            } }
-                        j += 7 } }
+                                val tp = if ("Perpendicular" in on && last != null) dot(DoubleArray(3) { last[it] - p1[it] }, dir) / l2 else -1.0
+                                if (tp in 0.0..1.0) { best = DoubleArray(3) { p1[it] + dir[it] * tp }; kind = "Perpendicular" }
+                                else if ("Near" in on) { val tt = segT(x, y, s1, s2).toDouble(); best = DoubleArray(3) { p1[it] + dir[it] * tt }; kind = "Near" }
+                            } } } }
             }
             best?.let { b -> t.snapKind = kind; t.hover = b
                 return if ("WorkingPlane" in on) app.workPlane.let { wp -> val l = wp.local(b); wp.global(doubleArrayOf(l[0], l[1], 0.0)) } else b }
@@ -536,10 +596,9 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
 
     private fun intersection(x: Float, y: Float, rad: Float): DoubleArray? {
         val segs = ArrayList<FloatArray>()      // screen segments near the finger with their 3D ends
-        for (o in renderer.objs) { val a = o.mesh.edges; var j = 0
-            while (j + 6 < a.size) { val s1 = icam.project(a[j], a[j + 1], a[j + 2]); val s2 = icam.project(a[j + 3], a[j + 4], a[j + 5])
-                if (s1 != null && s2 != null && segDist(x, y, s1, s2) < rad) segs.add(floatArrayOf(s1[0], s1[1], s2[0], s2[1], a[j], a[j + 1], a[j + 2], a[j + 3], a[j + 4], a[j + 5], a[j + 6]))
-                j += 7 } }
+        for (o in renderer.objs) { if (!nearBox(o, x, y, rad)) continue
+            eachSegment(o) { id, a, b -> val s1 = icam.project(a[0], a[1], a[2]); val s2 = icam.project(b[0], b[1], b[2])
+                if (s1 != null && s2 != null && segDist(x, y, s1, s2) < rad) segs.add(floatArrayOf(s1[0], s1[1], s2[0], s2[1], a[0], a[1], a[2], b[0], b[1], b[2], id.toFloat())) } }
         var best: DoubleArray? = null; var bd = rad
         for (i in segs.indices) for (k in i + 1 until segs.size) {
             val a = segs[i]; val b = segs[k]; if (a[10] == b[10]) continue
@@ -567,9 +626,11 @@ class ViewportView(ctx: Context, private val app: AppState) : FrameLayout(ctx) {
         }
         if (armed == "faces") {
             // Part_BoxSelection (PartGui::BoxSelection, TopAbs_FACE): faces whose tessellation lies inside the box
-            for (o in renderer.objs) { val t = o.mesh.tris; val inside = HashMap<Int, Boolean>(); var i = 0
-                while (i + 6 < t.size) { val f = t[i + 6].toInt(); val q = icam.project(t[i], t[i + 1], t[i + 2])
-                    inside[f] = (inside[f] ?: true) && q != null && r.contains(q[0], q[1]); i += 7 }
+            for (o in renderer.objs) { val m = o.mesh; val p = FloatArray(3); val fc = m.faces; val inside = HashMap<Int, Boolean>(); var k = 0
+                while (k + 2 < fc.size) { val f = fc[k]; var ok = inside[f] ?: true; var i = fc[k + 1]; val end = i + fc[k + 2]
+                    while (ok && i < end) { val v = m.idx.get(i); o.part.world(m.vtx.get(v * 6), m.vtx.get(v * 6 + 1), m.vtx.get(v * 6 + 2), p)
+                        val q = icam.project(p[0], p[1], p[2]); ok = q != null && r.contains(q[0], q[1]); i++ }
+                    inside[f] = ok; k += 3 }
                 inside.filterValues { it }.keys.sorted().forEach { f -> val ref = SelRef(o.name, "Face$f"); if (ref !in app.selection) app.selection.add(ref) } }
             overlay.box = null; mode = Mode.NONE; sync(); return
         }

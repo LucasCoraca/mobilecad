@@ -95,8 +95,8 @@ bool Interaction::rimRay(const Pose& aim, float* t) const {
 
 float Interaction::lowestY() const {
     float low = 1e30f;
-    for (const Mesh& m : scene.meshes) for (size_t i = 0; i + 2 < m.tris.size(); i += 7)
-        low = std::min(low, apply(model, V3{m.tris[i], m.tris[i + 1], m.tris[i + 2]}).y);
+    for (const Mesh& m : scene.meshes) for (size_t i = 0; i + 2 < m.g->vtx.size(); i += 6)
+        low = std::min(low, apply(model, m.at(V3{m.g->vtx[i], m.g->vtx[i + 1], m.g->vtx[i + 2]})).y);
     return low;
 }
 

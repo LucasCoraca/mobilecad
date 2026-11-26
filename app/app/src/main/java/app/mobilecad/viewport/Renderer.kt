@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import app.mobilecad.freecad.FcMesh
+import app.mobilecad.freecad.FcPart
+import java.util.IdentityHashMap
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -11,31 +13,17 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 /**
- * GPU copy of one FreeCAD object's tessellation. Vertices are grouped by face (FreeCAD Face<i>), segments by edge (Edge<i>),
- * so a single face/edge can be highlighted by drawing its range again.
+ * One FreeCAD object in the view: its mesh (shared with every object showing the same shape, uploaded to the GPU once)
+ * at its placement.  Triangles are grouped by face (FreeCAD Face<i>), edge segments by edge (Edge<i>), so a single
+ * face/edge can be highlighted by drawing its range again.
  */
-class RenderObj(val name: String, val mesh: FcMesh, val isSketch: Boolean, val ghostOf: String? = null) {
+class RenderObj(val name: String, val part: FcPart, val isSketch: Boolean, val ghostOf: String? = null) {
     /** The object picks refer to: a failed feature's ghost is the shape of [ghostOf], so its faces/edges are that object's. */
     val ref get() = ghostOf ?: name
-    val tris: FloatBuffer = buf(mesh.tris); val edges: FloatBuffer = buf(mesh.edges)
-    val colors: FloatBuffer? = if (mesh.colors.isNotEmpty()) buf(mesh.colors) else null
-    val faceRanges = ranges(mesh.tris, 3)      // face id -> (first vertex, vertex count)
-    val edgeRanges = ranges(mesh.edges, 2)     // edge id -> (first vertex, vertex count)
-    val min = FloatArray(3) { Float.MAX_VALUE }; val max = FloatArray(3) { -Float.MAX_VALUE }
-    init {
-        for (arr in listOf(mesh.tris, mesh.edges)) { var i = 0
-            while (i + 6 < arr.size) { for (k in 0..2) { val v = arr[i + k]; if (v.isFinite()) { min[k] = minOf(min[k], v); max[k] = maxOf(max[k], v) } }; i += 7 } }
-        var j = 0; val vs = mesh.verts          // point clouds have only vertexes [x y z id]
-        while (j + 3 < vs.size) { for (k in 0..2) { val v = vs[j + k]; if (v.isFinite()) { min[k] = minOf(min[k], v); max[k] = maxOf(max[k], v) } }; j += 4 }
-    }
-    private fun buf(a: FloatArray): FloatBuffer = ByteBuffer.allocateDirect(maxOf(4, a.size * 4)).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(a); position(0) }
-    /** Tri vertices: x y z nx ny nz id (stride 7, id per vertex). Edge vertices are stored as 2-point segments x1 y1 z1 x2 y2 z2 id. */
-    private fun ranges(a: FloatArray, perPrim: Int): Map<Int, Pair<Int, Int>> {
-        val out = LinkedHashMap<Int, Pair<Int, Int>>(); var i = 0; var v = 0
-        if (perPrim == 3) while (i + 6 < a.size) { val id = a[i + 6].toInt(); val r = out[id]; out[id] = if (r == null) v to 1 else r.first to r.second + 1; i += 7; v++ }
-        else while (i + 6 < a.size) { val id = a[i + 6].toInt(); val r = out[id]; out[id] = if (r == null) v to 1 else r.first to r.second + 1; i += 7; v++ }
-        return out
-    }
+    val mesh: FcMesh get() = part.mesh
+    val min get() = part.min
+    val max get() = part.max
+    val model: FloatArray = part.matrix ?: FloatArray(16).also { android.opengl.Matrix.setIdentityM(it, 0) }
 }
 
 class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
@@ -72,10 +60,69 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
     private var uClip = 0          // sketch mode: dim the model like FreeCAD does
     private var aCol = 0; private var uVcol = 0
     private var prog = 0; private var aPos = 0; private var aNrm = 0; private var uMvp = 0; private var uColor = 0; private var uLit = 0
-    private var edgeBuf: FloatBuffer? = null
+    private var uModel = 0
+    /** Wide lines as far as the GPU draws them (some draw nothing for a width outside their range) */
+    private var maxLine = 1f
+    private fun lineWidth(w: Float) = GLES20.glLineWidth(w.coerceIn(1f, maxLine))
+    private val ident = FloatArray(16).also { android.opengl.Matrix.setIdentityM(it, 0) }
+    /** Asks for another frame (the meshes not yet uploaded are drawn then). */
+    @Volatile var requestRender: () -> Unit = {}
 
-    private val vs = """uniform mat4 uMvp; attribute vec3 aPos; attribute vec3 aNrm; attribute vec3 aCol; varying vec3 vN; varying vec3 vP; varying vec3 vC;
-        void main(){ vN = aNrm; vP = aPos; vC = aCol; gl_PointSize = 7.0; gl_Position = uMvp * vec4(aPos,1.0); }"""
+    /** GPU buffers of one mesh: vertices, triangle indices, edge points, colours (0 = none). */
+    private class Gpu(val vbo: Int, val ibo: Int, val lbo: Int, val cbo: Int, val bytes: Long) { var pbo = 0 }
+    private val gpu = IdentityHashMap<FcMesh, Gpu>()
+    private var gpuObjs: List<RenderObj>? = null
+    /** Meshes are uploaded up to this many bytes per frame, so a large model appears progressively instead of freezing the view. */
+    private val uploadPerFrame = 48L shl 20
+    private var uploaded = 0L
+
+    private fun gpuOf(m: FcMesh): Gpu? {
+        gpu[m]?.let { return it }
+        if (uploaded >= uploadPerFrame) return null
+        val ids = IntArray(5); GLES20.glGenBuffers(5, ids, 0)
+        fun up(target: Int, id: Int, b: java.nio.Buffer, bytes: Int): Int { if (bytes == 0) return 0
+            b.position(0); GLES20.glBindBuffer(target, id); GLES20.glBufferData(target, bytes, b, GLES20.GL_STATIC_DRAW); return id }
+        while (GLES20.glGetError() != GLES20.GL_NO_ERROR) { }
+        fun sec(i: Int) = m.bytesOf(i) ?: ByteBuffer.allocateDirect(0)
+        val g = Gpu(up(GLES20.GL_ARRAY_BUFFER, ids[0], sec(0), m.vtx.capacity() * 4), up(GLES20.GL_ELEMENT_ARRAY_BUFFER, ids[1], sec(1), m.idx.capacity() * 4),
+            up(GLES20.GL_ARRAY_BUFFER, ids[2], sec(2), m.lines.capacity() * 4), m.colors?.let { up(GLES20.GL_ARRAY_BUFFER, ids[3], sec(4), it.capacity() * 4) } ?: 0, m.bytes)
+        g.pbo = up(GLES20.GL_ARRAY_BUFFER, ids[4], sec(3), m.points.capacity() * 4)
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0); GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0)
+        if (GLES20.glGetError() == GLES20.GL_OUT_OF_MEMORY) { GLES20.glDeleteBuffers(5, ids, 0); outOfGpu = true; uploaded = uploadPerFrame; return null }
+        for (k in 0..4) if (ids[k] != g.vbo && ids[k] != g.ibo && ids[k] != g.lbo && ids[k] != g.cbo && ids[k] != g.pbo) GLES20.glDeleteBuffers(1, ids, k)
+        uploaded += m.bytes; gpu[m] = g
+        return g
+    }
+    /** Buffer objects for the small per-frame geometry (grid, axes, boxes, background). Client-side arrays are not used at
+     *  all: mixed with buffer objects, some GL implementations (the emulator's) draw from a stale client array. */
+    private val scratch = IntArray(3)
+    private fun attrib(loc: Int, size: Int, stride: Int, b: java.nio.Buffer, slot: Int) {
+        if (scratch[slot] == 0) GLES20.glGenBuffers(1, scratch, slot)
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, scratch[slot]); b.position(0)
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, b.capacity() * (if (b is ByteBuffer) 1 else 4), b, GLES20.GL_STREAM_DRAW)
+        GLES20.glVertexAttribPointer(loc, size, GLES20.GL_FLOAT, false, stride, 0); GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0)
+    }
+    /** Drops the GPU copies of meshes no longer shown. */
+    private fun gpuPrune(os: List<RenderObj>) {
+        if (os === gpuObjs) return; gpuObjs = os; outOfGpu = false
+        val used = java.util.Collections.newSetFromMap(IdentityHashMap<FcMesh, Boolean>()).apply { os.forEach { add(it.mesh) } }
+        val it = gpu.entries.iterator()
+        while (it.hasNext()) { val (m, g) = it.next(); if (m !in used) { GLES20.glDeleteBuffers(5, intArrayOf(g.vbo, g.ibo, g.lbo, g.cbo, g.pbo), 0); it.remove() } }
+    }
+    /** The GPU's memory ran out: the rest of the model is not drawn. */
+    @Volatile var outOfGpu = false
+
+    /** View frustum planes (a b c d, inside: a x + b y + c z + d >= 0) of [vp]. */
+    private fun frustum(vp: FloatArray): Array<FloatArray> = Array(6) { i -> val r = i / 2; val sg = if (i % 2 == 0) 1f else -1f
+        FloatArray(4) { c -> vp[c * 4 + 3] + sg * vp[c * 4 + r] } }
+    private fun visible(o: RenderObj, pl: Array<FloatArray>): Boolean {
+        val a = o.min; val b = o.max; if (a[0] > b[0]) return true
+        for (p in pl) if (p[0] * (if (p[0] >= 0) b[0] else a[0]) + p[1] * (if (p[1] >= 0) b[1] else a[1]) + p[2] * (if (p[2] >= 0) b[2] else a[2]) + p[3] < 0) return false
+        return true
+    }
+
+    private val vs = """uniform mat4 uMvp; uniform mat4 uModel; attribute vec3 aPos; attribute vec3 aNrm; attribute vec3 aCol; varying vec3 vN; varying vec3 vP; varying vec3 vC;
+        void main(){ vN = (uModel * vec4(aNrm,0.0)).xyz; vP = (uModel * vec4(aPos,1.0)).xyz; vC = aCol; gl_PointSize = 7.0; gl_Position = uMvp * vec4(vP,1.0); }"""
     private val fs = """precision highp float; uniform vec4 uColor; uniform float uLit; uniform vec4 uClip; uniform float uVcol; uniform float uUseTex; uniform sampler2D uTex; uniform vec4 uTexBox; varying vec3 vN; varying vec3 vP; varying vec3 vC;
         void main(){ if (dot(uClip.xyz, vP) + uClip.w > 0.001) discard; vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n;
           float l = 0.35 + 0.45*max(dot(n, normalize(vec3(0.4,-0.6,0.8))),0.0) + 0.2*max(dot(n, normalize(vec3(-0.5,0.4,0.3))),0.0);
@@ -89,10 +136,11 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         GLES20.glClearColor(1f, 1f, 1f, 1f); GLES20.glEnable(GLES20.GL_DEPTH_TEST); GLES20.glDepthFunc(GLES20.GL_LEQUAL)
         prog = GLES20.glCreateProgram().also { GLES20.glAttachShader(it, sh(GLES20.GL_VERTEX_SHADER, vs)); GLES20.glAttachShader(it, sh(GLES20.GL_FRAGMENT_SHADER, fs)); GLES20.glLinkProgram(it) }
         aPos = GLES20.glGetAttribLocation(prog, "aPos"); aNrm = GLES20.glGetAttribLocation(prog, "aNrm")
-        uMvp = GLES20.glGetUniformLocation(prog, "uMvp"); uColor = GLES20.glGetUniformLocation(prog, "uColor"); uLit = GLES20.glGetUniformLocation(prog, "uLit"); uClip = GLES20.glGetUniformLocation(prog, "uClip")
+        uMvp = GLES20.glGetUniformLocation(prog, "uMvp"); uModel = GLES20.glGetUniformLocation(prog, "uModel"); uColor = GLES20.glGetUniformLocation(prog, "uColor"); uLit = GLES20.glGetUniformLocation(prog, "uLit"); uClip = GLES20.glGetUniformLocation(prog, "uClip")
         aCol = GLES20.glGetAttribLocation(prog, "aCol"); uVcol = GLES20.glGetUniformLocation(prog, "uVcol")
         uTex = GLES20.glGetUniformLocation(prog, "uTex"); uUseTex = GLES20.glGetUniformLocation(prog, "uUseTex"); uTexBox = GLES20.glGetUniformLocation(prog, "uTexBox")
-        texIds.clear()
+        val lr = FloatArray(2); GLES20.glGetFloatv(GLES20.GL_ALIASED_LINE_WIDTH_RANGE, lr, 0); maxLine = maxOf(1f, lr[1])
+        texIds.clear(); gpu.clear(); gpuObjs = null; scratch.fill(0)      // a new context: the old one's buffers are gone
     }
     override fun onSurfaceChanged(gl: GL10?, w: Int, h: Int) { GLES20.glViewport(0, 0, w, h); cam.w = w; cam.h = h; vw = w; vh = h }
     private fun col(c: Int, a: Float = 1f) = floatArrayOf(Color.red(c) / 255f, Color.green(c) / 255f, Color.blue(c) / 255f, a)
@@ -100,32 +148,43 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
     override fun onDrawFrame(gl: GL10?) {
         if (dark) GLES20.glClearColor(0.094f, 0.106f, 0.122f, 1f) else GLES20.glClearColor(1f, 1f, 1f, 1f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT or GLES20.GL_DEPTH_BUFFER_BIT)
-        GLES20.glUseProgram(prog)
+        GLES20.glUseProgram(prog); GLES20.glUniformMatrix4fv(uModel, 1, false, ident, 0)
         if (background != 0) drawBackground()
-        GLES20.glUniformMatrix4fv(uMvp, 1, false, cam.viewProj(), 0)
+        val vp = cam.viewProj()
+        GLES20.glUniformMatrix4fv(uMvp, 1, false, vp, 0)
         GLES20.glEnableVertexAttribArray(aPos)
         GLES20.glUniform4f(uClip, 0f, 0f, 0f, -1f)
         if (showGrid) drawGrid()
         clip?.let { GLES20.glUniform4f(uClip, it[0], it[1], it[2], it[3]) }
         val os = objs; val selO = selectedObjs; val selF = selectedFaces; val selE = selectedEdges; val hov = hover
         val style = drawStyle; val cols = colors; val transp = transparent; val fcs = faceColors
+        gpuPrune(os); uploaded = 0L
+        // objects with a face / edge drawn again (selected, preselected, coloured): only those walk their faces
+        val faceMarked = HashSet<String>().apply { selF.forEach { add(it.first) }; hov?.let { add(it.first) }; fcs.keys.forEach { add(it.first) } }
+        val edgeMarked = HashSet<String>().apply { selE.forEach { add(it.first) }; hov?.let { add(it.first) } }
+        val pl = frustum(vp); val shown = os.filter { visible(it, pl) }
+        var pending = false
         val faces = style != "Wireframe" && style != "Points"
         val edgesOn = style != "Shaded" && style != "Points"
         val lit = if (style == "No Shading" || style == "Flat Lines" || style == "Hidden Line") 0f else 1f
         GLES20.glEnable(GLES20.GL_POLYGON_OFFSET_FILL)
         GLES20.glEnableVertexAttribArray(aNrm)
         GLES20.glEnable(GLES20.GL_BLEND); GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA)
-        if (faces) for (o in os.sortedBy { it.name in transp || it.ghostOf != null }) {      // opaque first, then transparent
-            if (o.mesh.tris.isEmpty()) continue
-            bindTris(o)
+        if (faces) for (o in shown.sortedBy { it.name in transp || it.ghostOf != null }) {      // opaque first, then transparent
+            val m = o.mesh; if (!m.hasTris) continue
+            val g = gpuOf(m); if (g == null) { pending = true; continue }
+            GLES20.glUniformMatrix4fv(uModel, 1, false, o.model, 0)
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, g.vbo)
+            GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 24, 0); GLES20.glVertexAttribPointer(aNrm, 3, GLES20.GL_FLOAT, false, 24, 12)
+            GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, g.ibo)
             val a = if (dim) 0.35f else if (o.ghostOf != null) 0.45f else if (o.name in transp) 0.5f else 1f
             GLES20.glDepthMask(a == 1f)
             // result colourings (FEM results / pipelines, inspection) lie on the part they were computed on: drawn a
             // little nearer than plain faces so they win instead of z-fighting, still behind edges
-            GLES20.glPolygonOffset(if (o.colors != null) 1f else 2f, if (o.colors != null) 2f else 8f); GLES20.glUniform1f(uLit, lit)
+            GLES20.glPolygonOffset(if (g.cbo != 0) 1f else 2f, if (g.cbo != 0) 2f else 8f); GLES20.glUniform1f(uLit, lit)
             val base = if (o.ghostOf != null) 0xE0483A else if (style == "Hidden Line") (if (dark) 0x181B1F else 0xFFFFFF) else cols[o.name] ?: 0xCFD6DC
             GLES20.glUniform4fv(uColor, 1, col(if (o.name in selO) 0x9CC6EF else base, a), 0)
-            val vc = o.colors
+            val vc = g.cbo != 0 && o.name !in selO
             val tex = textures[o.name]?.takeIf { o.name !in selO && style != "Hidden Line" }
             if (tex != null) {
                 val id = texIds.getOrPut(tex) { val t = IntArray(1); GLES20.glGenTextures(1, t, 0); GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, t[0])
@@ -136,36 +195,51 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
                 val size = maxOf(o.max[0] - o.min[0], o.max[1] - o.min[1], o.max[2] - o.min[2], 1e-6f)
                 GLES20.glUniform4f(uTexBox, o.min[0], o.min[1], o.min[2], size); GLES20.glUniform1f(uUseTex, 1f)
             }
-            if (vc != null && o.name !in selO) { vc.position(0); GLES20.glEnableVertexAttribArray(aCol); GLES20.glVertexAttribPointer(aCol, 3, GLES20.GL_FLOAT, false, 12, vc); GLES20.glUniform1f(uVcol, 1f) }
-            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, o.mesh.tris.size / 7)
-            if (vc != null) { GLES20.glDisableVertexAttribArray(aCol); GLES20.glUniform1f(uVcol, 0f) }
+            if (vc) { GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, g.cbo); GLES20.glEnableVertexAttribArray(aCol); GLES20.glVertexAttribPointer(aCol, 3, GLES20.GL_FLOAT, false, 12, 0); GLES20.glUniform1f(uVcol, 1f) }
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, m.idxCount, GLES20.GL_UNSIGNED_INT, 0)
+            if (vc) { GLES20.glDisableVertexAttribArray(aCol); GLES20.glUniform1f(uVcol, 0f) }
             if (tex != null) GLES20.glUniform1f(uUseTex, 0f)
             GLES20.glPolygonOffset(0f, 0f)
-            for ((id, r) in o.faceRanges) {
+            if (o.ref in faceMarked || o.name in faceMarked) for ((id, rs) in m.faceRanges) {
                 val c = when { (o.ref to id) in selF -> 0x418FDE; hov == o.ref to "Face$id" -> 0xC3DCF5
                     style != "Hidden Line" && o.name !in selO -> fcs[o.name to id] ?: continue; else -> continue }
-                GLES20.glUniform4fv(uColor, 1, col(c, a), 0); GLES20.glDrawArrays(GLES20.GL_TRIANGLES, r.first, r.second)
+                GLES20.glUniform4fv(uColor, 1, col(c, a), 0)
+                for (r in rs) GLES20.glDrawElements(GLES20.GL_TRIANGLES, r[1], GLES20.GL_UNSIGNED_INT, r[0] * 4)
             }
             GLES20.glDepthMask(true)
         }
+        GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0)
         GLES20.glDisableVertexAttribArray(aNrm); GLES20.glVertexAttrib3f(aNrm, 0f, 0f, 1f)
         GLES20.glDisable(GLES20.GL_POLYGON_OFFSET_FILL); GLES20.glUniform1f(uLit, 0f)
-        for (o in os) {
-            if (o.mesh.edges.isEmpty()) continue
+        for (o in shown) {
+            val m = o.mesh; if (!m.hasEdges) continue
+            val g = gpuOf(m); if (g == null) { pending = true; continue }
+            GLES20.glUniformMatrix4fv(uModel, 1, false, o.model, 0)
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, g.lbo); GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, 0)
             // edges of solids stay dark on the light-grey faces; wires on their own need contrast with the background
-            val ec = when { o.ghostOf != null -> 0xB0281C; o.isSketch -> if (dark) 0x6FA8FF else 0x2A6FC9; dark && o.mesh.tris.isEmpty() -> 0xD0D7DE; else -> 0x2B3640 }
-            if (edgesOn || o.isSketch) drawSegments(o, null, ec, if (o.isSketch) 2.5f else 1.5f)
-            for ((id, _) in o.edgeRanges) {
+            val ec = when { o.ghostOf != null -> 0xB0281C; o.isSketch -> if (dark) 0x6FA8FF else 0x2A6FC9; dark && !m.hasTris -> 0xD0D7DE; else -> 0x2B3640 }
+            if (edgesOn || o.isSketch) { lineWidth(if (o.isSketch) 2.5f else 1.5f); GLES20.glUniform4fv(uColor, 1, col(ec), 0); GLES20.glDrawArrays(GLES20.GL_LINES, 0, m.lineCount) }
+            if (o.ref in edgeMarked) for ((id, rs) in m.edgeRanges) {
                 val c = when { (o.ref to id) in selE -> 0x418FDE; hov == o.ref to "Edge$id" -> 0x66C7C9; else -> continue }
-                drawSegments(o, id, c, 4f)
+                lineWidth(4f); GLES20.glUniform4fv(uColor, 1, col(c), 0)
+                for (r in rs) GLES20.glDrawArrays(GLES20.GL_LINES, r[0], r[1])
             }
+            lineWidth(1f)
         }
-        for (o in os) if (style == "Points" || (o.mesh.tris.isEmpty() && o.mesh.edges.isEmpty())) {  // point clouds always
-            val vc = o.colors?.takeIf { o.mesh.tris.isEmpty() && o.name !in selO }
-            if (vc != null) { vc.position(0); GLES20.glEnableVertexAttribArray(aCol); GLES20.glVertexAttribPointer(aCol, 3, GLES20.GL_FLOAT, false, 12, vc); GLES20.glUniform1f(uVcol, 1f) }
-            drawPoints(o.mesh.verts, if (o.name in selO) 0x418FDE else cols[o.name] ?: if (dark) 0xD0D7DE else 0x2B3640)
-            if (vc != null) { GLES20.glDisableVertexAttribArray(aCol); GLES20.glUniform1f(uVcol, 0f) }
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0)
+        for (o in shown) { val m = o.mesh
+            if (!(style == "Points" || (!m.hasTris && !m.hasEdges)) || m.pointCount == 0) continue  // point clouds always
+            GLES20.glUniformMatrix4fv(uModel, 1, false, o.model, 0)
+            val g = gpuOf(m) ?: run { pending = true; null } ?: continue
+            val vc = g.cbo != 0 && !m.hasTris && o.name !in selO
+            if (vc) { GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, g.cbo); GLES20.glEnableVertexAttribArray(aCol); GLES20.glVertexAttribPointer(aCol, 3, GLES20.GL_FLOAT, false, 12, 0); GLES20.glUniform1f(uVcol, 1f) }
+            GLES20.glUniform4fv(uColor, 1, col(if (o.name in selO) 0x418FDE else cols[o.name] ?: if (dark) 0xD0D7DE else 0x2B3640), 0)
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, g.pbo); GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 16, 0); GLES20.glDrawArrays(GLES20.GL_POINTS, 0, m.pointCount)
+            if (vc) { GLES20.glDisableVertexAttribArray(aCol); GLES20.glUniform1f(uVcol, 0f) }
+            GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0)
         }
+        GLES20.glUniformMatrix4fv(uModel, 1, false, ident, 0)
+        if (pending) requestRender()
         GLES20.glDisable(GLES20.GL_BLEND)
         GLES20.glUniform4f(uClip, 0f, 0f, 0f, -1f)
         for ((mn, mx) in boxes) drawBox(mn, mx)
@@ -188,7 +262,7 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST); GLES20.glUniform1f(uLit, 0f); GLES20.glUniform1f(uVcol, 1f); GLES20.glUniform4f(uClip, 0f, 0f, 0f, -1f)
         GLES20.glUniform4f(uColor, 1f, 1f, 1f, 1f)
         GLES20.glEnableVertexAttribArray(aPos); GLES20.glEnableVertexAttribArray(aCol)
-        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, pb); GLES20.glVertexAttribPointer(aCol, 3, GLES20.GL_FLOAT, false, 12, cb)
+        attrib(aPos, 3, 12, pb, 0); attrib(aCol, 3, 12, cb, 1)
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, pts.size / 3)
         GLES20.glDisableVertexAttribArray(aCol); GLES20.glUniform1f(uVcol, 0f); GLES20.glEnable(GLES20.GL_DEPTH_TEST)
     }
@@ -196,14 +270,10 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
     private fun lines(pts: FloatArray, color: Int, width: Float, mode: Int = GLES20.GL_LINES) {
         if (pts.isEmpty()) return
         val b = ByteBuffer.allocateDirect(pts.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(pts); position(0) }
-        GLES20.glLineWidth(width); GLES20.glUniform4fv(uColor, 1, col(color), 0)
-        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, b); GLES20.glDrawArrays(mode, 0, pts.size / 3)
-        GLES20.glLineWidth(1f)
+        lineWidth(width); GLES20.glUniform4fv(uColor, 1, col(color), 0)
+        attrib(aPos, 3, 12, b, 0); GLES20.glDrawArrays(mode, 0, pts.size / 3)
+        lineWidth(1f)
     }
-
-    /** Vertex records are [x y z id]. */
-    private fun drawPoints(v: FloatArray, color: Int) =
-        lines(FloatArray(v.size / 4 * 3) { v[it / 3 * 4 + it % 3] }, color, 1f, GLES20.GL_POINTS)
 
     private fun drawBox(a: FloatArray, b: FloatArray) {
         val c = listOf(floatArrayOf(a[0], a[1], a[2]), floatArrayOf(b[0], a[1], a[2]), floatArrayOf(b[0], b[1], a[2]), floatArrayOf(a[0], b[1], a[2]),
@@ -218,22 +288,6 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         val bmp = android.graphics.Bitmap.createBitmap(vw, vh, android.graphics.Bitmap.Config.ARGB_8888); bmp.copyPixelsFromBuffer(buf)
         val flip = android.graphics.Matrix().apply { preScale(1f, -1f) }
         return android.graphics.Bitmap.createBitmap(bmp, 0, 0, vw, vh, flip, false)
-    }
-
-    private fun bindTris(o: RenderObj) {
-        o.tris.position(0); GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 28, o.tris)
-        o.tris.position(3); GLES20.glVertexAttribPointer(aNrm, 3, GLES20.GL_FLOAT, false, 28, o.tris)
-    }
-
-    /** Expands [x1 y1 z1 x2 y2 z2 id] records into a temporary GL_LINES buffer (only for the requested edge, or all). */
-    private fun drawSegments(o: RenderObj, edge: Int?, color: Int, width: Float) {
-        val a = o.mesh.edges; val out = ArrayList<Float>(); var i = 0
-        while (i + 6 < a.size) { if (edge == null || a[i + 6].toInt() == edge) { for (k in 0..5) out.add(a[i + k]) }; i += 7 }
-        if (out.isEmpty()) return
-        val b = ByteBuffer.allocateDirect(out.size * 4).order(ByteOrder.nativeOrder()).asFloatBuffer().apply { put(out.toFloatArray()); position(0) }
-        GLES20.glLineWidth(width); GLES20.glUniform4fv(uColor, 1, col(color), 0)
-        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, b); GLES20.glDrawArrays(GLES20.GL_LINES, 0, out.size / 3)
-        GLES20.glLineWidth(1f)
     }
 
     private val grid: FloatBuffer by lazy {
@@ -256,18 +310,18 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         GLES20.glUniformMatrix4fv(uMvp, 1, false, mvp, 0)
         // the grid never occludes geometry: draw it without writing depth
         GLES20.glDepthMask(false)
-        GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, grid); GLES20.glDrawArrays(GLES20.GL_LINES, 0, grid.capacity() / 3)
+        attrib(aPos, 3, 12, grid, 0); GLES20.glDrawArrays(GLES20.GL_LINES, 0, grid.capacity() / 3)
         GLES20.glDepthMask(true)
         GLES20.glUniformMatrix4fv(uMvp, 1, false, cam.viewProj(), 0)
     }
     private fun drawAxes() {
         val b = ByteBuffer.allocateDirect(18 * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
-        GLES20.glLineWidth(2.5f)
+        lineWidth(2.5f)
         val l = if (axisCross) cam.dist * 2f else 30f * zoomStep(); val s0 = if (axisCross) -l else 0f
         for ((v, c) in listOf(floatArrayOf(1f, 0f, 0f) to 0xE0403F, floatArrayOf(0f, 1f, 0f) to 0x47AB72, floatArrayOf(0f, 0f, 1f) to 0x418FDE)) {
             b.position(0); b.put(floatArrayOf(v[0] * s0, v[1] * s0, v[2] * s0, v[0] * l, v[1] * l, v[2] * l)); b.position(0)
-            GLES20.glUniform4fv(uColor, 1, col(c), 0); GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, b); GLES20.glDrawArrays(GLES20.GL_LINES, 0, 2)
+            GLES20.glUniform4fv(uColor, 1, col(c), 0); attrib(aPos, 3, 12, b, 0); GLES20.glDrawArrays(GLES20.GL_LINES, 0, 2)
         }
-        GLES20.glLineWidth(1f)
+        lineWidth(1f)
     }
 }

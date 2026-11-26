@@ -94,23 +94,30 @@ bool Renderer::init() {
 
 void Renderer::upload(Scene& s) {
     if (uploaded == s.version && uploadedScene == &s) return;
-    if (!buffers.empty()) glDeleteBuffers((GLsizei)buffers.size(), buffers.data());
-    if (!arrays.empty()) glDeleteVertexArrays((GLsizei)arrays.size(), arrays.data());
-    buffers.clear(); arrays.clear();
+    // the meshes no longer shown are dropped
+    for (size_t i = 0; i < ups.size();) {
+        bool used = false; auto g = ups[i].g.lock();
+        if (g) for (const auto& m : s.meshes) if (m.g == g) { used = true; break; }
+        if (used) { ++i; continue; }
+        glDeleteVertexArrays(2, ups[i].arrays); glDeleteBuffers(3, ups[i].buffers);
+        if (g) g->vao = g->vbo = g->ibo = g->evao = g->evbo = 0;
+        ups[i] = ups.back(); ups.pop_back();
+    }
     for (auto& m : s.meshes) {
-        glGenVertexArrays(1, &m.vao); glGenBuffers(1, &m.vbo); arrays.push_back(m.vao); buffers.push_back(m.vbo);
-        glBindVertexArray(m.vao); glBindBuffer(GL_ARRAY_BUFFER, m.vbo);
-        glBufferData(GL_ARRAY_BUFFER, m.tris.size() * 4, m.tris.data(), GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0); glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 28, (void*)0);
-        glEnableVertexAttribArray(1); glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 28, (void*)12);
-        // edges: segments of 7 floats -> two xyz vertices each
-        std::vector<float> ev; ev.reserve(m.edgeSegments() * 6);
-        for (size_t i = 0; i + 6 < m.edges.size(); i += 7) ev.insert(ev.end(), m.edges.begin() + i, m.edges.begin() + i + 6);
-        glGenVertexArrays(1, &m.evao); glGenBuffers(1, &m.evbo); arrays.push_back(m.evao); buffers.push_back(m.evbo);
-        glBindVertexArray(m.evao); glBindBuffer(GL_ARRAY_BUFFER, m.evbo);
-        glBufferData(GL_ARRAY_BUFFER, ev.size() * 4, ev.data(), GL_STATIC_DRAW);
+        Geom& g = *m.g; if (g.vao) continue;
+        glGenVertexArrays(1, &g.vao); glGenBuffers(1, &g.vbo); glGenBuffers(1, &g.ibo);
+        glBindVertexArray(g.vao); glBindBuffer(GL_ARRAY_BUFFER, g.vbo);
+        glBufferData(GL_ARRAY_BUFFER, g.vtx.size() * 4, g.vtx.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0); glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 24, (void*)0);
+        glEnableVertexAttribArray(1); glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 24, (void*)12);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g.ibo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, g.idx.size() * 4, g.idx.data(), GL_STATIC_DRAW);
+        glGenVertexArrays(1, &g.evao); glGenBuffers(1, &g.evbo);
+        glBindVertexArray(g.evao); glBindBuffer(GL_ARRAY_BUFFER, g.evbo);
+        glBufferData(GL_ARRAY_BUFFER, g.lines.size() * 4, g.lines.data(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(0); glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, (void*)0);
         glDisableVertexAttribArray(1);
+        ups.push_back(Up{m.g, {g.vao, g.evao}, {g.vbo, g.ibo, g.evbo}});
     }
     glBindVertexArray(0); uploaded = s.version; uploadedScene = &s;
 }
@@ -128,30 +135,36 @@ void Renderer::beginView(GLuint fbo, int x, int y, int w, int h, bool doClear) {
 }
 
 void Renderer::drawScene(const Scene& s, const Pose& model, const M4& vp, V3 eye, ElemRef hover, const std::vector<ElemRef>& sel, float fade) {
-    M4 mm = fromPose(model); M4 mvp = mul(vp, mm);
+    M4 mm = fromPose(model);
     glUseProgram(meshProg);
-    glUniformMatrix4fv(uMvp, 1, GL_FALSE, mvp.m); glUniformMatrix4fv(uModel, 1, GL_FALSE, mm.m); glUniform3f(uEye, eye.x, eye.y, eye.z);
+    glUniform3f(uEye, eye.x, eye.y, eye.z);
     glUniform1f(glGetUniformLocation(meshProg, "uGamma"), gamma); glUniform1f(glGetUniformLocation(meshProg, "uUseTex"), 0.f);
     glUniform1f(glGetUniformLocation(meshProg, "uFadeUv"), 0.f);
+    // each object's mesh at its placement in the model
+    auto place = [&](const Mesh& m, GLint mvpLoc, GLint modelLoc) {
+        M4 w = m.placed ? mul(mm, m.place) : mm; M4 mvp = mul(vp, w);
+        glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, mvp.m); if (modelLoc >= 0) glUniformMatrix4fv(modelLoc, 1, GL_FALSE, w.m);
+    };
     const V3 hoverCol{0.73f, 0.86f, 0.96f}, selCol{0.26f, 0.56f, 0.87f};
-    auto faceRange = [&](const Mesh& m, int id, int& first, int& count) {
-        if (id <= 0 || id >= (int)m.faceFirst.size() || m.faceFirst[id] < 0) return false;
-        first = m.faceFirst[id]; count = m.faceCount[id]; return true;
+    auto faceRanges = [&](const Mesh& m, int id, V3 col, float a) {
+        const auto& f = m.g->faces;
+        for (size_t k = 0; k + 2 < f.size(); k += 3) if (f[k] == id) {
+            glUniform4f(uColor, col.x, col.y, col.z, a); glDrawElements(GL_TRIANGLES, f[k + 2], GL_UNSIGNED_INT, (void*)(size_t)(f[k + 1] * 4)); }
     };
     glEnable(GL_POLYGON_OFFSET_FILL); glPolygonOffset(1.f, 2.f);
     // opaque meshes first, then the see-through ones, blended over them without hiding what is behind
     for (int pass = 0; pass < 2; ++pass) {
         if (pass == 1) { glEnable(GL_BLEND); glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA); glDepthMask(GL_FALSE); }
         for (size_t i = 0; i < s.meshes.size(); ++i) {
-            const Mesh& m = s.meshes[i]; if (!m.triVerts()) continue;
+            const Mesh& m = s.meshes[i]; if (!m.triIndices()) continue;
             float a = m.alpha * fade; if ((a < 0.999f) != (pass == 1)) continue;
-            glBindVertexArray(m.vao); glEnableVertexAttribArray(1);
+            place(m, uMvp, uModel);
+            glBindVertexArray(m.g->vao); glEnableVertexAttribArray(1);
             glUniform1f(uLit, 1.f); glUniform4f(uColor, m.color[0], m.color[1], m.color[2], a);
-            glDrawArrays(GL_TRIANGLES, 0, (GLsizei)m.triVerts());
-            int f, c; float ha = std::max(a, 0.7f);
-            if (hover.mesh == (int)i && hover.kind == 'F' && faceRange(m, hover.id, f, c)) { glUniform4f(uColor, hoverCol.x, hoverCol.y, hoverCol.z, ha); glDrawArrays(GL_TRIANGLES, f, c); }
-            for (const ElemRef& r : sel)
-                if (r.mesh == (int)i && r.kind == 'F' && faceRange(m, r.id, f, c)) { glUniform4f(uColor, selCol.x, selCol.y, selCol.z, ha); glDrawArrays(GL_TRIANGLES, f, c); }
+            glDrawElements(GL_TRIANGLES, (GLsizei)m.triIndices(), GL_UNSIGNED_INT, (void*)0);
+            float ha = std::max(a, 0.7f);
+            if (hover.mesh == (int)i && hover.kind == 'F') faceRanges(m, hover.id, hoverCol, ha);
+            for (const ElemRef& r : sel) if (r.mesh == (int)i && r.kind == 'F') faceRanges(m, r.id, selCol, ha);
         }
     }
     glDepthMask(GL_TRUE);
@@ -159,16 +172,17 @@ void Renderer::drawScene(const Scene& s, const Pose& model, const M4& vp, V3 eye
     if (fade < 0.999f) { glEnable(GL_BLEND); glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA); } else glDisable(GL_BLEND);
     glUniform1f(uLit, 0.f); glVertexAttrib3f(1, 0.f, 0.f, 1.f);                       // edges carry no normals
     for (size_t i = 0; i < s.meshes.size(); ++i) {
-        const Mesh& m = s.meshes[i]; if (!m.edgeSegments()) continue;
-        glBindVertexArray(m.evao);
+        const Mesh& m = s.meshes[i]; if (!m.linePoints()) continue;
+        place(m, uMvp, uModel);
+        glBindVertexArray(m.g->evao);
         // a solid's edges dark on its faces; a wire alone (Draft line, sketch) light, to stand out in the room
-        if (m.triVerts()) glUniform4f(uColor, 0.17f, 0.21f, 0.25f, fade); else glUniform4f(uColor, 0.86f, 0.90f, 0.95f, fade);
-        glLineWidth(m.triVerts() ? 1.f : 2.f);
-        glDrawArrays(GL_LINES, 0, (GLsizei)(m.edgeSegments() * 2));
+        if (m.triIndices()) glUniform4f(uColor, 0.17f, 0.21f, 0.25f, fade); else glUniform4f(uColor, 0.86f, 0.90f, 0.95f, fade);
+        glLineWidth(m.triIndices() ? 1.f : 2.f);
+        glDrawArrays(GL_LINES, 0, (GLsizei)m.linePoints());
         auto edge = [&](int id, V3 col) {
-            if (id <= 0 || id >= (int)m.edgeFirst.size() || m.edgeFirst[id] < 0) return;
-            glUniform4f(uColor, col.x, col.y, col.z, 1.f); glLineWidth(4.f);
-            glDrawArrays(GL_LINES, m.edgeFirst[id] * 2, m.edgeCount[id] * 2);
+            const auto& e = m.g->edges;
+            for (size_t k = 0; k + 2 < e.size(); k += 3) if (e[k] == id) {
+                glUniform4f(uColor, col.x, col.y, col.z, 1.f); glLineWidth(4.f); glDrawArrays(GL_LINES, e[k + 1], e[k + 2]); }
         };
         if (hover.mesh == (int)i && hover.kind == 'E') edge(hover.id, V3{0.40f, 0.78f, 0.79f});
         for (const ElemRef& r : sel) if (r.mesh == (int)i && r.kind == 'E') edge(r.id, selCol);

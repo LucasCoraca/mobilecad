@@ -1,0 +1,4 @@
+• Very large models open whole: a STEP assembly of more than 10,000 parts that stopped after a few hundred parts is now drawn completely on a phone with enough memory. The 3D view no longer keeps the model in the app's limited Java memory, so the phone's full RAM is used, as on the desktop.
+• Repeated parts (screws, nuts, profiles) are triangulated once and shown at each of their places: a large assembly needs a fraction of the memory and time.
+• Tapping a part in a large model answers at once: only what is under the finger is checked, front to back.
+• Surfaces are shaded smoothly, with the normals desktop FreeCAD uses.

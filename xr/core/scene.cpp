@@ -1,4 +1,6 @@
 #include "scene.h"
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 
@@ -12,35 +14,54 @@ static bool readBlock(const uint8_t*& p, const uint8_t* end, std::vector<float>&
     return true;
 }
 
+void Geom::bounds() {
+    for (size_t i = 0; i + 5 < vtx.size(); i += 6)
+        for (int k = 0; k < 3; ++k) { float v = vtx[i + k]; if (std::isfinite(v)) { (&lo.x)[k] = std::min((&lo.x)[k], v); (&hi.x)[k] = std::max((&hi.x)[k], v); } }
+}
+
 bool Scene::addTessellation(const std::string& name, const uint8_t* data, size_t size, const float rgb[3]) {
-    Mesh m; m.name = name;
-    if (rgb) for (int k = 0; k < 3; ++k) m.color[k] = rgb[k];
+    std::vector<float> tris, edges;
     const uint8_t* p = data; const uint8_t* end = data + size;
-    if (!readBlock(p, end, m.tris) || !readBlock(p, end, m.edges)) return false;   // vertexes/colours that follow are not used in XR
-    if (m.tris.empty() && m.edges.empty()) return false;
-    for (const auto* arr : {&m.tris, &m.edges})
-        for (size_t i = 0; i + 6 < arr->size(); i += 7)
-            for (int k = 0; k < 3; ++k) {
-                float v = (*arr)[i + k]; if (!std::isfinite(v)) continue;
-                (&min.x)[k] = std::min((&min.x)[k], v); (&max.x)[k] = std::max((&max.x)[k], v);
-                if (arr == &m.edges) { float w = (*arr)[i + 3 + k]; if (std::isfinite(w)) { (&min.x)[k] = std::min((&min.x)[k], w); (&max.x)[k] = std::max((&max.x)[k], w); } }
-            }
-    for (size_t i = 0; i + 6 < m.tris.size(); i += 7)
-        for (int k = 0; k < 3; ++k) { float v = m.tris[i + k]; if (std::isfinite(v)) { (&m.lo.x)[k] = std::min((&m.lo.x)[k], v); (&m.hi.x)[k] = std::max((&m.hi.x)[k], v); } }
-    for (size_t v = 0; v < m.triVerts(); ++v) {                      // vertices come grouped by face
-        int id = (int)m.tris[v * 7 + 6]; if (id < 0 || id > 1000000) continue;
-        if ((int)m.faceFirst.size() <= id) { m.faceFirst.resize(id + 1, -1); m.faceCount.resize(id + 1, 0); }
-        if (m.faceFirst[id] < 0) m.faceFirst[id] = (int)v;
-        m.faceCount[id] = (int)v - m.faceFirst[id] + 1;
+    if (!readBlock(p, end, tris) || !readBlock(p, end, edges)) return false;   // vertexes/colours that follow are not used in XR
+    if (tris.empty() && edges.empty()) return false;
+    auto g = std::make_shared<Geom>();
+    for (size_t i = 0; i + 6 < tris.size(); i += 7) {               // corners come grouped by face
+        int id = (int)tris[i + 6]; uint32_t v = (uint32_t)(i / 7);
+        g->vtx.insert(g->vtx.end(), tris.begin() + i, tris.begin() + i + 6); g->idx.push_back(v);
+        if (v % 3 == 0) { if (g->faces.empty() || g->faces[g->faces.size() - 3] != id) g->faces.insert(g->faces.end(), {id, (int)v, 0}); g->faces.back() += 3; }
     }
-    for (size_t sgm = 0; sgm < m.edgeSegments(); ++sgm) {           // segments come grouped by edge
-        int id = (int)m.edges[sgm * 7 + 6]; if (id < 0 || id > 1000000) continue;
-        if ((int)m.edgeFirst.size() <= id) { m.edgeFirst.resize(id + 1, -1); m.edgeCount.resize(id + 1, 0); }
-        if (m.edgeFirst[id] < 0) m.edgeFirst[id] = (int)sgm;
-        m.edgeCount[id] = (int)sgm - m.edgeFirst[id] + 1;
+    for (size_t i = 0; i + 6 < edges.size(); i += 7) {              // segments come grouped by edge
+        int id = (int)edges[i + 6];
+        g->lines.insert(g->lines.end(), edges.begin() + i, edges.begin() + i + 6);
+        if (g->edges.empty() || g->edges[g->edges.size() - 3] != id) g->edges.insert(g->edges.end(), {id, (int)(i / 7 * 2), 0});
+        g->edges.back() += 2;
     }
-    meshes.push_back(std::move(m)); ++version;
+    g->bounds();
+    addMesh(name, g, nullptr, rgb, 1.f);
     return true;
+}
+
+void Scene::addMesh(const std::string& name, std::shared_ptr<Geom> g, const float* place, const float rgb[3], float alpha) {
+    Mesh m; m.name = name; m.g = std::move(g); m.alpha = alpha;
+    if (rgb) for (int k = 0; k < 3; ++k) m.color[k] = rgb[k];
+    if (place) { std::memcpy(m.place.m, place, 64); M4 id = identity(); m.placed = std::memcmp(place, id.m, 64) != 0; }
+    const Geom& G = *m.g;
+    auto grow = [&](V3 w, V3& a, V3& b) { for (int k = 0; k < 3; ++k) { (&a.x)[k] = std::min((&a.x)[k], (&w.x)[k]); (&b.x)[k] = std::max((&b.x)[k], (&w.x)[k]); } };
+    if (G.lo.x <= G.hi.x)
+        for (int c = 0; c < 8; ++c) { V3 w = m.at({c & 1 ? G.hi.x : G.lo.x, c & 2 ? G.hi.y : G.lo.y, c & 4 ? G.hi.z : G.lo.z}); grow(w, m.lo, m.hi); grow(w, min, max); }
+    for (size_t i = 0; i + 2 < G.lines.size(); i += 3) {           // wires alone (sketches, Draft lines) have extent too
+        V3 w = m.at({G.lines[i], G.lines[i + 1], G.lines[i + 2]}); if (std::isfinite(w.x) && std::isfinite(w.y) && std::isfinite(w.z)) grow(w, min, max); }
+    meshes.push_back(std::move(m)); ++version;
+}
+
+/** [p] in the coordinates of [m]'s mesh (the inverse of its placement: rotation, uniform scale, translation). */
+static V3 toLocal(const Mesh& m, V3 p, bool point) {
+    if (!m.placed) return p;
+    const float* a = m.place.m;
+    V3 q = point ? V3{p.x - a[12], p.y - a[13], p.z - a[14]} : p;
+    V3 c0{a[0], a[1], a[2]}, c1{a[4], a[5], a[6]}, c2{a[8], a[9], a[10]};
+    float s2 = dot(c0, c0); if (s2 < 1e-30f) return q;
+    return V3{dot(c0, q), dot(c1, q), dot(c2, q)} * (1.f / s2);
 }
 
 /** The ray o + t d meets the box within [0, maxT] (slab test). */
@@ -58,17 +79,24 @@ static bool boxRay(V3 lo, V3 hi, V3 o, V3 d, float maxT) {
 Hit Scene::pick(V3 o, V3 d, float maxT) const {
     Hit best; best.t = maxT;
     for (size_t mi = 0; mi < meshes.size(); ++mi) {
-        if (!boxRay(meshes[mi].lo, meshes[mi].hi, o, d, best.t)) continue;
-        const auto& t = meshes[mi].tris;
-        for (size_t i = 0; i + 20 < t.size(); i += 21) {               // Möller–Trumbore
-            V3 a{t[i], t[i + 1], t[i + 2]}, b{t[i + 7], t[i + 8], t[i + 9]}, c{t[i + 14], t[i + 15], t[i + 16]};
-            V3 e1 = b - a, e2 = c - a, h = cross(d, e2); float det = dot(e1, h);
-            if (std::fabs(det) < 1e-12f) continue;
-            float f = 1.f / det; V3 s = o - a; float u = f * dot(s, h); if (u < 0 || u > 1) continue;
-            V3 q = cross(s, e1); float v = f * dot(d, q); if (v < 0 || u + v > 1) continue;
-            float tt = f * dot(e2, q);
-            if (tt > 1e-6f && tt < best.t) { best.t = tt; best.mesh = (int)mi; best.face = (int)t[i + 6]; best.point = o + d * tt; best.normal = norm(cross(e1, e2)); }
-        }
+        const Mesh& m = meshes[mi]; if (!m.triIndices() || !boxRay(m.lo, m.hi, o, d, best.t)) continue;
+        // in the mesh's coordinates: distances along the ray are the same (rigid placement)
+        V3 lo = toLocal(m, o, true), ld = toLocal(m, d, false);
+        const Geom& g = *m.g; const float* v = g.vtx.data();
+        for (size_t f = 0; f + 2 < g.faces.size(); f += 3)
+            for (int i = g.faces[f + 1], e = i + g.faces[f + 2]; i + 2 < e; i += 3) {   // Möller–Trumbore
+                const float *pa = v + 6 * g.idx[i], *pb = v + 6 * g.idx[i + 1], *pc = v + 6 * g.idx[i + 2];
+                V3 a{pa[0], pa[1], pa[2]}, b{pb[0], pb[1], pb[2]}, c{pc[0], pc[1], pc[2]};
+                V3 e1 = b - a, e2 = c - a, h = cross(ld, e2); float det = dot(e1, h);
+                if (std::fabs(det) < 1e-12f) continue;
+                float fi = 1.f / det; V3 s = lo - a; float u = fi * dot(s, h); if (u < 0 || u > 1) continue;
+                V3 q = cross(s, e1); float w = fi * dot(ld, q); if (w < 0 || u + w > 1) continue;
+                float tt = fi * dot(e2, q);
+                if (tt > 1e-6f && tt < best.t) {
+                    best.t = tt; best.mesh = (int)mi; best.face = g.faces[f]; best.point = o + d * tt;
+                    best.normal = norm(m.at(cross(e1, e2)) - m.at(V3{}));
+                }
+            }
     }
     if (best.mesh < 0) best.t = 0;
     return best;
@@ -77,22 +105,25 @@ Hit Scene::pick(V3 o, V3 d, float maxT) const {
 Hit Scene::pickEdge(V3 o, V3 d, float tanTol, float maxT) const {
     Hit best; float bestScore = 1e30f;
     for (size_t mi = 0; mi < meshes.size(); ++mi) {
-        const auto& e = meshes[mi].edges;
-        for (size_t i = 0; i + 6 < e.size(); i += 7) {
-            V3 a{e[i], e[i + 1], e[i + 2]}, b{e[i + 3], e[i + 4], e[i + 5]}, u = b - a;
-            // closest points between the ray o + t d and the segment a + s u
-            float uu = dot(u, u), ud = dot(u, d); V3 w = a - o;
-            float denom = uu - ud * ud;                                   // |d| = 1
-            float s = 0, t = 0;
-            if (uu < 1e-12f) { s = 0; t = dot(w, d); }
-            else if (std::fabs(denom) < 1e-9f) { s = 0; t = dot(w, d); }
-            else { s = (ud * dot(w, d) - dot(w, u)) / denom; s = std::max(0.f, std::min(1.f, s)); t = dot(a + u * s - o, d); }
-            if (t <= 1e-6f || t > maxT) continue;
-            V3 p = a + u * s; float dist = len(p - (o + d * t));
-            if (dist > tanTol * t) continue;
-            float score = dist / (tanTol * t) + t * 1e-6f;                 // closest to the ray, then nearest
-            if (score < bestScore) { bestScore = score; best.mesh = (int)mi; best.face = (int)e[i + 6]; best.t = t; best.point = p; }
-        }
+        const Mesh& m = meshes[mi]; if (!m.linePoints()) continue;
+        const Geom& g = *m.g;
+        for (size_t k = 0; k + 2 < g.edges.size(); k += 3)
+            for (int j = g.edges[k + 1], e = j + g.edges[k + 2]; j + 1 < e; j += 2) {
+                const float* L = g.lines.data() + 3 * j;
+                V3 a = m.at({L[0], L[1], L[2]}), b = m.at({L[3], L[4], L[5]}), u = b - a;
+                // closest points between the ray o + t d and the segment a + s u
+                float uu = dot(u, u), ud = dot(u, d); V3 w = a - o;
+                float denom = uu - ud * ud;                                   // |d| = 1
+                float s = 0, t = 0;
+                if (uu < 1e-12f) { s = 0; t = dot(w, d); }
+                else if (std::fabs(denom) < 1e-9f) { s = 0; t = dot(w, d); }
+                else { s = (ud * dot(w, d) - dot(w, u)) / denom; s = std::max(0.f, std::min(1.f, s)); t = dot(a + u * s - o, d); }
+                if (t <= 1e-6f || t > maxT) continue;
+                V3 p = a + u * s; float dist = len(p - (o + d * t));
+                if (dist > tanTol * t) continue;
+                float score = dist / (tanTol * t) + t * 1e-6f;                 // closest to the ray, then nearest
+                if (score < bestScore) { bestScore = score; best.mesh = (int)mi; best.face = g.edges[k]; best.t = t; best.point = p; }
+            }
     }
     return best;
 }
@@ -117,19 +148,6 @@ bool Scene::loadBundle(const std::string& path) {
         addTessellation(name, p, sz, rgb); p += sz;
     }
     return !meshes.empty();
-}
-
-bool Scene::writeBundle(const std::string& path, const Scene& s) {
-    FILE* f = std::fopen(path.c_str(), "wb"); if (!f) return false;
-    std::fwrite("MCXR1", 1, 5, f); uint32_t c = (uint32_t)s.meshes.size(); std::fwrite(&c, 4, 1, f);
-    for (const auto& m : s.meshes) {
-        uint16_t nl = (uint16_t)m.name.size(); std::fwrite(&nl, 2, 1, f); std::fwrite(m.name.data(), 1, nl, f);
-        std::fwrite(m.color, 4, 3, f);
-        int32_t nt = (int32_t)m.tris.size(), ne = (int32_t)m.edges.size(); uint32_t sz = 8 + 4 * (nt + ne);
-        std::fwrite(&sz, 4, 1, f); std::fwrite(&nt, 4, 1, f); std::fwrite(m.tris.data(), 4, nt, f);
-        std::fwrite(&ne, 4, 1, f); std::fwrite(m.edges.data(), 4, ne, f);
-    }
-    std::fclose(f); return true;
 }
 
 }  // namespace mcxr

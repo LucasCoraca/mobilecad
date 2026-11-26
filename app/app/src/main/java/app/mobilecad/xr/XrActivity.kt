@@ -70,7 +70,8 @@ class XrActivity : ComponentActivity() {
     private external fun nativeStartXr()
     private external fun nativeStop()
     private external fun nativeBeginScene(title: String)
-    private external fun nativeAddMesh(name: String, tris: FloatArray, edges: FloatArray, r: Float, g: Float, b: Float, alpha: Float)
+    private external fun nativeAddMesh(name: String, key: String, vtx: java.nio.ByteBuffer?, idx: java.nio.ByteBuffer?, faces: IntArray, lines: java.nio.ByteBuffer?,
+                                       edges: IntArray, place: FloatArray?, r: Float, g: Float, b: Float, alpha: Float)
     private external fun nativeSetView(hoverObj: String, hoverSub: String, fade: Float, lines: FloatArray, dots: FloatArray, labelPos: FloatArray, labelText: Array<String>)
     private external fun nativeSetSketch(pixels: java.nio.ByteBuffer?, w: Int, h: Int, corners: FloatArray)
     private external fun nativeSetSketchLabels(pixels: java.nio.ByteBuffer?, w: Int, h: Int, labels: FloatArray)
@@ -139,12 +140,12 @@ class XrActivity : ComponentActivity() {
             val meshes = app.meshes
             nativeBeginScene(doc)
             for ((name, m) in meshes) {
-                if (m.tris.isEmpty() && m.edges.isEmpty()) continue
+                val mesh = m.mesh; if (!mesh.hasTris && !mesh.hasEdges) continue
                 // as MobileCAD's view draws them: a failed feature's last good shape red and see-through, transparent objects
                 val ghost = app.ghosts.containsKey(name)
                 val c = if (ghost) 0xE0403F else app.colors[name] ?: 0xCFD6DC
                 val alpha = if (ghost) 0.45f else if (name in app.transparent) 0.5f else 1f
-                nativeAddMesh(name, m.tris, m.edges, ((c shr 16) and 255) / 255f, ((c shr 8) and 255) / 255f, (c and 255) / 255f, alpha)
+                nativeAddMesh(name, mesh.key, mesh.bytesOf(0), mesh.bytesOf(1), mesh.faces, mesh.bytesOf(2), mesh.edges, m.matrix, ((c shr 16) and 255) / 255f, ((c shr 8) and 255) / 255f, (c and 255) / 255f, alpha)
             }
             val place = newDocAt >= 0 && ver > newDocAt
             nativeEndScene(place)

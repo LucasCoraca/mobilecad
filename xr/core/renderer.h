@@ -45,7 +45,7 @@ public:
      *  raised to `gammaOut` (2.2 for an sRGB target), alpha kept premultiplied, `holeUv` regions left transparent. */
     void drawImageInto(GLuint dst, int w, int h, GLuint src, bool external, float gammaOut, const std::vector<float>& holeUv);
     /** Forget GL objects of a previous context (they are gone with it): the next upload starts afresh. */
-    void contextLost() { uploaded = ~0u; uploadedScene = nullptr; buffers.clear(); arrays.clear(); }
+    void contextLost() { uploaded = ~0u; uploadedScene = nullptr; for (auto& u : ups) if (auto g = u.g.lock()) g->vao = g->vbo = g->ibo = g->evao = g->evbo = 0; ups.clear(); }
     float clear[3] = {0.11f, 0.13f, 0.16f};
     bool seeThrough = false;            // passthrough: clear to transparent, so the camera view shows where nothing is drawn
     /** Parts of the image drawPanel leaves out (up to 4, x0 y0 x1 y1 in 0..1, y down): shown elsewhere. */
@@ -60,7 +60,9 @@ private:
     unsigned uploaded = ~0u; const Scene* uploadedScene = nullptr;
     GLuint maskFbo = 0, maskTex = 0; int maskW = 0, maskH = 0;
     GLuint copyFbo = 0; int copyW = 0, copyH = 0;
-    std::vector<GLuint> buffers, arrays;                    // owned by the last upload
+    /** GL objects of the meshes uploaded (a mesh shared by several objects, or kept from the last scene, is uploaded once) */
+    struct Up { std::weak_ptr<Geom> g; GLuint arrays[2]; GLuint buffers[3]; };
+    std::vector<Up> ups;
 };
 
 }  // namespace mcxr
