@@ -24,6 +24,13 @@ class RenderObj(val name: String, val part: FcPart, val isSketch: Boolean, val g
     val min get() = part.min
     val max get() = part.max
     val model: FloatArray = part.matrix ?: FloatArray(16).also { android.opengl.Matrix.setIdentityM(it, 0) }
+    /** Its size on screen in the frame being drawn (Renderer). */
+    var px = Float.MAX_VALUE
+    /** Bounding sphere (centre, radius) in world coordinates; radius < 0: unknown (always drawn). */
+    val sphere: FloatArray = part.min.let { a -> val b = part.max
+        if (a[0] > b[0]) floatArrayOf(0f, 0f, 0f, -1f)
+        else floatArrayOf((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2,
+            0.5f * kotlin.math.sqrt((b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1]) + (b[2] - a[2]) * (b[2] - a[2]))) }
 }
 
 class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
@@ -143,7 +150,21 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         texIds.clear(); gpu.clear(); gpuObjs = null; scratch.fill(0)      // a new context: the old one's buffers are gone
     }
     override fun onSurfaceChanged(gl: GL10?, w: Int, h: Int) { GLES20.glViewport(0, 0, w, h); cam.w = w; cam.h = h; vw = w; vh = h }
-    private fun col(c: Int, a: Float = 1f) = floatArrayOf(Color.red(c) / 255f, Color.green(c) / 255f, Color.blue(c) / 255f, a)
+    private val colBuf = FloatArray(4)
+    private fun col(c: Int, a: Float = 1f) = colBuf.also { it[0] = Color.red(c) / 255f; it[1] = Color.green(c) / 255f; it[2] = Color.blue(c) / 255f; it[3] = a }
+
+    // While the view moves (a gesture, an animation), parts smaller on screen than a few pixels and the edges of parts
+    // smaller than a thumb are left out, so a model of thousands of parts still turns smoothly; once the view rests
+    // for a moment, it is drawn again in full.
+    private val lastVp = FloatArray(16); private var lastMove = 0L
+    private val main = android.os.Handler(android.os.Looper.getMainLooper())
+    private val settle = Runnable { requestRender() }
+    /** Radius on screen, in pixels, of [o]'s bounding sphere (infinite when unknown or around the eye). */
+    private fun pixels(o: RenderObj, vp: FloatArray, sy: Float): Float {
+        val c = o.sphere; if (c[3] < 0f) return Float.MAX_VALUE
+        val w = vp[3] * c[0] + vp[7] * c[1] + vp[11] * c[2] + vp[15]
+        return if (w <= 1e-6f) Float.MAX_VALUE else c[3] * sy / w * vh / 2
+    }
 
     override fun onDrawFrame(gl: GL10?) {
         if (dark) GLES20.glClearColor(0.094f, 0.106f, 0.122f, 1f) else GLES20.glClearColor(1f, 1f, 1f, 1f)
@@ -162,7 +183,15 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         // objects with a face / edge drawn again (selected, preselected, coloured): only those walk their faces
         val faceMarked = HashSet<String>().apply { selF.forEach { add(it.first) }; hov?.let { add(it.first) }; fcs.keys.forEach { add(it.first) } }
         val edgeMarked = HashSet<String>().apply { selE.forEach { add(it.first) }; hov?.let { add(it.first) } }
-        val pl = frustum(vp); val shown = os.filter { visible(it, pl) }
+        val now = android.os.SystemClock.uptimeMillis()
+        if (!vp.contentEquals(lastVp)) { vp.copyInto(lastVp); lastMove = now }
+        val moving = now - lastMove < 200 && os.size > 200
+        if (moving) { main.removeCallbacks(settle); main.postDelayed(settle, 220) }
+        val sy = kotlin.math.sqrt(vp[1] * vp[1] + vp[5] * vp[5] + vp[9] * vp[9])
+        val minFace = if (moving) 2f else 0.5f; val minEdge = if (moving) 40f else 2f
+        val pl = frustum(vp)
+        val shown = os.filter { visible(it, pl) && pixels(it, vp, sy).also { p -> it.px = p }.let { p -> p >= minFace || it.name in selO } }
+        fun edgesOf(o: RenderObj) = o.isSketch || o.name in selO || o.ref in edgeMarked || o.px >= minEdge
         var pending = false
         val faces = style != "Wireframe" && style != "Points"
         val edgesOn = style != "Shaded" && style != "Points"
@@ -212,7 +241,7 @@ class Renderer(private val cam: Camera) : GLSurfaceView.Renderer {
         GLES20.glDisableVertexAttribArray(aNrm); GLES20.glVertexAttrib3f(aNrm, 0f, 0f, 1f)
         GLES20.glDisable(GLES20.GL_POLYGON_OFFSET_FILL); GLES20.glUniform1f(uLit, 0f)
         for (o in shown) {
-            val m = o.mesh; if (!m.hasEdges) continue
+            val m = o.mesh; if (!m.hasEdges || (m.hasTris && !edgesOf(o))) continue
             val g = gpuOf(m); if (g == null) { pending = true; continue }
             GLES20.glUniformMatrix4fv(uModel, 1, false, o.model, 0)
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, g.lbo); GLES20.glVertexAttribPointer(aPos, 3, GLES20.GL_FLOAT, false, 12, 0)

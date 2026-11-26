@@ -1,0 +1,5 @@
+• Parts of imported assemblies are in their right places: the placement of the assembly containers (App::Part) holding them is applied, as on the desktop. Before, most parts of a STEP assembly were drawn out of place.
+• Large models are prepared for display many times faster: the shapes are meshed natively and in parallel with desktop FreeCAD's display settings, instead of face by face in Python. A 10,000-part STEP assembly took about 2½ minutes instead of 16 on a test device.
+• Meshes are as fine as desktop FreeCAD's, not finer: large models use a fraction of the memory and turn faster.
+• A large model appears while it is being drawn, not only at the end.
+• While the view moves, parts only a few pixels big and the edges of small parts are left out; everything is drawn again when the view rests.

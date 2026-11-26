@@ -452,8 +452,14 @@ class AppState(private val ctx: Context) {
         val cache = HashMap<String, FcMesh>(); val old = meshCache
         val am = ctx.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager; val mi = android.app.ActivityManager.MemoryInfo()
         val report = shown.size >= 200; val opening = busy
+        var shownAt = System.currentTimeMillis()
         for ((k, o) in shown.withIndex()) {
             if (report && k % 50 == 0) busy = tr("Drawing the model: %1 of %2 parts", k, shown.size)
+            // the engine meshes the next parts at once, in parallel (then each is only packed)
+            if (k % 256 == 0) runCatching { call("tess_prepare", mapOf("names" to shown.subList(k, minOf(k + 256, shown.size)).map { gh[it.name] ?: it.name })) }
+            // a large model appears as it is drawn, not only once all of it is ready
+            if (report && System.currentTimeMillis() - shownAt > 3000) { shownAt = System.currentTimeMillis(); val part = LinkedHashMap(m)
+                scope.launch { if (busy != null) { meshes = part; sceneVersion.intValue++ } } }
             if (rt.maxMemory() - (rt.totalMemory() - rt.freeMemory()) < 32L shl 20) break
             if (k % 16 == 0) { am.getMemoryInfo(mi); if (mi.lowMemory || mi.availMem < mi.threshold + mi.totalMem / 6) break }   // (a call to the system: not per part)
             // a shape the engine sent before comes back as its key: found in this refresh's meshes, or in the last one's

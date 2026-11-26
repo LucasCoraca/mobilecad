@@ -614,7 +614,7 @@ def run(script, args=None):
     return scope.get('result')
 
 # ------------------------------------------------------------------ geometry for the viewport
-import array, struct
+import array, struct, ctypes
 def _shape(o):
     import Part
     try:
@@ -663,7 +663,7 @@ def _runs(ids, per):
     st = np.flatnonzero(np.r_[True, ids[1:] != ids[:-1]]); en = np.r_[st[1:], len(ids)]
     return np.stack([ids[st], st * per, (en - st) * per], axis=1).astype(np.int32)
 
-def _encode(key, mat, ref, V=None, I=None, F=None, L=None, E=None, P=None, C=None):
+def _encode(key, mat, ref, V=None, I=None, F=None, L=None, E=None, P=None, C=None, body=None):
     """tessellate's bytes, little endian: b'MCM2', flags (1 = same mesh as [key] sent before: no body), key (int32 length,
     utf-8, padded to 4), the placement (16 float32, column major: world = M * local), then the sections, each [int32
     count][items]: vertices (x y z nx ny nz), triangle indices (uint32), faces (id first count), edge points (x y z, in
@@ -672,7 +672,9 @@ def _encode(key, mat, ref, V=None, I=None, F=None, L=None, E=None, P=None, C=Non
     import numpy as np
     kb = key.encode(); kb += b'\0' * (-len(kb) % 4)
     out = [b'MCM2', struct.pack('<ii', 1 if ref else 0, len(key.encode())), kb, np.asarray(mat, dtype=np.float32).tobytes()]
-    if not ref:
+    if body is not None:      # the native mesher's sections (all but the colours)
+        out += [body, struct.pack('<i', 0)]
+    elif not ref:
         for a, dt in ((V, np.float32), (I, np.uint32), (F, np.int32), (L, np.float32), (E, np.int32), (P, np.float32), (C, np.float32)):
             a = np.zeros(0, dt) if a is None else np.asarray(a, dtype=dt).reshape(-1)
             out += [struct.pack('<i', a.size), a.tobytes()]
@@ -688,9 +690,16 @@ _tess_bucket = {}        # shape type, orientation, face / edge counts, toleranc
 _tess_count = [0]
 
 def _tess_key(s, tol):
-    """(key, sent before) for shape [s]: shapes sharing their geometry (TopoDS TShape: isPartner) share the key.  OCC's
-    hash code includes the location, so shapes are bucketed by their face count and compared with isPartner (not
-    countElement: it counts FreeCAD's element names, which differ between copies)."""
+    """(key, sent before) for shape [s]: shapes sharing their geometry (TopoDS TShape: isPartner) share the key.  The
+    native mesher gives the TShape itself; else OCC's hash code includes the location, so shapes are bucketed by their
+    face count and compared with isPartner (not countElement: it counts FreeCAD's element names, which differ between
+    copies)."""
+    nat = _native()
+    if nat is not None:
+        o = ctypes.c_int(0); t = nat.mc_tshape(id(s), ctypes.byref(o))
+        if t:
+            k = 'T%x:%d:%g' % (t, o.value, tol)
+            return k, k in _tess_sent
     b = '%s:%s:%d:%g' % (s.ShapeType, s.Orientation, len(s.Faces), tol)
     for k in _tess_bucket.get(b, ()):
         if _tess_sent[k].isPartner(s): return k, True
@@ -703,6 +712,74 @@ def _tess_forget(k):
     if ks and k in ks:
         ks.remove(k)
         if not ks: del _tess_bucket[b]
+
+# The native mesher (app/app/src/main/cpp/mcmesh.cpp, libmcmesh.so in the app's native libraries): meshes shapes in
+# parallel and packs the mesh without a Python object per node, as desktop's view provider does.  None where it is
+# missing or does not see the shapes FreeCAD sees (then the Python path below is used).
+_nat = [False]
+_TOPABS = ('Compound', 'CompSolid', 'Solid', 'Shell', 'Face', 'Wire', 'Edge', 'Vertex')
+def _native():
+    if _nat[0] is not False: return _nat[0]
+    _nat[0] = None
+    try:
+        import os, Part
+        path = os.path.join(os.environ.get('FC_NATIVE_LIB_DIR', ''), 'libmcmesh.so')
+        if not os.path.exists(path): return None
+        lib = ctypes.CDLL(path)
+        lib.mc_check.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int)]; lib.mc_check.restype = ctypes.c_int
+        lib.mc_tshape.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_int)]; lib.mc_tshape.restype = ctypes.c_size_t
+        lib.mc_mesh.argtypes = [ctypes.POINTER(ctypes.c_void_p), ctypes.c_int, ctypes.c_double, ctypes.c_int]; lib.mc_mesh.restype = None
+        lib.mc_pack.argtypes = [ctypes.c_void_p, ctypes.c_double, ctypes.POINTER(ctypes.c_int64)]; lib.mc_pack.restype = ctypes.c_void_p
+        lib.mc_free.argtypes = [ctypes.c_void_p]; lib.mc_free.restype = None
+        # the layout it assumes (FreeCAD's Python shape -> TopoShape -> TopoDS_Shape) must show these shapes as FreeCAD does
+        for t in (Part.makeBox(1, 2, 3), Part.makeCylinder(1, 2).Faces[0], Part.Compound([Part.makeBox(1, 1, 1), Part.makeSphere(1)])):
+            n = ctypes.c_int(-1)
+            if lib.mc_check(id(t), ctypes.byref(n)) != _TOPABS.index(t.ShapeType) or n.value != len(t.Faces): return None
+        _nat[0] = lib
+    except Exception:
+        _nat[0] = None
+    return _nat[0]
+
+_prep = {}      # name -> its shape, from the last tess_prepare
+@op
+def tess_prepare(names, tol=0.05):
+    """Meshes the shapes of objects [names] not sent yet, natively and in parallel (the app then asks for each
+    object's mesh: tessellate)."""
+    _prep.clear()
+    nat = _native()
+    if nat is None: return 0
+    import os
+    todo = {}
+    for n in names:
+        o = _doc().getObject(n)
+        if o is None or not _plain_shape(o): continue
+        try: s = _shape(o)
+        except Exception: continue
+        if s.isNull(): continue
+        _prep[n] = s
+        k, sent = _tess_key(s, tol)
+        if not sent and k not in todo: todo[k] = s
+    if todo:
+        arr = (ctypes.c_void_p * len(todo))(*[id(s) for s in todo.values()])
+        nat.mc_mesh(arr, len(todo), tol, max(1, os.cpu_count() or 1))
+    return len(todo)
+
+def _plain_shape(o):
+    """Objects tessellate draws from their Part shape (not meshes, FEM, paths ...)."""
+    t = o.TypeId
+    return not (t == 'Inspection::Feature' or t.startswith('Robot::') or o.isDerivedFrom('Fem::FemResultObject') or o.isDerivedFrom('Fem::FemPostObject')
+                or o.isDerivedFrom('Mesh::Feature') or o.isDerivedFrom('Points::Feature') or o.isDerivedFrom('Fem::FemMeshObject') or o.isDerivedFrom('Path::Feature'))
+
+def _group_matrix(o):
+    """Placement of the groups holding [o] (App::Part, Body ...: GeoFeatureGroupExtension), which desktop applies to
+    their children in the 3D view: the object's shape is in its group's coordinates."""
+    try:
+        g = o.getParentGeoFeatureGroup()
+        if g is not None:
+            pl = g.getGlobalPlacement()
+            if not pl.isIdentity(): return pl.toMatrix()
+    except Exception: pass
+    return None
 
 @op
 def tess_keep(keys):
@@ -804,14 +881,25 @@ def tessellate(name, tol=0.05):
                 a2, b2 = pl.multVec(a), pl.multVec(b); edges.extend((a2.x, a2.y, a2.z, b2.x, b2.y, b2.z, ci))
             pos = end
     else:
-        s = _shape(o)
+        s = _prep.pop(o.Name, None)
+        if s is None: s = _shape(o)
+    G = _group_matrix(o)
     if s is not None and not s.isNull():
         import Part, numpy as np
         # the shape's own geometry (its location stripped) is triangulated once and shared by every object showing it
-        ls = Part.Shape(s); ls.Placement = App.Placement()
-        m = s.Matrix.A; mat = [m[r * 4 + c] for c in range(4) for r in range(4)]
+        M = s.Matrix if G is None else G.multiply(s.Matrix)
+        m = M.A; mat = [m[r * 4 + c] for c in range(4) for r in range(4)]
         key, sent = _tess_key(s, tol)
         if sent: return _encode(key, mat, True)
+        nat = _native()
+        if nat is not None:
+            n = ctypes.c_int64(0); ptr = nat.mc_pack(id(s), tol, ctypes.byref(n))
+            if ptr:
+                try: body = ctypes.string_at(ptr, n.value)
+                finally: nat.mc_free(ptr)
+                _tess_sent[key] = s
+                return _encode(key, mat, False, body=body)
+        ls = Part.Shape(s); ls.Placement = App.Placement()
         # desktop's deflection (Part::Tools::getDeflection with the default MeshDeviation 0.2), not finer than [tol]
         bb = ls.BoundBox; t = max(tol, (bb.XLength + bb.YLength + bb.ZLength) / 300.0 * 0.2) if bb.isValid() else tol
         V, I, F, L, E = _pack_shape(ls, t)
@@ -821,7 +909,8 @@ def tessellate(name, tol=0.05):
     # other objects (meshes, results, paths ...): world coordinates, one vertex per triangle corner
     import numpy as np
     T = np.frombuffer(tris.tobytes(), dtype=np.float32).reshape(-1, 7); S = np.frombuffer(edges.tobytes(), dtype=np.float32).reshape(-1, 7)
-    return _encode('', _IDENT, False, T[:, 0:6], np.arange(len(T), dtype=np.uint32), _runs(T[:, 6][::3], 3),
+    gm = _IDENT if G is None else [G.A[r * 4 + c] for c in range(4) for r in range(4)]
+    return _encode('', gm, False, T[:, 0:6], np.arange(len(T), dtype=np.uint32), _runs(T[:, 6][::3], 3),
                    S[:, 0:6], _runs(S[:, 6], 2), np.frombuffer(verts.tobytes(), dtype=np.float32), np.frombuffer(cols.tobytes(), dtype=np.float32))
 
 
