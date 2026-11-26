@@ -1,0 +1,2 @@
+• Large models open again within seconds: the 3D view of a model of hundreds of parts or more is kept for its file, so opening or importing that file again (or reopening it after a restart) shows the model at once, ready to turn and zoom, while FreeCAD reads the file in the background. The parts tree and the tools follow when the file is read.
+• The first opening of a large file is faster too: the list of the document's objects is built in one pass.

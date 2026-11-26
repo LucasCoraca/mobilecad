@@ -355,6 +355,7 @@ class AppState(private val ctx: Context) {
                     tmp.renameTo(recoveryFile); recoveryMeta.writeText(meta.toString())
                 }
                 autosavedSig = sig
+                cacheView(recoveryFile)       // a large model reopened after a restart shows at once
             } catch (e: Throwable) { Log.w("AppState", "autosave", e) } finally { autosaving = false }
         }
     }
@@ -437,6 +438,7 @@ class AppState(private val ctx: Context) {
     fun refresh(after: () -> Unit = {}) = eng({
         val t0 = System.currentTimeMillis()
         val objs = objects()
+        val tObjs = System.currentTimeMillis() - t0; var tPrep = 0L; var tTess = 0L; var tMem = 0L
         val byName = objs.associateBy { it.name }
         val hiddenBodies = objs.filter { it.type == "PartDesign::Body" && !it.visible }.flatMap { it.group }.toHashSet()
         val shown = objs.filter { (it.hasShape || it.invalid) && it.visible && displayable(it, byName, hiddenBodies) }   // a failed feature has no shape, but shows its ghost
@@ -456,14 +458,17 @@ class AppState(private val ctx: Context) {
         for ((k, o) in shown.withIndex()) {
             if (report && k % 50 == 0) busy = tr("Drawing the model: %1 of %2 parts", k, shown.size)
             // the engine meshes the next parts at once, in parallel (then each is only packed)
+            if (k % 256 == 0) tPrep -= System.currentTimeMillis()
             if (k % 256 == 0) runCatching { call("tess_prepare", mapOf("names" to shown.subList(k, minOf(k + 256, shown.size)).map { gh[it.name] ?: it.name })) }
             // a large model appears as it is drawn, not only once all of it is ready
             if (report && System.currentTimeMillis() - shownAt > 3000) { shownAt = System.currentTimeMillis(); val part = LinkedHashMap(m)
-                scope.launch { if (busy != null) { meshes = part; sceneVersion.intValue++ } } }
+                scope.launch { if (busy != null && !cacheShown) { meshes = part; sceneVersion.intValue++ } } }
+            if (k % 256 == 0) tPrep += System.currentTimeMillis()
             if (rt.maxMemory() - (rt.totalMemory() - rt.freeMemory()) < 32L shl 20) break
-            if (k % 16 == 0) { am.getMemoryInfo(mi); if (mi.lowMemory || mi.availMem < mi.threshold + mi.totalMem / 6) break }   // (a call to the system: not per part)
+            if (k % 16 == 0) { tMem -= System.currentTimeMillis(); am.getMemoryInfo(mi); tMem += System.currentTimeMillis(); if (mi.lowMemory || mi.availMem < mi.threshold + mi.totalMem / 6) break }   // (a call to the system: not per part)
             // a shape the engine sent before comes back as its key: found in this refresh's meshes, or in the last one's
-            try { m[o.name] = tessellate(gh[o.name] ?: o.name, cache, old) } catch (e: OutOfMemoryError) { break }
+            tTess -= System.currentTimeMillis()
+            try { m[o.name] = tessellate(gh[o.name] ?: o.name, cache, old) } catch (e: OutOfMemoryError) { break } finally { tTess += System.currentTimeMillis() }
         }
         meshCache = cache
         runCatching { call("tess_keep", mapOf("keys" to cache.keys.toList())) }
@@ -473,10 +478,12 @@ class AppState(private val ctx: Context) {
         if (m.size < shown.size) message = tr("Not enough memory to show the whole model: %1 of %2 parts shown", m.size, shown.size)
         val hist = undoState()
         val ann = if (objs.any { it.type == "App::FeaturePython" || it.type == "App::AnnotationLabel" }) call("annotations") as? org.json.JSONObject else null
-        Log.i("AppState", "refresh: ${objs.size} objects, ${m.size}/${shown.size} drawn, ${cache.size} meshes ${cache.values.sumOf { it.bytes } shr 20} MB, ${System.currentTimeMillis() - t0} ms")
+        Log.i("AppState", "refresh: ${objs.size} objects, ${m.size}/${shown.size} drawn, ${cache.size} meshes ${cache.values.sumOf { it.bytes } shr 20} MB, ${System.currentTimeMillis() - t0} ms (objects $tObjs, prepare $tPrep, tessellate $tTess, memory $tMem)")
         Triple(objs, m to gh, hist) to ann
     }) { (t, ann) -> val (objs, mg, ur) = t; val (m, gh) = mg
         objects.clear(); objects.addAll(objs); byName = objs.associateBy { it.name }; ghosts = gh; meshes = m
+        cacheShown = false
+        if (m.size >= ViewCache.MIN_PARTS) cacheFp?.let { fp -> cacheFp = null; scope.launch(Dispatchers.IO) { ViewCache.write(ctx, fp, m) } }
         annotations = ann?.let { j -> j.keys().asSequence().associateWith { k -> val o = j.getJSONObject(k)
             val ls = o.getJSONArray("lines"); val seg = FloatArray(ls.length() * 6) { i -> ls.getJSONArray(i / 6).getJSONArray(i % 6 / 3).getDouble(i % 3).toFloat() }
             val ts = o.getJSONArray("texts"); seg to List(ts.length()) { i -> ts.getJSONArray(i).let { tx -> val p = tx.getJSONArray(0)
@@ -562,13 +569,32 @@ class AppState(private val ctx: Context) {
     }) { h -> setHistory(h); refresh() }
 
     /** Std_Import / Part_Import: the file's contents go into the open document, as one undoable step. */
-    fun importFile(f: java.io.File) { busy = tr("Importing %1…", f.name); step("Import ${f.name}", { call("import_file", mapOf("path" to f.absolutePath)) }) { busy = null } }
+    fun importFile(f: java.io.File) { busy = tr("Importing %1…", f.name)
+        if (objects.isEmpty()) showCached(f)       // into an empty document: the file's model as last drawn, at once
+        step("Import ${f.name}", { call("import_file", mapOf("path" to f.absolutePath)) }) { busy = null } }
+
+    // A large model's view is kept per file (ViewCache): opening the file again shows it while FreeCAD reads the file.
+    /** the file whose view is written after the next refresh that draws a large model */
+    @Volatile private var cacheFp: String? = null
+    /** the view on screen is a cached one (the document is still being read) */
+    private var cacheShown = false
+    private fun showCached(f: java.io.File) = scope.launch {
+        val t0 = System.currentTimeMillis()
+        val parts = withContext(Dispatchers.IO) { ViewCache.fingerprint(f)?.let { fp -> cacheFp = fp; ViewCache.read(ctx, fp) } }
+        Log.i("ViewCache", "${f.name}: ${parts?.size ?: "no"} cached parts, ${System.currentTimeMillis() - t0} ms")
+        if (parts == null || busy == null) return@launch      // none, or the file is read already
+        cacheShown = true; ghosts = emptyMap(); meshes = parts; viewport?.refitOnNextSync(); sceneVersion.intValue++
+    }
+    /** After saving a large model to [f]: its view is kept for that file too. */
+    fun cacheView(f: java.io.File) { val m = meshes; if (m.size < ViewCache.MIN_PARTS) return
+        scope.launch(Dispatchers.IO) { ViewCache.fingerprint(f)?.let { ViewCache.write(ctx, it, m) } } }
 
     fun save(path: String) = eng({ saveDocument(path) }) { message = tr("Saved %1", it) }
     /** Opens a document with the look the desktop saved for it (GuiDocument.xml: colours, transparency, per-face colours,
      *  what is hidden) and frames it.  Nothing of the previous document's look is kept. */
     fun open(path: String, recovered: Boolean = false, done: () -> Unit = {}): kotlinx.coroutines.Job { closeTools()
         busy = tr("Opening %1…", java.io.File(path).name)
+        if (path.lowercase().endsWith(".fcstd")) showCached(java.io.File(path))
         return eng({ val n = openDocument(path); n to call("view_data") as org.json.JSONObject? }) { (n, vd) ->
         docName = n; selection.clear()
         colors.clear(); transparent.clear(); faceColors.clear(); textures.clear()
@@ -578,7 +604,7 @@ class AppState(private val ctx: Context) {
         vd?.optJSONObject("faces")?.let { f -> f.keys().forEach { k -> val a = f.getJSONArray(k)
             for (i in 0 until a.length()) a.getJSONArray(i).let { c -> faceColors[k to i + 1] = (Math.round(c.getDouble(0) * 255).toInt() shl 16) or
                 (Math.round(c.getDouble(1) * 255).toInt() shl 8) or Math.round(c.getDouble(2) * 255).toInt() } } }
-        viewport?.refitOnNextSync()
+        if (!cacheShown) viewport?.refitOnNextSync()
         // open on the tab that shows the document: Assembly when it has one, Part otherwise
         refresh { val asm = objects.any { it.type == "Assembly::AssemblyObject" }
             if (asm && !inAssembly) switchWorkspace("Assembly") else if (!asm && workspace.id != "partstudio" && workspace.id in setOf("Assembly", "TechDraw", "Spreadsheet")) switchWorkspace("partstudio")

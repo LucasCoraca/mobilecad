@@ -46,7 +46,9 @@ class FcProperty(val name: String, val type: String, val group: String, val doc:
 class FcMesh(val key: String, val vtx: FloatBuffer, val idx: IntBuffer, val faces: IntArray, val lines: FloatBuffer,
              val edges: IntArray, val points: FloatBuffer, val colors: FloatBuffer?,
              /** the same sections as bytes, for OpenGL (its Java binding misplaces float views of a sliced native buffer) */
-             val raw: Array<ByteBuffer> = emptyArray()) {
+             val raw: Array<ByteBuffer> = emptyArray(),
+             /** its bounds (min xyz, max xyz) when known (a cached view), else found from its points */
+             bounds: FloatArray? = null) {
     /** bytes of section [i] (0 vtx, 1 idx, 2 lines, 3 points, 4 colors) for glBufferData / glVertexAttribPointer */
     fun bytesOf(i: Int): ByteBuffer? = raw.getOrNull(i)?.also { it.position(0) }
     val vertCount get() = vtx.capacity() / 6
@@ -64,11 +66,11 @@ class FcMesh(val key: String, val vtx: FloatBuffer, val idx: IntBuffer, val face
         var i = 0; while (i + 2 < t.size) { out.getOrPut(t[i]) { ArrayList(1) }.add(intArrayOf(t[i + 1], t[i + 2])); i += 3 }; return out }
     /** bounds in the mesh's own coordinates */
     val min = FloatArray(3) { Float.MAX_VALUE }; val max = FloatArray(3) { -Float.MAX_VALUE }
-    init {
+    init { if (bounds != null) { bounds.copyInto(min, 0, 0, 3); bounds.copyInto(max, 0, 3, 6) } else {
         fun add(b: FloatBuffer, stride: Int) { var i = 0; val n = b.capacity()
             while (i + 2 < n) { for (k in 0..2) { val v = b.get(i + k); if (v.isFinite()) { if (v < min[k]) min[k] = v; if (v > max[k]) max[k] = v } }; i += stride } }
         add(vtx, 6); add(lines, 3); add(points, 4)
-    }
+    } }
 }
 
 /** An object's mesh at its placement ([matrix]: column major, world = matrix * mesh coordinates; null = identity). */

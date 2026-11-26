@@ -216,7 +216,9 @@ def _failed_dependency(o):
 def _assembly_of(o):
     """The assembly containing o through its group chain (GroupExtension::getGroupOfObject), or None. Links don't count:
     a body linked into an assembly as a component stays a part of the document, like on the desktop."""
+    par = _parents[0]
     def parent(o):   # the group holding o, or the Part / Body whose Origin it is
+        if par is not None: return par.get(o.Name)
         return next((p for p in o.InList if p.TypeId != 'App::Link' and p.hasExtension('App::GroupExtension')
                      and (o in p.Group or getattr(p, 'Origin', None) == o)), None)
     seen = {o.Name}; o = parent(o)
@@ -337,9 +339,18 @@ def _has_shape(o):
     if o.TypeId.startswith('Robot::') and hasattr(o, 'Trajectory'): return len(o.Trajectory.Waypoints) > 0
     return hasattr(o, 'Shape') and not o.Shape.isNull()
 
+_parents = [None]    # during objects(): object name -> the group holding it (a large assembly: one pass, not one per object)
 @op
 def objects():
-    return [_obj_info(o) for o in _doc().Objects]
+    par = {}
+    for p in _doc().Objects:
+        if p.TypeId != 'App::Link' and p.hasExtension('App::GroupExtension'):
+            for c in p.Group: par.setdefault(c.Name, p)
+            og = getattr(p, 'Origin', None)
+            if og is not None: par.setdefault(og.Name, p)
+    _parents[0] = par
+    try: return [_obj_info(o) for o in _doc().Objects]
+    finally: _parents[0] = None
 
 # ------------------------------------------------------------------ properties (drive the feature dialog)
 def _prop_value(o, p):

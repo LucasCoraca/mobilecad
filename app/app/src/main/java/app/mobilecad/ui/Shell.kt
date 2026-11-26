@@ -118,7 +118,7 @@ fun Shell(app: AppState) {
     fun cacheFile(uri: Uri, fallback: String) = File(ctx.cacheDir, displayName(ctx, uri) ?: fallback)
     fun writeBack(uri: Uri, f: File) { ctx.contentResolver.openOutputStream(uri, "wt")?.use { o -> f.inputStream().use { it.copyTo(o) } } }
     fun saveTo(uri: Uri) { val f = cacheFile(uri, "${app.docName}.FCStd")
-        app.eng({ saveDocument(f.absolutePath) }) { writeBack(uri, f); app.docUri = uri.toString(); app.docName = f.nameWithoutExtension; app.message = tr("Saved %1", f.name); app.markSaved() } }   // saveAs names the document after its file
+        app.eng({ saveDocument(f.absolutePath) }) { writeBack(uri, f); app.cacheView(f); app.docUri = uri.toString(); app.docName = f.nameWithoutExtension; app.message = tr("Saved %1", f.name); app.markSaved() } }   // saveAs names the document after its file
     val pickFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         val r = pending ?: return@rememberLauncherForActivityResult; pending = null
         if (uri == null) { if (r.kind == "panelopen") GuiCommands.panelFile(app, null); return@rememberLauncherForActivityResult }
